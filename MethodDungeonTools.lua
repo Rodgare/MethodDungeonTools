@@ -1,17 +1,51 @@
-local meta = getmetatable(UIParentCreateTexture and UIParent:CreateTexture() or WorldFrame:CreateTexture())
-if meta and not meta.__index.SetColorTexture then
-    meta.__index.SetColorTexture = function(self, r, g, b, a)
+local addonName, MethodDungeonTools = ...
+_G["MethodDungeonTools"] = MethodDungeonTools
+
+-- Initialize core tables early for dungeon data files
+MethodDungeonTools.dungeonEnemies = {}
+MethodDungeonTools.dungeonBosses = {}
+MethodDungeonTools.dungeonTotalCount = {}
+MethodDungeonTools.dungeonMaps = {}
+MethodDungeonTools.dungeonSubLevels = {}
+
+-- Polyfill for SetColorTexture
+local textureTestFrame = CreateFrame("Frame")
+local textureTest = textureTestFrame:CreateTexture()
+local textureMeta = getmetatable(textureTest)
+if textureMeta and textureMeta.__index and not textureMeta.__index.SetColorTexture then
+    textureMeta.__index.SetColorTexture = function(self, r, g, b, a)
         return self:SetTexture(r, g, b, a)
     end
 end
 
-local _, MethodDungeonTools = ...
+-- Polyfill for MouseIsOver
+if not MouseIsOver then
+    function MouseIsOver(frame)
+        if not frame then return false end
+        return frame:IsMouseOver()
+    end
+end
 
+-- Polyfill for Encounter Journal (missing in 3.3.0)
+if not EJ_GetCreatureInfo then
+    function EJ_GetCreatureInfo()
+        return nil
+    end
+end
+
+-- Polyfill for C_Timer
+if not C_Timer then
+    C_Timer = {
+        After = function(duration, callback)
+            local AceTimer = LibStub and LibStub("AceTimer-3.0", true)
+            if AceTimer then
+                return AceTimer:ScheduleTimer(callback, duration)
+            end
+        end
+    }
+end
 
 local mainFrameStrata = "HIGH"
-
-_G["MethodDungeonTools"] = MethodDungeonTools
-
 local sizex = 840
 local sizey = 555
 local buttonTextFontSize = 12
@@ -19,8 +53,28 @@ local methodColor = "|cFFF49D38"
 
 local Dialog = LibStub("LibDialog-1.0")
 local dropDownLib,_ = LibStub("PhanxConfig-Dropdown")
-local HBD = LibStub("HereBeDragons-1.0")
+-- local HBD = LibStub("HereBeDragons-1.0")
 local AceGUI = LibStub("AceGUI-3.0")
+-- Polyfill for AceGUI EnableResize (missing in older AceGUI)
+local oldAceGUICreate = AceGUI.Create
+AceGUI.Create = function(self, ...)
+    local widget = oldAceGUICreate(self, ...)
+    if widget then
+        if not widget.EnableResize then
+            widget.EnableResize = function() end
+        end
+        if not widget.DisableButton then
+            widget.DisableButton = function() end
+        end
+        if not widget.SetFocus then
+            widget.SetFocus = function() end
+        end
+        if not widget.HighlightText then
+            widget.HighlightText = function() end
+        end
+    end
+    return widget
+end
 local db
 local icon = LibStub("LibDBIcon-1.0")
 local LDB = LibStub("LibDataBroker-1.1"):NewDataObject("MethodDungeonTools", {
@@ -219,7 +273,7 @@ local tooltip
 local tooltipLastShown
 local dungeonEnemyBlipMouseoverHighlight
 local dungeonEnemiesSelected = {}
-MethodDungeonTools.dungeonTotalCount = {}
+-- MethodDungeonTools.dungeonTotalCount = {} -- Initialized at the top now
 
 
 local dungeonList = {		
@@ -311,6 +365,7 @@ local dungeonSubLevels = {
 }
 
 
+-- MethodDungeonTools.dungeonMaps = { -- Initialized at the top now
 MethodDungeonTools.dungeonMaps = {
 	[1] = {
 		[0]= "BlackRookHoldDungeon",
@@ -396,8 +451,8 @@ MethodDungeonTools.dungeonMaps = {
 	},
 	
 }
-MethodDungeonTools.dungeonBosses = {}
-MethodDungeonTools.dungeonEnemies = {}
+-- MethodDungeonTools.dungeonBosses = {} -- Initialized at top
+-- MethodDungeonTools.dungeonEnemies = {} -- Initialized at top
 
 function MethodDungeonTools:ShowInterface()
 	if self.main_frame:IsShown() then
@@ -758,14 +813,19 @@ function MethodDungeonTools:MakeSidePanel(frame)
     frame.sidePanel.WidgetGroup.frame:SetFrameLevel(7)
 	
 	--progress bar
-	
-	
-	frame.sidePanel.ProgressBar = CreateFrame("Frame", nil, frame.sidePanel, "ScenarioTrackerProgressBarTemplate")
+	frame.sidePanel.ProgressBar = CreateFrame("Frame", nil, frame.sidePanel)
+	frame.sidePanel.ProgressBar:SetSize(200, 20)
+	frame.sidePanel.ProgressBar.Bar = CreateFrame("StatusBar", nil, frame.sidePanel.ProgressBar)
+	frame.sidePanel.ProgressBar.Bar:SetAllPoints()
+	frame.sidePanel.ProgressBar.Bar:SetStatusBarTexture("Interface\\TargetingFrame\\UI-StatusBar")
+	frame.sidePanel.ProgressBar.Bar.Label = frame.sidePanel.ProgressBar.Bar:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+	frame.sidePanel.ProgressBar.Bar.Label:SetPoint("CENTER")
+	frame.sidePanel.ProgressBar.Bar.Icon = frame.sidePanel.ProgressBar.Bar:CreateTexture() -- Dummy for icon calls
+	frame.sidePanel.ProgressBar.Bar.IconBG = frame.sidePanel.ProgressBar.Bar:CreateTexture() -- Dummy for icon calls
+
 	frame.sidePanel.ProgressBar:Show()
 	frame.sidePanel.ProgressBar:SetPoint("TOP",frame.sidePanel.WidgetGroup.frame,"BOTTOM",-10,5)
 	MethodDungeonTools:Progressbar_SetValue(frame.sidePanel.ProgressBar, 50,205,205)
-	frame.sidePanel.ProgressBar.Bar.Icon:Hide();
-	frame.sidePanel.ProgressBar.Bar.IconBG:Hide();
 	
 end
 
@@ -1040,7 +1100,12 @@ end
 ---UpdatePullTooltip
 ---Updates the tooltip which is being displayed when a pull is mouseovered
 function MethodDungeonTools:UpdatePullTooltip(tooltip)
+    if not tooltip then return end
     local frame = MethodDungeonTools.main_frame
+    if not (frame and frame.sidePanel and frame.sidePanel.pullButtonsScrollFrame) then
+        tooltip:Hide()
+        return
+    end
 	if not MouseIsOver(frame.sidePanel.pullButtonsScrollFrame.frame) then
         tooltip:Hide()
     elseif MouseIsOver(frame.sidePanel.newPullButton.frame) then
@@ -1241,7 +1306,12 @@ function MethodDungeonTools:MakeMapTexture(frame)
                 local id
                 local guid = UnitGUID("target")
                 if guid then
-                    id = select(6,strsplit("-", guid))
+                    if guid:find("-") then
+                        id = select(6,strsplit("-", guid))
+                    else
+                        -- hex GUID fallback for 3.3.0
+                        id = tonumber(guid:sub(-12, -9), 16)
+                    end
                 end
                 if id then
                     local newIdx = 1
@@ -1278,7 +1348,12 @@ function MethodDungeonTools:MakeMapTexture(frame)
                 local id
                 local guid = UnitGUID("target")
                 if guid then
-                    id = select(6,strsplit("-", guid))
+                    if guid:find("-") then
+                        id = select(6,strsplit("-", guid))
+                    else
+                        -- hex GUID fallback for 3.3.0
+                        id = tonumber(guid:sub(-12, -9), 16)
+                    end
                 end
                 if id then
                     local encounterID
@@ -1413,7 +1488,7 @@ function MethodDungeonTools:MakeMapTexture(frame)
 			
 			--handle mouseover on enemy blips
 			local mouseoverBlip 
-			if MouseIsOver(MethodDungeonToolsScrollFrame) then
+			if MouseIsOver(MethodDungeonToolsScrollFrame) and dungeonEnemyBlips then
 				for i=1,numDungeonEnemyBlips do
 					if MouseIsOver(dungeonEnemyBlips[i]) then
 						mouseoverBlip = i
@@ -1423,7 +1498,7 @@ function MethodDungeonTools:MakeMapTexture(frame)
 			end
 			local mouseOverBoss
 			--handle mouseover on bosses
-			if MouseIsOver(MethodDungeonToolsScrollFrame) then
+			if MouseIsOver(MethodDungeonToolsScrollFrame) and dungeonBossButtons then
 				for k,v in pairs(dungeonBossButtons) do
 					if MouseIsOver(v) then
 						mouseoverBlip = nil
@@ -1552,7 +1627,8 @@ function MethodDungeonTools:MakeMapTexture(frame)
 					dungeonEnemyBlipMouseoverHighlight:Hide()
 				end
 				--hide all patrol waypoints and facing indicators
-				for blipIdx,blip in pairs(dungeonEnemyBlips) do
+				if dungeonEnemyBlips then
+					for blipIdx,blip in pairs(dungeonEnemyBlips) do
 					if blip.patrol then
 						for patrolIdx,waypointBlip in ipairs(blip.patrol) do
 							waypointBlip:Hide()
@@ -1563,9 +1639,10 @@ function MethodDungeonTools:MakeMapTexture(frame)
 						end
 						if blip.patrolIndicator2 then
 							blip.patrolIndicator2:Hide()
-						end
 					end
-				end				
+					end
+				end	
+			end
 			end
 
 			--mouseover pull button
@@ -1590,10 +1667,9 @@ function MethodDungeonTools:MakeMapTexture(frame)
 
 
 
-            MethodDungeonTools:UpdatePullTooltip(MethodDungeonTools.pullTooltip)
-
-
-
+            if MethodDungeonTools.pullTooltip then
+                MethodDungeonTools:UpdatePullTooltip(MethodDungeonTools.pullTooltip)
+            end
         end)
 
 
@@ -1678,7 +1754,9 @@ function MethodDungeonTools:MakeDungeonBossButtons(frame)
 	if not dungeonBossButtons then
 		dungeonBossButtons = {}
 		for i=1,5 do
-			dungeonBossButtons[i] = CreateFrame("Button", "MethodDungeonToolsBossButton"..i, frame.mapPanelFrame, "EncounterMapButtonTemplate");
+			dungeonBossButtons[i] = CreateFrame("Button", "MethodDungeonToolsBossButton"..i, frame.mapPanelFrame);
+			dungeonBossButtons[i].bgImage = dungeonBossButtons[i]:CreateTexture(nil, "BACKGROUND")
+			dungeonBossButtons[i].bgImage:SetAllPoints()
 			dungeonBossButtons[i]:SetScript("OnClick",nil)
 			dungeonBossButtons[i]:SetSize(25,25)
 			dungeonBossButtons[i]:Hide()
@@ -2084,7 +2162,8 @@ function MethodDungeonTools:UpdateToDungeon(dungeonIdx,forceZone) --on open and 
     frame.DungeonSublevelSelectDropdown:SetList(dungeonSubLevels[db.currentDungeonIdx])
     frame.DungeonSublevelSelectDropdown:SetValue(dungeonSubLevels[db.currentDungeonIdx][1])
 
-	local zoneId = HBD:GetPlayerZone()
+    -- local zoneId = HBD:GetPlayerZone()
+    -- local zoneId = GetCurrentMapAreaID() -- 3.3.5 equivalent if needed
 	--local dungIdx = zoneIdToIdx[zoneId]
 	--if forceZone and dungIdx then db.currentDungeonIdx = dungIdx end TODO HERE
 	if not db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]].value.currentSublevel then db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]].value.currentSublevel=1 end
@@ -2876,7 +2955,13 @@ function initFrames()
 
 	--tooltip
     do
-        tooltip = CreateFrame("Frame", "MethodDungeonToolsModelTooltip", UIParent, "TooltipBorderedFrameTemplate")
+        tooltip = CreateFrame("Frame", "MethodDungeonToolsModelTooltip", UIParent)
+        tooltip:SetBackdrop({
+            bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
+            edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border",
+            tile = true, tileSize = 32, edgeSize = 32,
+            insets = { left = 11, right = 12, top = 12, bottom = 11 }
+        })
         tooltip:SetClampedToScreen(true)
         tooltip:SetFrameStrata("TOOLTIP")
         tooltip.mySizes ={x=250,y=110}
@@ -2894,13 +2979,13 @@ function initFrames()
                 if self.fac >= 360 then
                     self.fac = 0
                 end
-                self:SetFacing(PI*2 / 360 * self.fac)
+                self:SetFacing(math.pi*2 / 360 * self.fac)
 				--print(tooltip.Model:GetModelFileID())
             end)
 
         else
             tooltip.Model:SetPortraitZoom(1)
-            tooltip.Model:SetFacing(PI*2 / 360 * 2)
+            tooltip.Model:SetFacing(math.pi*2 / 360 * 2)
         end
 
 
@@ -2921,7 +3006,13 @@ function initFrames()
 
 	--pullTooltip
 	do
-		MethodDungeonTools.pullTooltip = CreateFrame("Frame", "MethodDungeonToolsPullTooltip", UIParent, "TooltipBorderedFrameTemplate")
+		MethodDungeonTools.pullTooltip = CreateFrame("Frame", "MethodDungeonToolsPullTooltip", UIParent)
+		MethodDungeonTools.pullTooltip:SetBackdrop({
+            bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
+            edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border",
+            tile = true, tileSize = 32, edgeSize = 32,
+            insets = { left = 11, right = 12, top = 12, bottom = 11 }
+        })
 		MethodDungeonTools.pullTooltip:SetClampedToScreen(true)
 		MethodDungeonTools.pullTooltip:SetFrameStrata("TOOLTIP")
         MethodDungeonTools.pullTooltip.myHeight = 160
@@ -2938,13 +3029,13 @@ function initFrames()
                 if self.fac >= 360 then
                     self.fac = 0
                 end
-                self:SetFacing(PI*2 / 360 * self.fac)
+                self:SetFacing(math.pi*2 / 360 * self.fac)
                 --print(tooltip.Model:GetModelFileID())
             end)
 
         else
             MethodDungeonTools.pullTooltip.Model:SetPortraitZoom(1)
-            MethodDungeonTools.pullTooltip.Model:SetFacing(PI*2 / 360 * 2)
+            MethodDungeonTools.pullTooltip.Model:SetFacing(math.pi*2 / 360 * 2)
         end
 
         MethodDungeonTools.pullTooltip.Model:SetSize(110,110)
