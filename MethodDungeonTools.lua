@@ -7,6 +7,9 @@ MethodDungeonTools.dungeonBosses = {}
 MethodDungeonTools.dungeonTotalCount = {}
 MethodDungeonTools.dungeonMaps = {}
 MethodDungeonTools.dungeonSubLevels = {}
+MethodDungeonTools.dungeonTotalCount[14] = {normal=100,teeming=100,teemingEnabled=false}
+MethodDungeonTools.dungeonBosses[14] = {}
+MethodDungeonTools.dungeonEnemies[14] = {}
 
 -- Polyfill for SetColorTexture
 local textureTestFrame = CreateFrame("Frame")
@@ -14,7 +17,9 @@ local textureTest = textureTestFrame:CreateTexture()
 local textureMeta = getmetatable(textureTest)
 if textureMeta and textureMeta.__index and not textureMeta.__index.SetColorTexture then
     textureMeta.__index.SetColorTexture = function(self, r, g, b, a)
-        return self:SetTexture(r, g, b, a)
+        self:SetTexture("Interface\\Buttons\\WHITE8X8")
+        self:SetVertexColor(r, g, b, a or 1)
+        return self
     end
 end
 
@@ -67,11 +72,40 @@ AceGUI.Create = function(self, ...)
             widget.DisableButton = function() end
         end
         if not widget.SetFocus then
-            widget.SetFocus = function() end
+            widget.SetFocus = function(self)
+                local f = self.editbox or self.frame
+                if f and f.SetFocus then f:SetFocus() end
+            end
         end
         if not widget.HighlightText then
-            widget.HighlightText = function() end
+            widget.HighlightText = function(self, ...)
+                local f = self.editbox or self.frame
+                if f and f.HighlightText then f:HighlightText(...) end
+            end
         end
+        if not widget.GetText then
+            widget.GetText = function(self)
+                local f = self.editbox or self.frame
+                if f and f.GetText then return f:GetText() end
+                return ""
+            end
+        end
+        if not widget.SetText then
+            widget.SetText = function(self, text)
+                local f = self.editbox or self.frame
+                if f and f.SetText then f:SetText(text) end
+            end
+        end
+        -- Add methods directly to the widget just in case
+        if widget.editbox then
+            widget.SetFocus = widget.SetFocus or function(self) self.editbox:SetFocus() end
+            widget.HighlightText = widget.HighlightText or function(self, ...) self.editbox:HighlightText(...) end
+            widget.GetText = widget.GetText or function(self) return self.editbox:GetText() end
+            widget.SetText = widget.SetText or function(self, text) self.editbox:SetText(text) end
+        end
+        -- Fallback for basic widgets
+        if not widget.GetText then widget.GetText = function() return "" end end
+        if not widget.SetText then widget.SetText = function() end end
     end
     return widget
 end
@@ -80,7 +114,7 @@ local icon = LibStub("LibDBIcon-1.0")
 local LDB = LibStub("LibDataBroker-1.1"):NewDataObject("MethodDungeonTools", {
 	type = "data source",
 	text = "Method Dungeon Tools",
-	icon = "Interface\\AddOns\\MethodDungeonTools\\Textures\\MethodMinimap",
+	icon = "Interface\\AddOns\\MethodDungeonTools\\Textures\\MethodMinimap.tga",
 	OnClick = function(button,buttonPressed)
 		if buttonPressed == "RightButton" then
 			if db.minimap.lock then
@@ -206,6 +240,10 @@ local defaultSavedVars = {
 				[1] = {text="Default",value={}},
 				[2] = {text="<New Preset>",value=0},
 			},
+			[14] = {
+				[1] = {text="Default",value={}},
+				[2] = {text="<New Preset>",value=0},
+			},
 		},
 		currentPreset = {
 			[1] = 1,
@@ -221,6 +259,7 @@ local defaultSavedVars = {
 			[11] = 1,
 			[12] = 1,
 			[13] = 1,
+			[14] = 1,
 		},
 	},
 }
@@ -290,6 +329,7 @@ local dungeonList = {
 		[11] = "Seat of the Triumvirate",
 		[12] = "The Arcway",
 		[13] = "Vault of the Wardens",
+		[14] = "Ahn'kahet: The Old Kingdom",
 }
 
 local dungeonSubLevels = {
@@ -357,11 +397,13 @@ local dungeonSubLevels = {
 		[1] = "The Arcway", 
 	},
 	[13] = {
-		[1] = "The Warden's Court", 
-		[2] = "Vault of the Wardens", 
-		[3] = "Vault of the Betrayer", 
+		[1] = "Vault of the Wardens",
+		[2] = "Vault of the Wardens",
+		[3] = "Vault of the Wardens",
 	},
-
+	[14] = {
+		[1] = "Ahn'kahet: The Old Kingdom",
+	},
 }
 
 
@@ -395,14 +437,14 @@ MethodDungeonTools.dungeonMaps = {
 		[1] = "DarkheartThicket",
 	},
 	[5] = {
-		[0]= "AszunaDungeon",
-		[1]= "AszunaDungeon",
+		[0]= "AzsunaDungeon",
+		[1]= "AzsunaDungeon",
 	},
 	[6] = {
-		[0]= "Hallsofvalor",
-		[1]= "Hallsofvalor1_",
-		[2]= "Hallsofvalor",
-		[3]= "Hallsofvalor2_",
+		[0]= "HallsOfValor",
+		[1]= "HallsOfValor1_",
+		[2]= "HallsOfValor",
+		[3]= "HallsOfValor2_",
 	},
 	
 	[7] = {
@@ -440,14 +482,18 @@ MethodDungeonTools.dungeonMaps = {
 		[1] = "ArgusDungeon",
 	},
 	[12] = {
-		[0]= "SuamarCatacombsDungeon",
-		[1]= "SuamarCatacombsDungeon1_",
+		[0]= "SuramarCatacombsDungeon",
+		[1]= "SuramarCatacombsDungeon1_",
 	},
 	[13] = {
 		[0]= "VaultOfTheWardens",
 		[1]= "VaultOfTheWardens1_",
 		[2]= "VaultOfTheWardens2_",
 		[3]= "VaultOfTheWardens3_",
+	},
+	[14] = {
+		[0] = "", -- No directory needed for basic single file
+		[1] = "AhnKahet.blp",
 	},
 	
 }
@@ -508,7 +554,7 @@ function MethodDungeonTools:MakeTopBottomTextures(frame)
 		frame.topPanelString:Show()
 		
 		frame.topPanelLogo = frame.topPanel:CreateTexture(nil, "HIGH", nil, 7)
-		frame.topPanelLogo:SetTexture("Interface\\AddOns\\MethodDungeonTools\\Textures\\Method")
+		frame.topPanelLogo:SetTexture("Interface\\AddOns\\MethodDungeonTools\\Textures\\Method.tga")
 		frame.topPanelLogo:SetWidth(24)
 		frame.topPanelLogo:SetHeight(24)
 		frame.topPanelLogo:SetPoint("RIGHT",frame.topPanelString,"LEFT",183,0)
@@ -1675,11 +1721,9 @@ function MethodDungeonTools:MakeMapTexture(frame)
 
 		
 		if frame.mapPanelFrame == nil then
-			frame.mapPanelFrame = CreateFrame("frame","MethodDungeonToolsMapPanelFrame",nil)
-			frame.mapPanelFrame:ClearAllPoints();
-			frame.mapPanelFrame:SetSize(frame:GetWidth(), frame:GetHeight());
-			frame.mapPanelFrame:SetPoint("BOTTOM", frame, "BOTTOM", 0, 0);
-			
+			frame.mapPanelFrame = CreateFrame("Frame", "MethodDungeonToolsMapPanelFrame", frame.scrollFrame)
+			frame.mapPanelFrame:SetSize(856, 642);
+            frame.mapPanelFrame:Show()
 		end
 
 		
@@ -1696,25 +1740,33 @@ function MethodDungeonTools:MakeMapTexture(frame)
 			end
 		end
 		
-		--create the 12 tiles and set the scrollchild
-		for i=1,12 do
+		--create up to 25 tiles and set the scrollchild
+		for i=1,25 do
 			frame["mapPanelTile"..i] = frame.mapPanelFrame:CreateTexture("MethodDungeonToolsmapPanelTile"..i, "BACKGROUND");
 			frame["mapPanelTile"..i]:SetDrawLayer("ARTWORK", 0);
-			--frame["mapPanelTile"..i]:SetAlpha(0.3)
-			frame["mapPanelTile"..i]:SetSize(frame:GetWidth()/4+4,frame:GetWidth()/4+4);
+			frame["mapPanelTile"..i]:SetSize(sizex/4+4,sizex/4+4);
 		end
-		frame.mapPanelTile1:SetPoint("TOPLEFT",frame.mapPanelFrame,"TOPLEFT",1,0)
-		frame.mapPanelTile2:SetPoint("TOPLEFT",frame.mapPanelTile1,"TOPRIGHT")
-		frame.mapPanelTile3:SetPoint("TOPLEFT",frame.mapPanelTile2,"TOPRIGHT")
-		frame.mapPanelTile4:SetPoint("TOPLEFT",frame.mapPanelTile3,"TOPRIGHT")
-		frame.mapPanelTile5:SetPoint("TOPLEFT",frame.mapPanelTile1,"BOTTOMLEFT")
-		frame.mapPanelTile6:SetPoint("TOPLEFT",frame.mapPanelTile5,"TOPRIGHT")
-		frame.mapPanelTile7:SetPoint("TOPLEFT",frame.mapPanelTile6,"TOPRIGHT")
-		frame.mapPanelTile8:SetPoint("TOPLEFT",frame.mapPanelTile7,"TOPRIGHT")
-		frame.mapPanelTile9:SetPoint("TOPLEFT",frame.mapPanelTile5,"BOTTOMLEFT")
-		frame.mapPanelTile10:SetPoint("TOPLEFT",frame.mapPanelTile9,"TOPRIGHT")
-		frame.mapPanelTile11:SetPoint("TOPLEFT",frame.mapPanelTile10,"TOPRIGHT")
-		frame.mapPanelTile12:SetPoint("TOPLEFT",frame.mapPanelTile11,"TOPRIGHT")
+        
+        -- Helper to position tiles based on columns
+        function MethodDungeonTools:PositionMapTiles(columns)
+            columns = columns or 4
+            local tileSize = sizex / columns
+            for i=1,25 do
+                local tile = frame["mapPanelTile"..i]
+                tile:ClearAllPoints()
+                tile:SetSize(tileSize+4, tileSize+4)
+                if i == 1 then
+                    tile:SetPoint("TOPLEFT", frame.mapPanelFrame, "TOPLEFT", 1, 0)
+                else
+                    if (i-1) % columns == 0 then
+                        tile:SetPoint("TOPLEFT", frame["mapPanelTile"..(i-columns)], "BOTTOMLEFT")
+                    else
+                        tile:SetPoint("TOPLEFT", frame["mapPanelTile"..(i-1)], "TOPRIGHT")
+                    end
+                end
+            end
+        end
+        MethodDungeonTools:PositionMapTiles(4) -- Default
 		frame.scrollFrame:SetScrollChild(frame.mapPanelFrame)
 	end
 
@@ -2009,8 +2061,13 @@ function MethodDungeonTools:OpenNewPresetDialog()
 	MethodDungeonTools.main_frame.presetCreationFrame:SetStatusText("")
 	MethodDungeonTools.main_frame.presetCreationFrame:Show()
 	MethodDungeonTools.main_frame.presetCreationCreateButton:SetDisabled(false)
-	MethodDungeonTools.main_frame.PresetCreationEditbox:SetFocus()
-	MethodDungeonTools.main_frame.PresetCreationEditbox:HighlightText(0,50)
+	local editbox = MethodDungeonTools.main_frame.PresetCreationEditbox
+    if editbox then
+        if editbox.SetFocus then editbox:SetFocus()
+        elseif editbox.editbox and editbox.editbox.SetFocus then editbox.editbox:SetFocus() end
+        if editbox.HighlightText then editbox:HighlightText(0,50)
+        elseif editbox.editbox and editbox.editbox.HighlightText then editbox.editbox:HighlightText(0,50) end
+    end
 	MethodDungeonTools.main_frame.presetImportBox:SetText("")
 	
 	
@@ -2117,17 +2174,53 @@ function MethodDungeonTools:EnsureDBTables()
 end
 
 function MethodDungeonTools:UpdateMap(ignoreSetSelection,ignoreReloadPullButtons)
-	local mapPanel = self.main_frame.mapPanel
+	local mapPanelFrame = self.main_frame.mapPanelFrame
 	local mapName
 	local frame = MethodDungeonTools.main_frame	
-	mapName = MethodDungeonTools.dungeonMaps[db.currentDungeonIdx][0]	
+	mapName = MethodDungeonTools.dungeonMaps[db.currentDungeonIdx] and MethodDungeonTools.dungeonMaps[db.currentDungeonIdx][0]	
 	MethodDungeonTools:EnsureDBTables()
-	local fileName = MethodDungeonTools.dungeonMaps[db.currentDungeonIdx][db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]].value.currentSublevel]
+    local sublevel = db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]].value.currentSublevel
+	local fileName = MethodDungeonTools.dungeonMaps[db.currentDungeonIdx] and MethodDungeonTools.dungeonMaps[db.currentDungeonIdx][sublevel]
+    if not fileName or not mapName then 
+        print("MDT Debug: Missing map data for dungeon "..(db.currentDungeonIdx or "nil").." sublevel "..(sublevel or "nil"))
+        return 
+    end
 	local path = "Interface\\WorldMap\\"..mapName.."\\";
-	for i=1,12 do
-		local texName = path..fileName..i;
+    local localPath = "Interface\\AddOns\\MethodDungeonTools\\Textures\\Maps\\";
+    if mapName ~= "" then localPath = localPath..mapName.."\\" end
+    
+    print("MDT Debug: Attempting to load textures from: "..localPath)
+    -- Check if fileName is a single file (ends with .blp or .tga)
+    local isSingleFile = fileName:match("%.blp$") or fileName:match("%.tga$")
+    
+    local columns = MethodDungeonTools.dungeonMaps[db.currentDungeonIdx].columns or 4
+    local tileCount = MethodDungeonTools.dungeonMaps[db.currentDungeonIdx].tileCount or (isSingleFile and 1 or 12)
+    if not isSingleFile then
+        MethodDungeonTools:PositionMapTiles(columns)
+    end
+
+	for i=1,25 do
+		local texName = localPath..fileName
+        if not isSingleFile then
+            texName = texName..i
+        end
 		if frame["mapPanelTile"..i] then
-			frame["mapPanelTile"..i]:SetTexture(texName)
+            if isSingleFile then
+                if i == 1 then
+                    frame["mapPanelTile"..i]:SetTexture(texName)
+                    frame["mapPanelTile"..i]:SetAllPoints(frame.mapPanelFrame)
+                    frame["mapPanelTile"..i]:Show()
+                else
+                    frame["mapPanelTile"..i]:Hide()
+                end
+            else
+                if i <= tileCount then
+                    frame["mapPanelTile"..i]:SetTexture(texName)
+                    frame["mapPanelTile"..i]:Show()
+                else
+                    frame["mapPanelTile"..i]:Hide()
+                end
+            end
 		end
 	end
 	MethodDungeonTools:UpdateDungeonBossButtons()
@@ -2330,7 +2423,11 @@ function MethodDungeonTools:MakePresetCreationFrame(frame)
 	frame.presetCreationCreateButton:SetText("Create")
 	frame.presetCreationCreateButton:SetWidth(100)
 	frame.presetCreationCreateButton:SetCallback("OnClick", function()
-		local name = frame.PresetCreationEditbox:GetText()
+        local eb = frame.PresetCreationEditbox
+		local name = ""
+        if eb.GetText then name = eb:GetText()
+        elseif eb.GetValue then name = eb:GetValue()
+        elseif eb.editbox and eb.editbox.GetText then name = eb.editbox:GetText() end
 		MethodDungeonTools:CreateNewPreset(name) 
 	end)	
 	frame.presetCreationFrame:AddChild(frame.presetCreationCreateButton)

@@ -1,4 +1,4 @@
-## Interface: 303000300
+## Interface: 30300
 ## Title: Method Dungeon Tools
 ## Author: Nnogga
 ## Version: 1.5.1
