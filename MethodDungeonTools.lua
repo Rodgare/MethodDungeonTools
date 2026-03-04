@@ -23,6 +23,17 @@ if textureMeta and textureMeta.__index and not textureMeta.__index.SetColorTextu
     end
 end
 
+-- Polyfill for PlayerModel:SetDisplayInfo (missing in 3.3.0)
+local modelTestFrame = CreateFrame("PlayerModel")
+local modelMeta = getmetatable(modelTestFrame)
+if modelMeta and modelMeta.__index and not modelMeta.__index.SetDisplayInfo then
+    modelMeta.__index.SetDisplayInfo = function(self, id)
+        if self.SetCreature then self:SetCreature(id)
+        elseif self.SetDisplayID then self:SetDisplayID(id)
+        end
+    end
+end
+
 -- Polyfill for MouseIsOver
 if not MouseIsOver then
     function MouseIsOver(frame)
@@ -316,93 +327,45 @@ local dungeonEnemiesSelected = {}
 
 
 local dungeonList = {		
-		[1] = "Black Rook Hold",
-		[2] = "Cathedral of Eternal Night",
-		[3] = "Court of Stars",
-		[4] = "Darkheart Thicket",
-		[5] = "Eye of Azshara",
-		[6] = "Halls of Valor",
-		[7] = "Maw of Souls",
-		[8] = "Neltharion's Lair",
-		[9] = "Return to Karazhan Lower",
-		[10] = "Return to Karazhan Upper",
-		[11] = "Seat of the Triumvirate",
-		[12] = "The Arcway",
-		[13] = "Vault of the Wardens",
-		[14] = "Ahn'kahet: The Old Kingdom",
+		[1] = "Крепость Утгард",
+		[2] = "Крепость Драк'Тарон",
+		[3] = "Чертоги молний",
+		[4] = "Ан'кахет: Старое Королевство",
+		[5] = "Кузня крови",
+		[6] = "Узилище",
+		[7] = "Бастионы адского пламени",
+		[8] = "Гробницы маны",
 }
 
 local dungeonSubLevels = {
 	[1] = {
-		[1] = "The Ravenscrypt",
-		[2] = "The Grand Hall",
-		[3] = "Ravenshold",
-		[4] = "The Rook's Host",
-		[5] = "Lord Ravencrest's Chamber",
-		[6] = "The Raven's Crown",
+		[1] = "Горнило Ненависти",
+		[2] = "Зал Разорителей",
+		[3] = "Лестница Ньорна",
 	},
 	[2] = {
-		[1] = "Hall of the Moon",
-		[2] = "Twilight Grove",
-		[3] = "The Emerald Archives",
-		[4] = "Path of Illumination",
-		[5] = "Sacristy of Elune",
+		[1] = "1-й ярус",
+		[2] = "2-й ярус",
 	},
 	[3] = {
-		[1] = "Court of Stars",
-		[2] = "The Jeweled Estate",
-		[3] = "The Balconies",
+		[1] = "1-й ярус",
+		[2] = "2-й ярус",
 	},
 	[4] = {
-		[1] = "Darkheart Thicket",
+		[1] = "1-й ярус",
+		[2] = "2-й ярус",
 	},
 	[5] = {
-		[1] = "Eye of Azshara",
+		[1] = "1-й ярус",
 	},
 	[6] = {
-		[1] = "The High Gate",
-		[2] = "Field of the Eternal Hunt",
-		[3] = "Halls of Valor",
+		[1] = "1-й ярус",
 	},
 	[7] = {
-		[1] = "Helmouth Cliffs",
-		[2] = "The Hold",
-		[3] = "The Naglfar",
+		[1] = "1-й ярус",
 	},
 	[8] = {
-		[1] = "Neltharion's Lair",
-	},
-	[9] = {
-		[1] = "Master's Terrace",
-		[2] = "Opera Hall Balcony",
-		[3] = "The Guest Chambers",
-		[4] = "The Banquet Hall",
-		[5] = "Upper Livery Stables",
-		[6] = "The Servant's Quarters",		
-	},
-	[10] = {
-		[1] = "Lower Broken Stair",
-		[2] = "Upper Broken Stair",
-		[3] = "The Menagerie",
-		[4] = "Guardian's Library",
-		[5] = "Library Floor",
-		[6] = "Upper Library",
-		[7] = "Gamesman's Hall",
-		[8] = "Netherspace",
-	},
-	[11] = {
-		[1] = "Seat of the Triumvirate", 
-	},
-	[12] = {
-		[1] = "The Arcway", 
-	},
-	[13] = {
-		[1] = "Vault of the Wardens",
-		[2] = "Vault of the Wardens",
-		[3] = "Vault of the Wardens",
-	},
-	[14] = {
-		[1] = "Ahn'kahet: The Old Kingdom",
+		[1] = "1-й ярус",
 	},
 }
 
@@ -410,92 +373,43 @@ local dungeonSubLevels = {
 -- MethodDungeonTools.dungeonMaps = { -- Initialized at the top now
 MethodDungeonTools.dungeonMaps = {
 	[1] = {
-		[0]= "BlackRookHoldDungeon",
-		[1]= "BlackRookHoldDungeon1_",
-		[2]= "BlackRookHoldDungeon2_",
-		[3]= "BlackRookHoldDungeon3_",
-		[4]= "BlackRookHoldDungeon4_",
-		[5]= "BlackRookHoldDungeon5_",
-		[6]= "BlackRookHoldDungeon6_",
+		[0]= "UtgardeKeep",
+		[1]= "UtgardeKeep1_",
+		[2]= "UtgardeKeep2_",
+		[3]= "UtgardeKeep3_",
 	},
 	[2] = {
-		[0]= "TombofSargerasDungeon",
-		[1]= "TombofSargerasDungeon1_",
-		[2]= "TombofSargerasDungeon2_",
-		[3]= "TombofSargerasDungeon3_",
-		[4]= "TombofSargerasDungeon4_",
-		[5]= "TombofSargerasDungeon5_",
+		[0]= "DrakTharonKeep",
+		[1]= "DrakTharonKeep1_",
+		[2]= "DrakTharonKeep2_",
 	},
 	[3] = {
-		[0] = "SuramarNoblesDistrict",
-		[1] = "SuramarNoblesDistrict",
-		[2] = "SuramarNoblesDistrict1_",
-		[3] = "SuramarNoblesDistrict2_",
+		[0] = "HallsOfLightning",
+		[2] = "HallsOfLightning1_",
+		[3] = "HallsOfLightning2_",
 	},
 	[4] = {
-		[0] = "DarkheartThicket",
-		[1] = "DarkheartThicket",
+		[0] = "Ahnkahet",
+		[1] = "Ahnkahet1_",
+		[2] = "Ahnkahet2_",
 	},
 	[5] = {
-		[0]= "AzsunaDungeon",
-		[1]= "AzsunaDungeon",
+		[0]= "TheBloodFurnace",
+		[1]= "TheBloodFurnace1_",
 	},
 	[6] = {
-		[0]= "HallsOfValor",
-		[1]= "HallsOfValor1_",
-		[2]= "HallsOfValor",
-		[3]= "HallsOfValor2_",
+		[0]= "TheSlavePens",
+		[1]= "TheSlavePens1_",
 	},
 	
 	[7] = {
-		[0] = "HelheimDungeonDock",
-		[1] = "HelheimDungeonDock",
-		[2] = "HelheimDungeonDock1_",
-		[3] = "HelheimDungeonDock2_",
+		[0] = "HellfireRamparts",
+		[1] = "HellfireRamparts1_",
 	},
 	[8] = {
-		[0] = "NeltharionsLair",
-		[1] = "NeltharionsLair",
+		[0] = "ManaTombs",
+		[1] = "ManaTombs1_",
 	},
-	[9] = {
-		[0] = "LegionKarazhanDungeon",
-		[1] = "LegionKarazhanDungeon6_",
-		[2] = "LegionKarazhanDungeon5_",
-		[3] = "LegionKarazhanDungeon4_",
-		[4] = "LegionKarazhanDungeon3_",
-		[5] = "LegionKarazhanDungeon2_",
-		[6] = "LegionKarazhanDungeon1_",
-	},
-	[10] = {
-		[0] = "LegionKarazhanDungeon", 
-		[1] = "LegionKarazhanDungeon7_", 
-		[2] = "LegionKarazhanDungeon8_", 
-		[3] = "LegionKarazhanDungeon9_", 
-		[4] = "LegionKarazhanDungeon10_", 
-		[5] = "LegionKarazhanDungeon11_", 
-		[6] = "LegionKarazhanDungeon12_", 
-		[7] = "LegionKarazhanDungeon13_", 
-		[8] = "LegionKarazhanDungeon14_",
-	},
-	[11] = {
-		[0] = "ArgusDungeon",
-		[1] = "ArgusDungeon",
-	},
-	[12] = {
-		[0]= "SuramarCatacombsDungeon",
-		[1]= "SuramarCatacombsDungeon1_",
-	},
-	[13] = {
-		[0]= "VaultOfTheWardens",
-		[1]= "VaultOfTheWardens1_",
-		[2]= "VaultOfTheWardens2_",
-		[3]= "VaultOfTheWardens3_",
-	},
-	[14] = {
-		[0] = "", -- No directory needed for basic single file
-		[1] = "AhnKahet.blp",
-	},
-	
 }
 -- MethodDungeonTools.dungeonBosses = {} -- Initialized at top
 -- MethodDungeonTools.dungeonEnemies = {} -- Initialized at top
@@ -1154,7 +1068,7 @@ function MethodDungeonTools:UpdatePullTooltip(tooltip)
     end
 	if not MouseIsOver(frame.sidePanel.pullButtonsScrollFrame.frame) then
         tooltip:Hide()
-    elseif MouseIsOver(frame.sidePanel.newPullButton.frame) then
+    elseif frame.sidePanel.newPullButton and MouseIsOver(frame.sidePanel.newPullButton.frame) then
         tooltip:Hide()
 	else
 		if frame.sidePanel.newPullButtons and tooltip.currentPull and frame.sidePanel.newPullButtons[tooltip.currentPull] then
