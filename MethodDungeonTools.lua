@@ -1081,13 +1081,12 @@ function MethodDungeonTools:UpdatePullTooltip(tooltip)
 			for k,v in pairs(frame.sidePanel.newPullButtons[tooltip.currentPull].enemyPortraits) do
 				if MouseIsOver(v) then
 					if v:IsShown() then
-                        --model
-						local modelId = v.enemyData.npcId or v.enemyData.id or v.enemyData.displayId
+						tooltip.Model:Show()
+                        local modelId = v.enemyData.npcId or v.enemyData.id or v.enemyData.displayId
                         if not tooltip.modelNpcId or (tooltip.modelNpcId ~= modelId) then
 							MethodDungeonTools:SetDisplayInfo(tooltip.Model, modelId, (v.enemyData.npcId or v.enemyData.id) ~= nil)
 							tooltip.modelNpcId = modelId
 						end
-						tooltip.Model:Show()
                         --topString
                         local newLine = "\n"
                         local text = newLine..newLine..newLine..v.enemyData.name.." x"..v.enemyData.quantity..newLine
@@ -1475,11 +1474,44 @@ function MethodDungeonTools:MakeMapTexture(frame)
 				end
 			end
 			if mouseOverBoss then
-				local data 
-			
-			end
-
-			if mouseoverBlip then
+				local data = MethodDungeonTools.dungeonBosses[db.currentDungeonIdx][db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]].value.currentSublevel][mouseOverBoss]
+				if data then
+					local fortified = false
+					local boss = true
+					if db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]].value.currentAffix then
+						if db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]].value.currentAffix == "fortified" then fortified = true end
+					end
+					local tyrannical = not fortified
+					local health = MethodDungeonTools:CalculateEnemyHealth(boss,fortified,tyrannical,data.health,db.currentDifficulty)
+					tooltip.String:SetText("\n\n"..data.name.."\nБосс\n"..MethodDungeonTools:FormatEnemyHealth(health).." HP")
+					tooltip.String:Show()
+					tooltip:Show()
+					if db.tooltipInCorner then
+						tooltip:SetPoint("BOTTOMRIGHT",MethodDungeonTools.main_frame,"BOTTOMRIGHT",0,0)
+						tooltip:SetPoint("TOPLEFT",MethodDungeonTools.main_frame,"BOTTOMRIGHT",-tooltip.mySizes.x,tooltip.mySizes.y)
+					else
+						tooltip:SetPoint("TOPLEFT",dungeonBossButtons[mouseOverBoss],"BOTTOMRIGHT",10,0)
+						tooltip:SetPoint("BOTTOMRIGHT",dungeonBossButtons[mouseOverBoss],"BOTTOMRIGHT",10+tooltip.mySizes.x,-tooltip.mySizes.y)
+					end
+					local id = data.id or data.displayId
+					if id then
+						tooltip.Model:Show()
+						if lastModelId then 
+							if lastModelId ~= id then 
+								MethodDungeonTools:SetDisplayInfo(tooltip.Model, id, data.id ~= nil)
+								lastModelId = id
+							end
+						else
+							MethodDungeonTools:SetDisplayInfo(tooltip.Model, id, data.id ~= nil)
+							lastModelId = id
+						end
+					else 
+						tooltip.Model:ClearModel()
+						tooltip.Model:Hide()
+					end
+					tooltipLastShown = GetTime()
+				end
+			elseif mouseoverBlip then
 				local data = dungeonEnemyBlips[mouseoverBlip]
 				local fortified = false
 				local boss = false
@@ -1518,7 +1550,8 @@ function MethodDungeonTools:MakeMapTexture(frame)
                 end
 				local id = dungeonEnemyBlips[mouseoverBlip].id
 				if id then
-					if lastModelId then 
+					tooltip.Model:Show()
+                    if lastModelId then 
 						if lastModelId ~= id then 
 							tooltip.Model:SetCreature(id)
 							lastModelId = id
@@ -1527,7 +1560,6 @@ function MethodDungeonTools:MakeMapTexture(frame)
 						tooltip.Model:SetCreature(id)
 						lastModelId = id
 					end
-					tooltip.Model:Show()
 				else 
 					tooltip.Model:ClearModel()
 					tooltip.Model:Hide()
@@ -1745,14 +1777,10 @@ function MethodDungeonTools:UpdateDungeonBossButtons()
 				local data = MethodDungeonTools.dungeonBosses[db.currentDungeonIdx][db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]].value.currentSublevel][i]
 				dungeonBossButtons[i].tooltipTitle = data["name"]
 				local encounterID = data["encounterID"]
-				local _, _, _, displayInfo = EJ_GetCreatureInfo(1, encounterID);
-				dungeonBossButtons[i].displayInfo = displayInfo;
-				if ( displayInfo ) then
-					SetPortraitTexture(dungeonBossButtons[i].bgImage, displayInfo);
-					dungeonBossButtons[i]:Show()
-				else
-					dungeonBossButtons[i].bgImage:SetTexture("DoesNotExist");
-				end
+                
+				-- 3.3.5 workaround: Set a skull icon since EJ_GetCreatureInfo doesn't exist
+				dungeonBossButtons[i].bgImage:SetTexture("Interface\\TargetingFrame\\UI-TargetingFrame-Skull")
+				dungeonBossButtons[i]:Show()
 				dungeonBossButtons[i].bgImage:SetSize(16,16)
 				dungeonBossButtons[i]:SetScript("OnClick",function()
 					if MouseIsOver(MethodDungeonToolsScrollFrame) then
@@ -1804,7 +1832,7 @@ function MethodDungeonTools:UpdateDungeonEnemies()
 						dungeonEnemyBlips[idx].health = data["health"]
 						dungeonEnemyBlips[idx].level = data["level"]
 						dungeonEnemyBlips[idx]:SetDrawLayer("ARTWORK", 5)
-						dungeonEnemyBlips[idx]:SetTexture("Interface\\Worldmap\\WorldMapPartyIcon")
+						dungeonEnemyBlips[idx]:SetTexture("Interface\\BUTTONS\\WHITE8X8")
 						dungeonEnemyBlips[idx]:SetWidth(10*data["scale"])
 						dungeonEnemyBlips[idx]:SetHeight(10*data["scale"])
 						dungeonEnemyBlips[idx]:SetPoint("CENTER",MethodDungeonTools.main_frame.mapPanelTile1,"TOPLEFT",clone.x,clone.y)
@@ -1812,7 +1840,7 @@ function MethodDungeonTools:UpdateDungeonEnemies()
                         --color patrol
                         dungeonEnemyBlips[idx].patrolFollower = nil
                         if clone.patrol then
-                            dungeonEnemyBlips[idx]:SetTexture("Interface\\Worldmap\\WorldMapPlayerIcon")
+                            dungeonEnemyBlips[idx]:SetTexture("Interface\\BUTTONS\\WHITE8X8")
                             dungeonEnemyBlips[idx].color = patrolColor
                         else
                             --iterate over all enemies again to find if this npc is linked to a patrol
@@ -1825,7 +1853,7 @@ function MethodDungeonTools:UpdateDungeonEnemies()
                                         if (patrolCheckDataTeeming==true) or (patrolCheckDataTeeming==false and ((not patrolCheckClone.teeming) or patrolCheckClone.teeming==false))  then
                                             if clone.g and patrolCheckClone.g then
                                                 if clone.g == patrolCheckClone.g and patrolCheckClone.patrol then
-                                                    dungeonEnemyBlips[idx]:SetTexture("Interface\\Worldmap\\WorldMapPlayerIcon")
+                                                    dungeonEnemyBlips[idx]:SetTexture("Interface\\BUTTONS\\WHITE8X8")
                                                     dungeonEnemyBlips[idx].color = patrolColor
                                                     dungeonEnemyBlips[idx].patrolFollower = true
                                                 end
@@ -2987,7 +3015,7 @@ function initFrames()
         tooltip:Hide()
 
         tooltip.Model = CreateFrame("PlayerModel", nil, tooltip)
-        tooltip.Model:SetFrameLevel(1)
+        tooltip.Model:SetFrameLevel(5)
         tooltip.Model:SetSize(100,100)
 
         tooltip.Model.fac = 0
@@ -3000,9 +3028,7 @@ function initFrames()
                 self:SetFacing(math.pi*2 / 360 * self.fac)
 				--print(tooltip.Model:GetModelFileID())
             end)
-
         else
-            tooltip.Model:SetPortraitZoom(1)
             tooltip.Model:SetFacing(math.pi*2 / 360 * 2)
         end
 
@@ -3038,7 +3064,7 @@ function initFrames()
 		MethodDungeonTools.pullTooltip:Hide()
 
         MethodDungeonTools.pullTooltip.Model = CreateFrame("PlayerModel", nil, MethodDungeonTools.pullTooltip)
-        MethodDungeonTools.pullTooltip.Model:SetFrameLevel(1)
+        MethodDungeonTools.pullTooltip.Model:SetFrameLevel(5)
 
         MethodDungeonTools.pullTooltip.Model.fac = 0
         if true then
@@ -3048,11 +3074,8 @@ function initFrames()
                     self.fac = 0
                 end
                 self:SetFacing(math.pi*2 / 360 * self.fac)
-                --print(tooltip.Model:GetModelFileID())
             end)
-
         else
-            MethodDungeonTools.pullTooltip.Model:SetPortraitZoom(1)
             MethodDungeonTools.pullTooltip.Model:SetFacing(math.pi*2 / 360 * 2)
         end
 

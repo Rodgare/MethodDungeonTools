@@ -12,8 +12,8 @@ MethodDungeonTools.dungeonBosses[dungeonIndex] = {
             ["id"] = 23953,
             ["displayId"] = 23953,
             ["health"] = 90276936,
-            ["x"] = 500, -- Map coordinates (0-840)
-            ["y"] = -300, -- Map coordinates (0-555)
+            ["x"] = 400, -- Map coordinates (0-840)
+            ["y"] = -200, -- Map coordinates (0-555)
         },
     }
 }
@@ -25,8 +25,8 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
         ["health"] = 130330,
         ["level"] = 80,
         ["creatureType"] = "Дракон",
-        ["id"] = 92035,
-        ["displayId"] = 92035,
+        ["id"] = 24849,
+        ["displayId"] = 24849,
         ["count"] = 3.61, -- Enemy count for the progress bar
         ["scale"] = 2,
         ["color"] = {r=1,g=1,b=1,a=0.8},
