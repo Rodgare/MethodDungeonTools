@@ -7,31 +7,63 @@ MethodDungeonTools.dungeonBosses = {}
 MethodDungeonTools.dungeonTotalCount = {}
 MethodDungeonTools.dungeonMaps = {}
 MethodDungeonTools.dungeonSubLevels = {}
-MethodDungeonTools.dungeonTotalCount[14] = {normal=100,teeming=100,teemingEnabled=false}
-MethodDungeonTools.dungeonBosses[14] = {}
-MethodDungeonTools.dungeonEnemies[14] = {}
 
--- Polyfill for SetColorTexture
-local textureTestFrame = CreateFrame("Frame")
-local textureTest = textureTestFrame:CreateTexture()
-local textureMeta = getmetatable(textureTest)
-if textureMeta and textureMeta.__index and not textureMeta.__index.SetColorTexture then
-    textureMeta.__index.SetColorTexture = function(self, r, g, b, a)
-        self:SetTexture("Interface\\Buttons\\WHITE8X8")
-        self:SetVertexColor(r, g, b, a or 1)
-        return self
+local Dialog = LibStub("LibDialog-1.0")
+local dropDownLib,_ = LibStub("PhanxConfig-Dropdown")
+local AceGUI = LibStub("AceGUI-3.0")
+
+-- Local polyfills to avoid global namespace/metatable corruption
+function MethodDungeonTools:SetColorTexture(texture, r, g, b, a)
+    if texture.SetColorTexture then
+        texture:SetColorTexture(r, g, b, a)
+    else
+        texture:SetTexture("Interface\\Buttons\\WHITE8X8")
+        texture:SetVertexColor(r, g, b, a or 1)
     end
 end
 
--- Polyfill for PlayerModel:SetDisplayInfo (missing in 3.3.0)
-local modelTestFrame = CreateFrame("PlayerModel")
-local modelMeta = getmetatable(modelTestFrame)
-if modelMeta and modelMeta.__index and not modelMeta.__index.SetDisplayInfo then
-    modelMeta.__index.SetDisplayInfo = function(self, id)
-        if self.SetCreature then self:SetCreature(id)
-        elseif self.SetDisplayID then self:SetDisplayID(id)
+function MethodDungeonTools:SetDisplayInfo(model, id)
+    if model.SetDisplayInfo then
+        model:SetDisplayInfo(id)
+    elseif model.SetCreature then
+        model:SetCreature(id)
+    elseif model.SetDisplayID then
+        model:SetDisplayID(id)
+    end
+end
+
+function MethodDungeonTools:AceGUI_Create(...)
+    local widget = AceGUI:Create(...)
+    if widget then
+        widget.EnableResize = widget.EnableResize or function() end
+        widget.DisableButton = widget.DisableButton or function() end
+        if not widget.SetFocus then
+            widget.SetFocus = function(self)
+                local f = self.editbox or self.frame
+                if f and f.SetFocus then f:SetFocus() end
+            end
+        end
+        if not widget.HighlightText then
+            widget.HighlightText = function(self, ...)
+                local f = self.editbox or self.frame
+                if f and f.HighlightText then f:HighlightText(...) end
+            end
+        end
+        if not widget.GetText then
+            widget.GetText = function(self)
+                local f = self.editbox or self.frame
+                if f and f.GetText then return f:GetText() end
+                return ""
+            end
+        end
+        if not widget.SetText then
+            widget.SetText = function(self, text)
+                local f = self.editbox or self.frame
+                if f and f.SetText then f:SetText(text) end
+            end
         end
     end
+    return widget
 end
 
 -- Polyfill for MouseIsOver
@@ -67,65 +99,12 @@ local sizey = 555
 local buttonTextFontSize = 12
 local methodColor = "|cFFF49D38"
 
-local Dialog = LibStub("LibDialog-1.0")
-local dropDownLib,_ = LibStub("PhanxConfig-Dropdown")
--- local HBD = LibStub("HereBeDragons-1.0")
-local AceGUI = LibStub("AceGUI-3.0")
--- Polyfill for AceGUI EnableResize (missing in older AceGUI)
-local oldAceGUICreate = AceGUI.Create
-AceGUI.Create = function(self, ...)
-    local widget = oldAceGUICreate(self, ...)
-    if widget then
-        if not widget.EnableResize then
-            widget.EnableResize = function() end
-        end
-        if not widget.DisableButton then
-            widget.DisableButton = function() end
-        end
-        if not widget.SetFocus then
-            widget.SetFocus = function(self)
-                local f = self.editbox or self.frame
-                if f and f.SetFocus then f:SetFocus() end
-            end
-        end
-        if not widget.HighlightText then
-            widget.HighlightText = function(self, ...)
-                local f = self.editbox or self.frame
-                if f and f.HighlightText then f:HighlightText(...) end
-            end
-        end
-        if not widget.GetText then
-            widget.GetText = function(self)
-                local f = self.editbox or self.frame
-                if f and f.GetText then return f:GetText() end
-                return ""
-            end
-        end
-        if not widget.SetText then
-            widget.SetText = function(self, text)
-                local f = self.editbox or self.frame
-                if f and f.SetText then f:SetText(text) end
-            end
-        end
-        -- Add methods directly to the widget just in case
-        if widget.editbox then
-            widget.SetFocus = widget.SetFocus or function(self) self.editbox:SetFocus() end
-            widget.HighlightText = widget.HighlightText or function(self, ...) self.editbox:HighlightText(...) end
-            widget.GetText = widget.GetText or function(self) return self.editbox:GetText() end
-            widget.SetText = widget.SetText or function(self, text) self.editbox:SetText(text) end
-        end
-        -- Fallback for basic widgets
-        if not widget.GetText then widget.GetText = function() return "" end end
-        if not widget.SetText then widget.SetText = function() end end
-    end
-    return widget
-end
 local db
 local icon = LibStub("LibDBIcon-1.0")
 local LDB = LibStub("LibDataBroker-1.1"):NewDataObject("MethodDungeonTools", {
 	type = "data source",
 	text = "Method Dungeon Tools",
-	icon = "Interface\\AddOns\\MethodDungeonTools\\Textures\\MethodMinimap.tga",
+	icon = "Interface\\AddOns\\"..addonName.."\\Textures\\MethodMinimap.tga",
 	OnClick = function(button,buttonPressed)
 		if buttonPressed == "RightButton" then
 			if db.minimap.lock then
@@ -339,9 +318,9 @@ local dungeonList = {
 
 local dungeonSubLevels = {
 	[1] = {
-		[1] = "Горнило Ненависти",
-		[2] = "Зал Разорителей",
-		[3] = "Лестница Ньорна",
+		[1] = "1-й ярус",
+		[2] = "2-й ярус",
+		[3] = "3-й ярус",
 	},
 	[2] = {
 		[1] = "1-й ярус",
@@ -385,8 +364,8 @@ MethodDungeonTools.dungeonMaps = {
 	},
 	[3] = {
 		[0] = "HallsOfLightning",
-		[2] = "HallsOfLightning1_",
-		[3] = "HallsOfLightning2_",
+		[1] = "HallsOfLightning1_",
+		[2] = "HallsOfLightning2_",
 	},
 	[4] = {
 		[0] = "Ahnkahet",
@@ -453,7 +432,7 @@ function MethodDungeonTools:MakeTopBottomTextures(frame)
 		frame.topPanelTex = frame.topPanel:CreateTexture(nil, "BACKGROUND")
 		frame.topPanelTex:SetAllPoints()
 		frame.topPanelTex:SetDrawLayer("ARTWORK", -5)
-		frame.topPanelTex:SetColorTexture(0, 0, 0, 0.7)
+		MethodDungeonTools:SetColorTexture(frame.topPanelTex, 0, 0, 0, 0.7)
 		
 		frame.topPanelString = frame.topPanel:CreateFontString("MethodDungeonTools name")
 		frame.topPanelString:SetFont("Fonts\\FRIZQT__.TTF", 20)
@@ -468,7 +447,7 @@ function MethodDungeonTools:MakeTopBottomTextures(frame)
 		frame.topPanelString:Show()
 		
 		frame.topPanelLogo = frame.topPanel:CreateTexture(nil, "HIGH", nil, 7)
-		frame.topPanelLogo:SetTexture("Interface\\AddOns\\MethodDungeonTools\\Textures\\Method.tga")
+		frame.topPanelLogo:SetTexture("Interface\\AddOns\\"..addonName.."\\Textures\\Method.tga")
 		frame.topPanelLogo:SetWidth(24)
 		frame.topPanelLogo:SetHeight(24)
 		frame.topPanelLogo:SetPoint("RIGHT",frame.topPanelString,"LEFT",183,0)
@@ -500,7 +479,7 @@ function MethodDungeonTools:MakeTopBottomTextures(frame)
         frame.bottomPanelTex = frame.bottomPanel:CreateTexture(nil, "BACKGROUND")
         frame.bottomPanelTex:SetAllPoints()
         frame.bottomPanelTex:SetDrawLayer("ARTWORK", -5)
-        frame.bottomPanelTex:SetColorTexture(0, 0, 0, 0.7)
+        MethodDungeonTools:SetColorTexture(frame.bottomPanelTex, 0, 0, 0, 0.7)
 
     end
 
@@ -536,7 +515,7 @@ function MethodDungeonTools:MakeSidePanel(frame)
 		frame.sidePanelTex = frame.sidePanel:CreateTexture(nil, "BACKGROUND");
 		frame.sidePanelTex:SetAllPoints();
 		frame.sidePanelTex:SetDrawLayer("ARTWORK", -5);
-		frame.sidePanelTex:SetColorTexture(0, 0, 0, 0.7);
+		MethodDungeonTools:SetColorTexture(frame.sidePanelTex, 0, 0, 0, 0.7);
 		frame.sidePanelTex:Show()
 	end
 	
@@ -573,7 +552,7 @@ function MethodDungeonTools:MakeSidePanel(frame)
 	
 	
 	
-	frame.sidePanel.WidgetGroup = AceGUI:Create("SimpleGroup")
+	frame.sidePanel.WidgetGroup = MethodDungeonTools:AceGUI_Create("SimpleGroup")
 	frame.sidePanel.WidgetGroup:SetWidth(245);
 	frame.sidePanel.WidgetGroup:SetHeight(frame:GetHeight()+(frame.topPanel:GetHeight()*2)-31);
 	frame.sidePanel.WidgetGroup:SetPoint("TOP",frame.sidePanel,"TOP",3,-31)
@@ -590,15 +569,17 @@ function MethodDungeonTools:MakeSidePanel(frame)
 	end
 	function frame:Hide(...)
 		frame.sidePanel.WidgetGroup.frame:Hide()
-        MethodDungeonTools.pullTooltip:Hide()
+        if MethodDungeonTools.pullTooltip then
+            MethodDungeonTools.pullTooltip:Hide()
+        end
 		return originalHide(self, ...);
 	end
 	
 	local buttonWidth = 80
 	
 	---new profile,rename,export,delete
-	frame.sidePanelNewButton = AceGUI:Create("Button")
-	frame.sidePanelNewButton:SetText("New")
+	frame.sidePanelNewButton = MethodDungeonTools:AceGUI_Create("Button")
+	frame.sidePanelNewButton:SetText("Создать")
 	frame.sidePanelNewButton:SetWidth(buttonWidth)
 	--button fontInstance
 	local fontInstance = CreateFont("MDTButtonFont");
@@ -613,9 +594,9 @@ function MethodDungeonTools:MakeSidePanel(frame)
 	end)
 
 	
-	frame.sidePanelRenameButton = AceGUI:Create("Button")	
+	frame.sidePanelRenameButton = MethodDungeonTools:AceGUI_Create("Button")	
 	frame.sidePanelRenameButton:SetWidth(buttonWidth)
-	frame.sidePanelRenameButton:SetText("Rename")	
+	frame.sidePanelRenameButton:SetText("Переименовать")	
 	frame.sidePanelRenameButton.frame:SetNormalFontObject(fontInstance)
 	frame.sidePanelRenameButton.frame:SetHighlightFontObject(fontInstance)
 	frame.sidePanelRenameButton.frame:SetDisabledFontObject(fontInstance)
@@ -630,8 +611,8 @@ function MethodDungeonTools:MakeSidePanel(frame)
 		MethodDungeonTools.main_frame.RenameFrame.Editbox:SetFocus()
 	end)
 
-	frame.sidePanelImportButton = AceGUI:Create("Button")
-	frame.sidePanelImportButton:SetText("Import")
+	frame.sidePanelImportButton = MethodDungeonTools:AceGUI_Create("Button")
+	frame.sidePanelImportButton:SetText("Импорт")
 	frame.sidePanelImportButton:SetWidth(buttonWidth)
 	frame.sidePanelImportButton.frame:SetNormalFontObject(fontInstance)
 	frame.sidePanelImportButton.frame:SetHighlightFontObject(fontInstance)
@@ -640,8 +621,8 @@ function MethodDungeonTools:MakeSidePanel(frame)
 		MethodDungeonTools:OpenImportPresetDialog()
 	end)
 
-	frame.sidePanelExportButton = AceGUI:Create("Button")
-	frame.sidePanelExportButton:SetText("Export")
+	frame.sidePanelExportButton = MethodDungeonTools:AceGUI_Create("Button")
+	frame.sidePanelExportButton:SetText("Экспорт")
 	frame.sidePanelExportButton:SetWidth(buttonWidth)
 	frame.sidePanelExportButton.frame:SetNormalFontObject(fontInstance)
 	frame.sidePanelExportButton.frame:SetHighlightFontObject(fontInstance)
@@ -656,8 +637,8 @@ function MethodDungeonTools:MakeSidePanel(frame)
 		MethodDungeonTools.main_frame.ExportFrameEditbox:SetFocus()
 	end)
 	
-	frame.sidePanelDeleteButton = AceGUI:Create("Button")
-	frame.sidePanelDeleteButton:SetText("Delete")
+	frame.sidePanelDeleteButton = MethodDungeonTools:AceGUI_Create("Button")
+	frame.sidePanelDeleteButton:SetText("Удалить")
 	frame.sidePanelDeleteButton:SetWidth(buttonWidth)
 	frame.sidePanelDeleteButton.frame:SetNormalFontObject(fontInstance)
 	frame.sidePanelDeleteButton.frame:SetHighlightFontObject(fontInstance)
@@ -670,8 +651,8 @@ function MethodDungeonTools:MakeSidePanel(frame)
 		frame.DeleteConfirmationFrame:Show()
 	end)
 
-	frame.sidePanelClearButton = AceGUI:Create("Button")
-	frame.sidePanelClearButton:SetText("Clear")
+	frame.sidePanelClearButton = MethodDungeonTools:AceGUI_Create("Button")
+	frame.sidePanelClearButton:SetText("Очистить")
 	frame.sidePanelClearButton:SetWidth(buttonWidth)
 	frame.sidePanelClearButton.frame:SetNormalFontObject(fontInstance)
 	frame.sidePanelClearButton.frame:SetHighlightFontObject(fontInstance)
@@ -691,12 +672,30 @@ function MethodDungeonTools:MakeSidePanel(frame)
 	frame.sidePanel.WidgetGroup:AddChild(frame.sidePanelClearButton)
 	frame.sidePanel.WidgetGroup:AddChild(frame.sidePanelDeleteButton)
 	
+	-- Defensive check: Ensure preset structure exists before accessing Affixes
+	if not db.presets[db.currentDungeonIdx] or type(db.presets[db.currentDungeonIdx]) ~= "table" then
+		db.presets[db.currentDungeonIdx] = {}
+	end
+	if not db.currentPreset[db.currentDungeonIdx] then
+		db.currentPreset[db.currentDungeonIdx] = 1
+	end
+    local curPresetIdx = db.currentPreset[db.currentDungeonIdx]
+    if not db.presets[db.currentDungeonIdx][curPresetIdx] or type(db.presets[db.currentDungeonIdx][curPresetIdx]) ~= "table" then
+        db.presets[db.currentDungeonIdx][curPresetIdx] = {text="Default", value={}}
+    end
+	if type(db.presets[db.currentDungeonIdx][curPresetIdx].value) ~= "table" then
+		db.presets[db.currentDungeonIdx][curPresetIdx].value = {}
+	end
+    
+	if not db.presets[db.currentDungeonIdx][curPresetIdx + 1] then
+		db.presets[db.currentDungeonIdx][curPresetIdx + 1] = {text="<New Preset>",value=0}
+	end
 	
 	--Tyranical/Fortified toggle
-	frame.sidePanelFortifiedCheckBox = AceGUI:Create("CheckBox")
-	frame.sidePanelFortifiedCheckBox:SetLabel("Fort")
+	frame.sidePanelFortifiedCheckBox = MethodDungeonTools:AceGUI_Create("CheckBox")
+	frame.sidePanelFortifiedCheckBox:SetLabel("Укрепленный")
 	frame.sidePanelFortifiedCheckBox.text:SetTextHeight(10)
-	frame.sidePanelFortifiedCheckBox:SetWidth(65)
+	frame.sidePanelFortifiedCheckBox:SetWidth(120)
 	frame.sidePanelFortifiedCheckBox:SetHeight(15)
 	if db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]].value.currentAffix then
 		if db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]].value.currentAffix == "fortified" then frame.sidePanelFortifiedCheckBox:SetValue(true) end
@@ -713,10 +712,10 @@ function MethodDungeonTools:MakeSidePanel(frame)
 	frame.sidePanel.WidgetGroup:AddChild(frame.sidePanelFortifiedCheckBox)
 	
 	
-	frame.sidePanelTyrannicalCheckBox = AceGUI:Create("CheckBox")
-	frame.sidePanelTyrannicalCheckBox:SetLabel("Tyran")
+	frame.sidePanelTyrannicalCheckBox = MethodDungeonTools:AceGUI_Create("CheckBox")
+	frame.sidePanelTyrannicalCheckBox:SetLabel("Тираник")
 	frame.sidePanelTyrannicalCheckBox.text:SetTextHeight(10)
-	frame.sidePanelTyrannicalCheckBox:SetWidth(74)
+	frame.sidePanelTyrannicalCheckBox:SetWidth(100)
 	frame.sidePanelTyrannicalCheckBox:SetHeight(15)
 	if db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]].value.currentAffix then
 		if db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]].value.currentAffix == "tyrannical" then frame.sidePanelTyrannicalCheckBox:SetValue(true) end
@@ -732,32 +731,37 @@ function MethodDungeonTools:MakeSidePanel(frame)
 	end) 
 	frame.sidePanel.WidgetGroup:AddChild(frame.sidePanelTyrannicalCheckBox)
 	
-	frame.sidePanelTeemingCheckBox = AceGUI:Create("CheckBox")
-	frame.sidePanelTeemingCheckBox:SetLabel("Teeming")
-	frame.sidePanelTeemingCheckBox.text:SetTextHeight(10)
-	frame.sidePanelTeemingCheckBox:SetWidth(90)
-	frame.sidePanelTeemingCheckBox:SetHeight(15)
-	frame.sidePanelTeemingCheckBox:SetDisabled(false)
+	-- frame.sidePanelTeemingCheckBox = MethodDungeonTools:AceGUI_Create("CheckBox")
+	-- frame.sidePanelTeemingCheckBox:SetLabel("Teeming")
+	-- frame.sidePanelTeemingCheckBox.text:SetTextHeight(10)
+	-- frame.sidePanelTeemingCheckBox:SetWidth(90)
+	-- frame.sidePanelTeemingCheckBox:SetHeight(15)
+	-- frame.sidePanelTeemingCheckBox:SetDisabled(false)
 	
-	if db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]].value.teeming then
-		if db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]].value.teeming == true then frame.sidePanelTeemingCheckBox:SetValue(true) end		
-	end
-	frame.sidePanelTeemingCheckBox:SetImage("Interface\\ICONS\\spell_nature_massteleport")	
-	frame.sidePanelTeemingCheckBox:SetCallback("OnValueChanged",function(widget,callbackName,value)
-		db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]].value.teeming = value
-		MethodDungeonTools:UpdateMap()
-        MethodDungeonTools:ReloadPullButtons()
-	end) 
-	frame.sidePanel.WidgetGroup:AddChild(frame.sidePanelTeemingCheckBox)
+	-- if db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]].value.teeming then
+	-- 	if db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]].value.teeming == true then frame.sidePanelTeemingCheckBox:SetValue(true) end		
+	-- end
+	-- frame.sidePanelTeemingCheckBox:SetImage("Interface\\ICONS\\spell_nature_massteleport")	
+	-- frame.sidePanelTeemingCheckBox:SetCallback("OnValueChanged",function(widget,callbackName,value)
+	-- 	db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]].value.teeming = value
+	-- 	MethodDungeonTools:UpdateMap()
+    --     MethodDungeonTools:ReloadPullButtons()
+	-- end) 
+	-- frame.sidePanel.WidgetGroup:AddChild(frame.sidePanelTeemingCheckBox)
+	
+	-- Force a line break
+	local lineBreak = MethodDungeonTools:AceGUI_Create("Label")
+	lineBreak:SetFullWidth(true)
+	frame.sidePanel.WidgetGroup:AddChild(lineBreak)
 	
 	--Difficulty Selection
-	frame.sidePanel.DifficultySliderLabel = AceGUI:Create("Label")
+	frame.sidePanel.DifficultySliderLabel = MethodDungeonTools:AceGUI_Create("Label")
 	frame.sidePanel.DifficultySliderLabel:SetText(" Level: ")
 	frame.sidePanel.DifficultySliderLabel:SetWidth(35)
 	frame.sidePanel.WidgetGroup:AddChild(frame.sidePanel.DifficultySliderLabel)
 	
 	
-	frame.sidePanel.DifficultySlider = AceGUI:Create("Slider")
+	frame.sidePanel.DifficultySlider = MethodDungeonTools:AceGUI_Create("Slider")
 	frame.sidePanel.DifficultySlider:SetSliderValues(1,35,1)
 	frame.sidePanel.DifficultySlider:SetWidth(195)	--240
 	frame.sidePanel.DifficultySlider:SetValue(db.currentDifficulty)
@@ -767,7 +771,7 @@ function MethodDungeonTools:MakeSidePanel(frame)
 	end)
 	frame.sidePanel.WidgetGroup:AddChild(frame.sidePanel.DifficultySlider)
 	
-	frame.sidePanel.middleLine = AceGUI:Create("Heading")
+	frame.sidePanel.middleLine = MethodDungeonTools:AceGUI_Create("Heading")
 	frame.sidePanel.middleLine:SetWidth(240)		
 	frame.sidePanel.WidgetGroup:AddChild(frame.sidePanel.middleLine)
     frame.sidePanel.WidgetGroup.frame:SetFrameLevel(7)
@@ -1077,7 +1081,7 @@ function MethodDungeonTools:UpdatePullTooltip(tooltip)
 					if v:IsShown() then
                         --model
 						if not tooltip.modelNpcId or (tooltip.modelNpcId ~= v.enemyData.displayId) then
-							tooltip.Model:SetDisplayInfo(v.enemyData.displayId)
+							MethodDungeonTools:SetDisplayInfo(tooltip.Model, v.enemyData.displayId)
 							tooltip.modelNpcId = v.enemyData.displayId
 						end
 						tooltip.Model:Show()
@@ -1482,7 +1486,7 @@ function MethodDungeonTools:MakeMapTexture(frame)
 				local tyrannical = not fortified
 				local health = MethodDungeonTools:CalculateEnemyHealth(boss,fortified,tyrannical,data.health,db.currentDifficulty)
 				local group = data.g and " (G "..data.g..")" or ""
-				tooltip.String:SetText("\n\n"..data.name.." "..data.cloneIdx..group.."\nLevel "..data.level.." "..data.creatureType.."\n"..MethodDungeonTools:FormatEnemyHealth(health).." HP\n".."Enemy Forces: "..data.count)
+				tooltip.String:SetText("\n\n"..data.name.." "..data.cloneIdx..group.."\nLevel "..data.level.." "..data.creatureType.."\n"..MethodDungeonTools:FormatEnemyHealth(health).." HP\n".."Enemy Forces: "..data.count.."%")
 				tooltip.String:Show()
 				tooltip:Show()
                 if db.tooltipInCorner then
@@ -1907,7 +1911,7 @@ function MethodDungeonTools:UpdateDungeonEnemies()
 									dungeonEnemyBlips[idx].patrol[patrolIdx].line = MethodDungeonTools.main_frame.mapPanelFrame:CreateTexture("MethodDungeonToolsDungeonEnemyBlip"..idx.."Patrol"..patrolIdx.."line","BACKGROUND")
 								end
 								dungeonEnemyBlips[idx].patrol[patrolIdx].line:SetDrawLayer("ARTWORK", 5)
-								dungeonEnemyBlips[idx].patrol[patrolIdx].line:SetTexture("Interface\\AddOns\\MethodDungeonTools\\Textures\\Square_White")
+								dungeonEnemyBlips[idx].patrol[patrolIdx].line:SetTexture("Interface\\AddOns\\"..addonName.."\\Textures\\Square_White")
 								dungeonEnemyBlips[idx].patrol[patrolIdx].line:SetVertexColor(0,0.2,0.5,0.6) 
 								dungeonEnemyBlips[idx].patrol[patrolIdx].line:Hide()
 
@@ -1994,10 +1998,10 @@ function MethodDungeonTools:UpdateSidePanelCheckBoxes()
 	frame.sidePanelFortifiedCheckBox:SetValue(affix=="fortified")
 
 
-	local teeming = db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]].value.teeming
-	frame.sidePanelTeemingCheckBox:SetValue(teeming)
-	local teemingEnabled = MethodDungeonTools.dungeonTotalCount[db.currentDungeonIdx].teemingEnabled
-	frame.sidePanelTeemingCheckBox:SetDisabled(not teemingEnabled)
+	-- local teeming = db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]].value.teeming
+	-- frame.sidePanelTeemingCheckBox:SetValue(teeming)
+	-- local teemingEnabled = MethodDungeonTools.dungeonTotalCount[db.currentDungeonIdx].teemingEnabled
+	-- frame.sidePanelTeemingCheckBox:SetDisabled(not teemingEnabled)
 
 end
 
@@ -2100,7 +2104,7 @@ function MethodDungeonTools:UpdateMap(ignoreSetSelection,ignoreReloadPullButtons
         return 
     end
 	local path = "Interface\\WorldMap\\"..mapName.."\\";
-    local localPath = "Interface\\AddOns\\MethodDungeonTools\\Textures\\Maps\\";
+    local localPath = "Interface\\AddOns\\"..addonName.."\\Textures\\Maps\\";
     if mapName ~= "" then localPath = localPath..mapName.."\\" end
     
     print("MDT Debug: Attempting to load textures from: "..localPath)
@@ -2253,7 +2257,7 @@ end
 
 
 function MethodDungeonTools:MakePresetImportFrame(frame)
-	frame.presetImportFrame = AceGUI:Create("Frame")
+	frame.presetImportFrame = MethodDungeonTools:AceGUI_Create("Frame")
 	frame.presetImportFrame:SetTitle("Import Preset")
 	frame.presetImportFrame:SetWidth(400)
 	frame.presetImportFrame:SetHeight(200)
@@ -2269,19 +2273,19 @@ function MethodDungeonTools:MakePresetImportFrame(frame)
 		end
 	end)
 
-	frame.presetImportLabel = AceGUI:Create("Label")
+	frame.presetImportLabel = MethodDungeonTools:AceGUI_Create("Label")
 	frame.presetImportLabel:SetText(nil)
 	frame.presetImportLabel:SetWidth(390)
 	frame.presetImportLabel:SetColor(1,0,0)
 
 	local importString	= ""
-	frame.presetImportBox = AceGUI:Create("EditBox")
+	frame.presetImportBox = MethodDungeonTools:AceGUI_Create("EditBox")
 	frame.presetImportBox:SetLabel("Import Preset:")
 	frame.presetImportBox:SetWidth(255)
 	frame.presetImportBox:SetCallback("OnEnterPressed", function(widget, event, text) importString = text end)
 	frame.presetImportFrame:AddChild(frame.presetImportBox)
 
-	local importButton = AceGUI:Create("Button")
+	local importButton = MethodDungeonTools:AceGUI_Create("Button")
 	importButton:SetText("Import")
 	importButton:SetWidth(100)
 	importButton:SetCallback("OnClick", function()
@@ -2300,7 +2304,7 @@ function MethodDungeonTools:MakePresetImportFrame(frame)
 end
 
 function MethodDungeonTools:MakePresetCreationFrame(frame)
-	frame.presetCreationFrame = AceGUI:Create("Frame")
+	frame.presetCreationFrame = MethodDungeonTools:AceGUI_Create("Frame")
 	frame.presetCreationFrame:SetTitle("New Preset")
 	frame.presetCreationFrame:SetWidth(400)
 	frame.presetCreationFrame:SetHeight(200)
@@ -2317,7 +2321,7 @@ function MethodDungeonTools:MakePresetCreationFrame(frame)
 	end)
 	
 	
-	frame.PresetCreationEditbox = AceGUI:Create("EditBox")
+	frame.PresetCreationEditbox = MethodDungeonTools:AceGUI_Create("EditBox")
 	frame.PresetCreationEditbox:SetLabel("Preset name:")
 	frame.PresetCreationEditbox:SetWidth(255)
 	frame.PresetCreationEditbox:SetCallback("OnEnterPressed", function(widget, event, text)
@@ -2333,7 +2337,7 @@ function MethodDungeonTools:MakePresetCreationFrame(frame)
 	end)
 	frame.presetCreationFrame:AddChild(frame.PresetCreationEditbox)
 	
-	frame.presetCreationCreateButton = AceGUI:Create("Button")
+	frame.presetCreationCreateButton = MethodDungeonTools:AceGUI_Create("Button")
 	frame.presetCreationCreateButton:SetText("Create")
 	frame.presetCreationCreateButton:SetWidth(100)
 	frame.presetCreationCreateButton:SetCallback("OnClick", function()
@@ -2346,14 +2350,14 @@ function MethodDungeonTools:MakePresetCreationFrame(frame)
 	end)	
 	frame.presetCreationFrame:AddChild(frame.presetCreationCreateButton)
 	
-	frame.presetCreationLabel = AceGUI:Create("Label")
+	frame.presetCreationLabel = MethodDungeonTools:AceGUI_Create("Label")
 	frame.presetCreationLabel:SetText(nil)
 	frame.presetCreationLabel:SetWidth(390)
 	frame.presetCreationLabel:SetColor(1,0,0)
 	frame.presetCreationFrame:AddChild(frame.presetCreationLabel)
 	
 	
-	frame.PresetCreationDropDown = AceGUI:Create("Dropdown")
+	frame.PresetCreationDropDown = MethodDungeonTools:AceGUI_Create("Dropdown")
 	frame.PresetCreationDropDown:SetLabel("Use as a starting point:")
 	frame.presetCreationFrame:AddChild(frame.PresetCreationDropDown)
 
@@ -2402,7 +2406,7 @@ end
 
 function MethodDungeonTools:MakePullSelectionButtons(frame)
 
-    frame.PullButtonScrollGroup = AceGUI:Create("SimpleGroup")
+    frame.PullButtonScrollGroup = MethodDungeonTools:AceGUI_Create("SimpleGroup")
     frame.PullButtonScrollGroup:SetWidth(249);
     frame.PullButtonScrollGroup:SetHeight(410)
     frame.PullButtonScrollGroup:SetPoint("TOPLEFT",frame.WidgetGroup.frame,"BOTTOMLEFT",-4,-32)
@@ -2424,7 +2428,7 @@ function MethodDungeonTools:MakePullSelectionButtons(frame)
 
 
 
-    frame.pullButtonsScrollFrame = AceGUI:Create("ScrollFrame")
+    frame.pullButtonsScrollFrame = MethodDungeonTools:AceGUI_Create("ScrollFrame")
     frame.pullButtonsScrollFrame:SetLayout("Flow")
 
     frame.PullButtonScrollGroup:AddChild(frame.pullButtonsScrollFrame)
@@ -2601,7 +2605,7 @@ function MethodDungeonTools:ReloadPullButtons()
 	local idx = 0
 	for k,pull in pairs(preset.value.pulls) do
 		idx = idx+1
-		frame.newPullButtons[idx] = AceGUI:Create("MethodDungeonToolsPullButton")
+		frame.newPullButtons[idx] = MethodDungeonTools:AceGUI_Create("MethodDungeonToolsPullButton")
 		frame.newPullButtons[idx]:SetMaxPulls(maxPulls)
 		frame.newPullButtons[idx]:SetIndex(idx)
 		MethodDungeonTools:UpdatePullButtonNPCData(idx)
@@ -2611,7 +2615,7 @@ function MethodDungeonTools:ReloadPullButtons()
 	end
 
 	--add the "new pull" button
-	frame.newPullButton = AceGUI:Create("MethodDungeonToolsNewPullButton")
+	frame.newPullButton = MethodDungeonTools:AceGUI_Create("MethodDungeonToolsNewPullButton")
 	frame.newPullButton:Initialize()
 	frame.newPullButton:Enable()
 	frame.pullButtonsScrollFrame:AddChild(frame.newPullButton)
@@ -2693,7 +2697,7 @@ end
 
 
 function MethodDungeonTools:MakeRenameFrame(frame)
-	frame.RenameFrame = AceGUI:Create("Frame")
+	frame.RenameFrame = MethodDungeonTools:AceGUI_Create("Frame")
 	frame.RenameFrame:SetTitle("Rename Preset")
 	frame.RenameFrame:SetWidth(350)
 	frame.RenameFrame:SetHeight(150)
@@ -2705,7 +2709,7 @@ function MethodDungeonTools:MakeRenameFrame(frame)
 	frame.RenameFrame:Hide()
 
 	local renameText
-	frame.RenameFrame.Editbox = AceGUI:Create("EditBox")
+	frame.RenameFrame.Editbox = MethodDungeonTools:AceGUI_Create("EditBox")
 	frame.RenameFrame.Editbox:SetLabel("Insert new Preset Name:")
 	frame.RenameFrame.Editbox:SetWidth(200)
 	frame.RenameFrame.Editbox:SetCallback("OnEnterPressed", function(...)
@@ -2725,13 +2729,13 @@ function MethodDungeonTools:MakeRenameFrame(frame)
 
 	frame.RenameFrame:AddChild(frame.RenameFrame.Editbox)
 
-	frame.RenameFrame.RenameButton = AceGUI:Create("Button")
+	frame.RenameFrame.RenameButton = MethodDungeonTools:AceGUI_Create("Button")
 	frame.RenameFrame.RenameButton:SetText("Rename")
 	frame.RenameFrame.RenameButton:SetWidth(100)
 	frame.RenameFrame.RenameButton:SetCallback("OnClick",function() MethodDungeonTools:RenamePreset(renameText) end)
 	frame.RenameFrame:AddChild(frame.RenameFrame.RenameButton)
 
-	frame.RenameFrame.PresetRenameLabel = AceGUI:Create("Label")
+	frame.RenameFrame.PresetRenameLabel = MethodDungeonTools:AceGUI_Create("Label")
 	frame.RenameFrame.PresetRenameLabel:SetText(nil)
 	frame.RenameFrame.PresetRenameLabel:SetWidth(390)
 	frame.RenameFrame.PresetRenameLabel:SetColor(1,0,0)
@@ -2744,7 +2748,7 @@ end
 ---Creates the frame used to export presets to a string which can be uploaded to text sharing websites like pastebin
 ---@param frame frame
 function MethodDungeonTools:MakeExportFrame(frame)
-	frame.ExportFrame = AceGUI:Create("Frame")
+	frame.ExportFrame = MethodDungeonTools:AceGUI_Create("Frame")
 	frame.ExportFrame:SetTitle("Preset Export")
 	frame.ExportFrame:SetWidth(600)
 	frame.ExportFrame:SetHeight(400)
@@ -2754,7 +2758,7 @@ function MethodDungeonTools:MakeExportFrame(frame)
 		
 	end)
 	
-	frame.ExportFrameEditbox = AceGUI:Create("MultiLineEditBox")
+	frame.ExportFrameEditbox = MethodDungeonTools:AceGUI_Create("MultiLineEditBox")
 	frame.ExportFrameEditbox:SetLabel("Preset Export:")
 	frame.ExportFrameEditbox:SetWidth(600)
 	frame.ExportFrameEditbox:DisableButton(true)
@@ -2771,7 +2775,7 @@ end
 ---MakeDeleteConfirmationFrame
 ---Creates the delete confirmation dialog that pops up when a user wants to delete a preset
 function MethodDungeonTools:MakeDeleteConfirmationFrame(frame)
-	frame.DeleteConfirmationFrame = AceGUI:Create("Frame")
+	frame.DeleteConfirmationFrame = MethodDungeonTools:AceGUI_Create("Frame")
 	frame.DeleteConfirmationFrame:SetTitle("Delete Preset")
 	frame.DeleteConfirmationFrame:SetWidth(250)
 	frame.DeleteConfirmationFrame:SetHeight(120)
@@ -2781,20 +2785,20 @@ function MethodDungeonTools:MakeDeleteConfirmationFrame(frame)
 
 	end)
 
-	frame.DeleteConfirmationFrame.label = AceGUI:Create("Label")
+	frame.DeleteConfirmationFrame.label = MethodDungeonTools:AceGUI_Create("Label")
 	frame.DeleteConfirmationFrame.label:SetWidth(390)
 	frame.DeleteConfirmationFrame.label:SetHeight(10)
 	--frame.DeleteConfirmationFrame.label:SetColor(1,0,0)
 	frame.DeleteConfirmationFrame:AddChild(frame.DeleteConfirmationFrame.label)
 
-	frame.DeleteConfirmationFrame.OkayButton = AceGUI:Create("Button")
+	frame.DeleteConfirmationFrame.OkayButton = MethodDungeonTools:AceGUI_Create("Button")
 	frame.DeleteConfirmationFrame.OkayButton:SetText("Delete")
 	frame.DeleteConfirmationFrame.OkayButton:SetWidth(100)
 	frame.DeleteConfirmationFrame.OkayButton:SetCallback("OnClick",function()
 		MethodDungeonTools:DeletePreset(db.currentPreset[db.currentDungeonIdx])
 		frame.DeleteConfirmationFrame:Hide()
 	end)
-	frame.DeleteConfirmationFrame.CancelButton = AceGUI:Create("Button")
+	frame.DeleteConfirmationFrame.CancelButton = MethodDungeonTools:AceGUI_Create("Button")
 	frame.DeleteConfirmationFrame.CancelButton:SetText("Cancel")
 	frame.DeleteConfirmationFrame.CancelButton:SetWidth(100)
 	frame.DeleteConfirmationFrame.CancelButton:SetCallback("OnClick",function()
@@ -2811,7 +2815,7 @@ end
 ---MakeClearConfirmationFrame
 ---Creates the clear confirmation dialog that pops up when a user wants to clear a preset
 function MethodDungeonTools:MakeClearConfirmationFrame(frame)
-	frame.ClearConfirmationFrame = AceGUI:Create("Frame")
+	frame.ClearConfirmationFrame = MethodDungeonTools:AceGUI_Create("Frame")
 	frame.ClearConfirmationFrame:SetTitle("Clear Preset")
 	frame.ClearConfirmationFrame:SetWidth(250)
 	frame.ClearConfirmationFrame:SetHeight(120)
@@ -2821,20 +2825,20 @@ function MethodDungeonTools:MakeClearConfirmationFrame(frame)
 
 	end)
 
-	frame.ClearConfirmationFrame.label = AceGUI:Create("Label")
+	frame.ClearConfirmationFrame.label = MethodDungeonTools:AceGUI_Create("Label")
 	frame.ClearConfirmationFrame.label:SetWidth(390)
 	frame.ClearConfirmationFrame.label:SetHeight(10)
 	--frame.DeleteConfirmationFrame.label:SetColor(1,0,0)
 	frame.ClearConfirmationFrame:AddChild(frame.ClearConfirmationFrame.label)
 
-	frame.ClearConfirmationFrame.OkayButton = AceGUI:Create("Button")
+	frame.ClearConfirmationFrame.OkayButton = MethodDungeonTools:AceGUI_Create("Button")
 	frame.ClearConfirmationFrame.OkayButton:SetText("Clear")
 	frame.ClearConfirmationFrame.OkayButton:SetWidth(100)
 	frame.ClearConfirmationFrame.OkayButton:SetCallback("OnClick",function()
 		MethodDungeonTools:ClearPreset(db.currentPreset[db.currentDungeonIdx])
 		frame.ClearConfirmationFrame:Hide()
 	end)
-	frame.ClearConfirmationFrame.CancelButton = AceGUI:Create("Button")
+	frame.ClearConfirmationFrame.CancelButton = MethodDungeonTools:AceGUI_Create("Button")
 	frame.ClearConfirmationFrame.CancelButton:SetText("Cancel")
 	frame.ClearConfirmationFrame.CancelButton:SetWidth(100)
 	frame.ClearConfirmationFrame.CancelButton:SetCallback("OnClick",function()
@@ -2912,7 +2916,7 @@ function initFrames()
 	main_frame.background = main_frame:CreateTexture(nil, "BACKGROUND");
 	main_frame.background:SetAllPoints();
 	main_frame.background:SetDrawLayer("ARTWORK", 1);
-	main_frame.background:SetColorTexture(0, 0, 0, 0.5);
+	MethodDungeonTools:SetColorTexture(main_frame.background, 0, 0, 0, 0.5);
 	main_frame.background:SetAlpha(0.2)
 	main_frame:SetSize(sizex, sizey);
 	MethodDungeonTools.main_frame = main_frame;	
