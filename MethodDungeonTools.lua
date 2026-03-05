@@ -22,16 +22,23 @@ function MethodDungeonTools:SetColorTexture(texture, r, g, b, a)
     end
 end
 
-function MethodDungeonTools:SetDisplayInfo(model, id, isNpcId)
-    if isNpcId and model.SetCreature then
-        model:SetCreature(id)
-    elseif model.SetDisplayInfo then
-        model:SetDisplayInfo(id)
+function MethodDungeonTools:SetDisplayInfo(model, id, isNpcId, modelPath)
+    if modelPath and model.SetModel then
+        print("|cFF00FF00[MDT Debug]|r Loading SetModel with path:", modelPath)
+        model:SetModel(modelPath)
+        if model.SetLight then
+            model:SetLight(1, 0, 0, -0.707, -0.707, 0.7, 1.0, 1.0, 1.0, 0.8, 1.0, 1.0, 0.8)
+        end
     elseif model.SetCreature then
+        print("|cFF00FF00[MDT Debug]|r Loading SetCreature with visual NPC ID:", id)
         model:SetCreature(id)
-    elseif model.SetDisplayID then
-        model:SetDisplayID(id)
     end
+    
+    -- Force WotLK camera bounds (handles models missing DBC scale offsets)
+    if model.SetCamera then model:SetCamera(0) end
+    if model.SetModelScale then model:SetModelScale(1) end
+    if model.SetPosition then model:SetPosition(0, 0, 0) end
+    if model.SetFacing then model:SetFacing(0) end
 end
 
 function MethodDungeonTools:AceGUI_Create(...)
@@ -1082,11 +1089,14 @@ function MethodDungeonTools:UpdatePullTooltip(tooltip)
 				if MouseIsOver(v) then
 					if v:IsShown() then
 						tooltip.Model:Show()
-                        local modelId = v.enemyData.displayId or v.enemyData.npcId or v.enemyData.id
+                        local modelPath = v.enemyData.modelPath
+                        local modelId = v.enemyData.displayId or v.enemyData.id
 						local isNpcId = (v.enemyData.displayId == nil)
-                        if not tooltip.modelNpcId or (tooltip.modelNpcId ~= modelId) then
-							MethodDungeonTools:SetDisplayInfo(tooltip.Model, modelId, isNpcId)
-							tooltip.modelNpcId = modelId
+                        local cacheId = modelPath or modelId
+                        if tooltip.Model.lastModelId ~= cacheId then
+                            if tooltip.Model.ClearModel then tooltip.Model:ClearModel() end
+							MethodDungeonTools:SetDisplayInfo(tooltip.Model, modelId, isNpcId, modelPath)
+							tooltip.Model.lastModelId = cacheId
 						end
                         --topString
                         local newLine = "\n"
@@ -1444,6 +1454,12 @@ function MethodDungeonTools:MakeMapTexture(frame)
 			frameX=(frameX/mapScale)+scrollH
 			frameY=(frameY/mapScale)+scrollV
 			
+			if db.devMode and MouseIsOver(scrollFrame) then
+				MethodDungeonTools.main_frame.CoordinateDisplay:SetText(string.format("X: %.2f, Y: %.2f", frameX, -frameY))
+				MethodDungeonTools.main_frame.CoordinateDisplay:Show()
+			else
+				MethodDungeonTools.main_frame.CoordinateDisplay:Hide()
+			end
 			
 			--MethodDungeonTools.main_frame.topPanelString:SetText(string.format("%.1f",frameX).."    "..string.format("%.1f",frameY));
 
@@ -1494,20 +1510,18 @@ function MethodDungeonTools:MakeMapTexture(frame)
 						tooltip:SetPoint("TOPLEFT",dungeonBossButtons[mouseOverBoss],"BOTTOMRIGHT",10,0)
 						tooltip:SetPoint("BOTTOMRIGHT",dungeonBossButtons[mouseOverBoss],"BOTTOMRIGHT",10+tooltip.mySizes.x,-tooltip.mySizes.y)
 					end
+					local modelPath = data.modelPath
 					local id = data.displayId or data.id
-					local isNpcId = (data.displayId == nil)
-					if id then
+                    local isNpcId = (data.displayId == nil)
+                    local cacheId = modelPath or id
+					if cacheId then
 						tooltip.Model:Show()
-						if lastModelId then 
-							if lastModelId ~= id then 
-								MethodDungeonTools:SetDisplayInfo(tooltip.Model, id, isNpcId)
-								lastModelId = id
-							end
-						else
-							MethodDungeonTools:SetDisplayInfo(tooltip.Model, id, isNpcId)
-							lastModelId = id
+						if tooltip.Model.lastModelId ~= cacheId then 
+                            if tooltip.Model.ClearModel then tooltip.Model:ClearModel() end
+							MethodDungeonTools:SetDisplayInfo(tooltip.Model, id, isNpcId, modelPath)
+							tooltip.Model.lastModelId = cacheId
 						end
-					else 
+					else
 						tooltip.Model:ClearModel()
 						tooltip.Model:Hide()
 					end
@@ -1550,18 +1564,16 @@ function MethodDungeonTools:MakeMapTexture(frame)
                     tooltip:SetPoint("TOPLEFT",dungeonEnemyBlips[mouseoverBlip],"BOTTOMRIGHT",30+rightOffset,bottomOffset)
                     tooltip:SetPoint("BOTTOMRIGHT",dungeonEnemyBlips[mouseoverBlip],"BOTTOMRIGHT",30+tooltip.mySizes.x+rightOffset,-tooltip.mySizes.y+bottomOffset)
                 end
-				local id = dungeonEnemyBlips[mouseoverBlip].displayId or dungeonEnemyBlips[mouseoverBlip].npcId or dungeonEnemyBlips[mouseoverBlip].id
-				local isNpcId = (dungeonEnemyBlips[mouseoverBlip].displayId == nil)
-				if id then
+                local modelPath = dungeonEnemyBlips[mouseoverBlip].modelPath
+				local id = dungeonEnemyBlips[mouseoverBlip].displayId or dungeonEnemyBlips[mouseoverBlip].id
+                local isNpcId = (dungeonEnemyBlips[mouseoverBlip].displayId == nil)
+                local cacheId = modelPath or id
+				if cacheId then
 					tooltip.Model:Show()
-                    if lastModelId then 
-						if lastModelId ~= id then 
-							MethodDungeonTools:SetDisplayInfo(tooltip.Model, id, isNpcId)
-							lastModelId = id
-						end
-					else
-						MethodDungeonTools:SetDisplayInfo(tooltip.Model, id, isNpcId)
-						lastModelId = id
+					if tooltip.Model.lastModelId ~= cacheId then 
+                        if tooltip.Model.ClearModel then tooltip.Model:ClearModel() end
+						MethodDungeonTools:SetDisplayInfo(tooltip.Model, id, isNpcId, modelPath)
+						tooltip.Model.lastModelId = cacheId
 					end
 				else 
 					tooltip.Model:ClearModel()
@@ -1625,6 +1637,7 @@ function MethodDungeonTools:MakeMapTexture(frame)
 				--GameTooltip:Hide()
 				tooltip.Model:Hide()
 				tooltip:Hide()
+                tooltip.Model.lastModelId = nil
 				if dungeonEnemyBlipMouseoverHighlight then
 					dungeonEnemyBlipMouseoverHighlight:Hide()
 				end
@@ -1831,6 +1844,7 @@ function MethodDungeonTools:UpdateDungeonEnemies()
 						dungeonEnemyBlips[idx].id = data["id"]
 						dungeonEnemyBlips[idx].displayId = data["displayId"]
 						dungeonEnemyBlips[idx].npcId = data["npcId"]
+						dungeonEnemyBlips[idx].modelPath = data["modelPath"]
 						dungeonEnemyBlips[idx].g = clone.g
 						dungeonEnemyBlips[idx].sublevel = clone.sublevel or 1							
 						dungeonEnemyBlips[idx].creatureType = data["creatureType"]				
@@ -3052,6 +3066,13 @@ function initFrames()
 		tooltip.String:SetPoint("TOPLEFT", tooltip, "TOPLEFT", 110, -7)
 		tooltip.String:Show();
 	end
+
+	-- Coordinate Display for Dev Mode
+	main_frame.CoordinateDisplay = main_frame:CreateFontString("MethodDungeonToolsCoordinateDisplay", "OVERLAY", "GameFontNormal")
+	main_frame.CoordinateDisplay:SetFont("Fonts\\FRIZQT__.TTF", 12, "OUTLINE")
+	main_frame.CoordinateDisplay:SetTextColor(1, 1, 1, 1)
+	main_frame.CoordinateDisplay:SetPoint("BOTTOMLEFT", main_frame, "BOTTOMLEFT", 10, 10)
+	main_frame.CoordinateDisplay:Hide()
 
 	--pullTooltip
 	do
