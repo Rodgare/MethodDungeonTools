@@ -1082,9 +1082,10 @@ function MethodDungeonTools:UpdatePullTooltip(tooltip)
 				if MouseIsOver(v) then
 					if v:IsShown() then
 						tooltip.Model:Show()
-                        local modelId = v.enemyData.npcId or v.enemyData.id or v.enemyData.displayId
+                        local modelId = v.enemyData.displayId or v.enemyData.npcId or v.enemyData.id
+						local isNpcId = (v.enemyData.displayId == nil)
                         if not tooltip.modelNpcId or (tooltip.modelNpcId ~= modelId) then
-							MethodDungeonTools:SetDisplayInfo(tooltip.Model, modelId, (v.enemyData.npcId or v.enemyData.id) ~= nil)
+							MethodDungeonTools:SetDisplayInfo(tooltip.Model, modelId, isNpcId)
 							tooltip.modelNpcId = modelId
 						end
                         --topString
@@ -1493,16 +1494,17 @@ function MethodDungeonTools:MakeMapTexture(frame)
 						tooltip:SetPoint("TOPLEFT",dungeonBossButtons[mouseOverBoss],"BOTTOMRIGHT",10,0)
 						tooltip:SetPoint("BOTTOMRIGHT",dungeonBossButtons[mouseOverBoss],"BOTTOMRIGHT",10+tooltip.mySizes.x,-tooltip.mySizes.y)
 					end
-					local id = data.id or data.displayId
+					local id = data.displayId or data.id
+					local isNpcId = (data.displayId == nil)
 					if id then
 						tooltip.Model:Show()
 						if lastModelId then 
 							if lastModelId ~= id then 
-								MethodDungeonTools:SetDisplayInfo(tooltip.Model, id, data.id ~= nil)
+								MethodDungeonTools:SetDisplayInfo(tooltip.Model, id, isNpcId)
 								lastModelId = id
 							end
 						else
-							MethodDungeonTools:SetDisplayInfo(tooltip.Model, id, data.id ~= nil)
+							MethodDungeonTools:SetDisplayInfo(tooltip.Model, id, isNpcId)
 							lastModelId = id
 						end
 					else 
@@ -1548,16 +1550,17 @@ function MethodDungeonTools:MakeMapTexture(frame)
                     tooltip:SetPoint("TOPLEFT",dungeonEnemyBlips[mouseoverBlip],"BOTTOMRIGHT",30+rightOffset,bottomOffset)
                     tooltip:SetPoint("BOTTOMRIGHT",dungeonEnemyBlips[mouseoverBlip],"BOTTOMRIGHT",30+tooltip.mySizes.x+rightOffset,-tooltip.mySizes.y+bottomOffset)
                 end
-				local id = dungeonEnemyBlips[mouseoverBlip].id
+				local id = dungeonEnemyBlips[mouseoverBlip].displayId or dungeonEnemyBlips[mouseoverBlip].npcId or dungeonEnemyBlips[mouseoverBlip].id
+				local isNpcId = (dungeonEnemyBlips[mouseoverBlip].displayId == nil)
 				if id then
 					tooltip.Model:Show()
                     if lastModelId then 
 						if lastModelId ~= id then 
-							tooltip.Model:SetCreature(id)
+							MethodDungeonTools:SetDisplayInfo(tooltip.Model, id, isNpcId)
 							lastModelId = id
 						end
 					else
-						tooltip.Model:SetCreature(id)
+						MethodDungeonTools:SetDisplayInfo(tooltip.Model, id, isNpcId)
 						lastModelId = id
 					end
 				else 
@@ -1816,7 +1819,7 @@ function MethodDungeonTools:UpdateDungeonEnemies()
 					local teeming = db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]].value.teeming
 					if (teeming==true) or (teeming==false and ((not clone.teeming) or clone.teeming==false))  then
 						if not dungeonEnemyBlips[idx] then 
-							dungeonEnemyBlips[idx] = MethodDungeonTools.main_frame.mapPanelFrame:CreateTexture("MethodDungeonToolsDungeonEnemyBlip"..idx,"BACKGROUND")
+							dungeonEnemyBlips[idx] = MethodDungeonTools.main_frame.mapPanelFrame:CreateTexture("MethodDungeonToolsDungeonEnemyBlip"..idx,"OVERLAY")
 							dungeonEnemyBlips[idx].selected = false
 						end
 						dungeonEnemyBlips[idx].count = data["count"]
@@ -1825,14 +1828,16 @@ function MethodDungeonTools:UpdateDungeonEnemies()
 
 						dungeonEnemyBlips[idx].cloneIdx = cloneIdx
 						dungeonEnemyBlips[idx].enemyIdx = enemyIdx
-						dungeonEnemyBlips[idx].id = data["id"]	
+						dungeonEnemyBlips[idx].id = data["id"]
+						dungeonEnemyBlips[idx].displayId = data["displayId"]
+						dungeonEnemyBlips[idx].npcId = data["npcId"]
 						dungeonEnemyBlips[idx].g = clone.g
 						dungeonEnemyBlips[idx].sublevel = clone.sublevel or 1							
 						dungeonEnemyBlips[idx].creatureType = data["creatureType"]				
 						dungeonEnemyBlips[idx].health = data["health"]
 						dungeonEnemyBlips[idx].level = data["level"]
-						dungeonEnemyBlips[idx]:SetDrawLayer("ARTWORK", 5)
-						dungeonEnemyBlips[idx]:SetTexture("Interface\\BUTTONS\\WHITE8X8")
+						dungeonEnemyBlips[idx]:SetDrawLayer("OVERLAY", 7)
+						dungeonEnemyBlips[idx]:SetTexture("Interface\\AddOns\\"..addonName.."\\Textures\\Circle_White.tga")
 						dungeonEnemyBlips[idx]:SetWidth(10*data["scale"])
 						dungeonEnemyBlips[idx]:SetHeight(10*data["scale"])
 						dungeonEnemyBlips[idx]:SetPoint("CENTER",MethodDungeonTools.main_frame.mapPanelTile1,"TOPLEFT",clone.x,clone.y)
@@ -1840,7 +1845,7 @@ function MethodDungeonTools:UpdateDungeonEnemies()
                         --color patrol
                         dungeonEnemyBlips[idx].patrolFollower = nil
                         if clone.patrol then
-                            dungeonEnemyBlips[idx]:SetTexture("Interface\\BUTTONS\\WHITE8X8")
+                            dungeonEnemyBlips[idx]:SetTexture("Interface\\AddOns\\"..addonName.."\\Textures\\Circle_White.tga")
                             dungeonEnemyBlips[idx].color = patrolColor
                         else
                             --iterate over all enemies again to find if this npc is linked to a patrol
@@ -1853,7 +1858,7 @@ function MethodDungeonTools:UpdateDungeonEnemies()
                                         if (patrolCheckDataTeeming==true) or (patrolCheckDataTeeming==false and ((not patrolCheckClone.teeming) or patrolCheckClone.teeming==false))  then
                                             if clone.g and patrolCheckClone.g then
                                                 if clone.g == patrolCheckClone.g and patrolCheckClone.patrol then
-                                                    dungeonEnemyBlips[idx]:SetTexture("Interface\\BUTTONS\\WHITE8X8")
+                                                    dungeonEnemyBlips[idx]:SetTexture("Interface\\AddOns\\"..addonName.."\\Textures\\Circle_White.tga")
                                                     dungeonEnemyBlips[idx].color = patrolColor
                                                     dungeonEnemyBlips[idx].patrolFollower = true
                                                 end

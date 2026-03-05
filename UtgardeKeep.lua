@@ -26,7 +26,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
         ["level"] = 80,
         ["creatureType"] = "Дракон",
         ["id"] = 24849,
-        ["displayId"] = 24849,
+        ["displayId"] = 24083,
         ["count"] = 3.61, -- Enemy count for the progress bar
         ["scale"] = 2,
         ["color"] = {r=1,g=1,b=1,a=0.8},
