@@ -8,12 +8,12 @@ MethodDungeonTools.dungeonBosses[dungeonIndex] = {
     [1] = {
         [1] = {
             ["name"] = "Принц Келесет",
-            ["encounterID"] = 1502,
+            -- ["encounterID"] = 1502,
             ["id"] = 23953,
-            ["displayId"] = 96756,
+            ["displayId"] = 23953,
             ["health"] = 90276936,
-            ["x"] = 400, -- Map coordinates (0-840)
-            ["y"] = 300, -- Map coordinates (0-555)
+            ["x"] = 500, -- Map coordinates (0-840)
+            ["y"] = -300, -- Map coordinates (0-555)
         },
     }
 }
@@ -21,19 +21,19 @@ MethodDungeonTools.dungeonBosses[dungeonIndex] = {
 -- 3. Enemy Data
 MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
     [1] = { -- First enemy type
-        ["name"] = "Anub'ar Warrior",
-        ["health"] = 150000,
+        ["name"] = "Порабощенный протодракон",
+        ["health"] = 130330,
         ["level"] = 80,
-        ["creatureType"] = "Humanoid",
-        ["id"] = 29023,
-        ["displayId"] = 25801,
-        ["count"] = 4, -- Enemy count for the progress bar
-        ["scale"] = 1,
+        ["creatureType"] = "Дракон",
+        ["id"] = 92035,
+        ["displayId"] = 92035,
+        ["count"] = 3.61, -- Enemy count for the progress bar
+        ["scale"] = 2,
         ["color"] = {r=1,g=1,b=1,a=0.8},
         ["clones"] = {
             -- subLevel matches the floor index, g is the pull group
-            [1] = {x = 500, y = 300, sublevel = 1, g = 1}, 
-            [2] = {x = 510, y = 310, sublevel = 1, g = 1},
+            [1] = {x = 500, y = -300, sublevel = 1, g = 1}, 
+            [2] = {x = 510, y = -310, sublevel = 1, g = 1},
         },
     },
 }

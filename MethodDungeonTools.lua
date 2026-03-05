@@ -22,8 +22,10 @@ function MethodDungeonTools:SetColorTexture(texture, r, g, b, a)
     end
 end
 
-function MethodDungeonTools:SetDisplayInfo(model, id)
-    if model.SetDisplayInfo then
+function MethodDungeonTools:SetDisplayInfo(model, id, isNpcId)
+    if isNpcId and model.SetCreature then
+        model:SetCreature(id)
+    elseif model.SetDisplayInfo then
         model:SetDisplayInfo(id)
     elseif model.SetCreature then
         model:SetCreature(id)
@@ -1080,9 +1082,10 @@ function MethodDungeonTools:UpdatePullTooltip(tooltip)
 				if MouseIsOver(v) then
 					if v:IsShown() then
                         --model
-						if not tooltip.modelNpcId or (tooltip.modelNpcId ~= v.enemyData.displayId) then
-							MethodDungeonTools:SetDisplayInfo(tooltip.Model, v.enemyData.displayId)
-							tooltip.modelNpcId = v.enemyData.displayId
+						local modelId = v.enemyData.npcId or v.enemyData.id or v.enemyData.displayId
+                        if not tooltip.modelNpcId or (tooltip.modelNpcId ~= modelId) then
+							MethodDungeonTools:SetDisplayInfo(tooltip.Model, modelId, (v.enemyData.npcId or v.enemyData.id) ~= nil)
+							tooltip.modelNpcId = modelId
 						end
 						tooltip.Model:Show()
                         --topString
