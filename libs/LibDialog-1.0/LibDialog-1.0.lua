@@ -479,8 +479,8 @@ local function _AcquireEditBox(dialog, index)
 
     editbox.addHighlightedText = true
 
-    editbox:SetParent(dialog)
     editbox:SetID(index)
+    editbox:SetParent(dialog)
     editbox:SetWidth(template.width or DEFAULT_EDITBOX_WIDTH)
 
     editbox:SetAutoFocus(template.auto_focus)
