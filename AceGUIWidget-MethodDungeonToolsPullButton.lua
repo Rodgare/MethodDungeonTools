@@ -182,15 +182,10 @@ local methods = {
             end
             self.enemyPortraits[idx]:Show()
             self.enemyPortraits[idx].overlay:Show()
-            local quality = 0
-            if data.count>0 then quality = 1 end
-            if data.count>2 then quality = 2 end
-            if data.count>3 then quality = 3 end
-            if data.count>6 then quality = 4 end
-            if data.count>9 then quality = 5 end
-            local r, g, b, hex = GetItemQualityColor(quality)
-            if quality == 0 then r,g,b = 0,0,0 end
-            self.enemyPortraits[idx].overlay:SetVertexColor(r,g,b)
+            local colorIdx = (self.index % #MethodDungeonTools.pullColors) + 1
+            if colorIdx == 0 then colorIdx = 1 end
+            local pColor = MethodDungeonTools.pullColors[colorIdx]
+            self.enemyPortraits[idx].overlay:SetVertexColor(pColor[1], pColor[2], pColor[3])
             self.enemyPortraits[idx].fontString:SetText("x"..data.quantity)
             self.enemyPortraits[idx].fontString:Show()
         end

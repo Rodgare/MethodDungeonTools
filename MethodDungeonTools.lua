@@ -953,22 +953,49 @@ function MethodDungeonTools:AddOrRemoveEnemyBlipToCurrentPull(i,add,ignoreGroupe
 	MethodDungeonTools:UpdatePullButtonNPCData(pull)
 end
 
----UpdateEnemyBlipSelection
----Colors blips green when they are selected
-function MethodDungeonTools:UpdateEnemyBlipSelection(i, forceDeselect, ignoreLinked, otherPull)
+MethodDungeonTools.pullColors = {
+    {1, 0.4, 0.4}, -- Red
+    {0.4, 1, 0.4}, -- Green
+    {0.4, 0.4, 1}, -- Blue
+    {1, 1, 0.4},   -- Yellow
+    {1, 0.4, 1},   -- Magenta
+    {0.4, 1, 1},   -- Cyan
+    {1, 0.64, 0},  -- Orange
+    {0.64, 0.16, 0.16}, -- Brown
+    {0.5, 0.5, 0.5}, -- Gray
+    {1, 0.75, 0.79}, -- Pink
+    {0.5, 0, 0.5}, -- Purple
+    {0, 0.5, 0.5}, -- Teal
+}
 
-	if otherPull and otherPull == true then
-		dungeonEnemyBlips[i]:SetVertexColor(0,1,0,0.4)
+---UpdateEnemyBlipSelection
+---Colors blips according to their assigned pull, or unselected color
+function MethodDungeonTools:UpdateEnemyBlipSelection(i, forceDeselect, ignoreLinked, pullIdx)
+	local r, g, b, a = 0, 1, 0, 1
+
+	if pullIdx then
+		local colorIdx = (pullIdx % #MethodDungeonTools.pullColors) + 1
+		if colorIdx == 0 then colorIdx = 1 end
+		local pColor = MethodDungeonTools.pullColors[colorIdx]
+		dungeonEnemyBlips[i]:SetVertexColor(pColor[1], pColor[2], pColor[3], 0.7)
 	else
 		if forceDeselect and forceDeselect == true then
 			dungeonEnemyBlips[i].selected = false
 		else
 			dungeonEnemyBlips[i].selected = not dungeonEnemyBlips[i].selected		
 		end
-		if dungeonEnemyBlips[i].selected == true then dungeonEnemyBlips[i]:SetVertexColor(0,1,0,1) else
-			local r,g,b,a = dungeonEnemyBlips[i].color.r,dungeonEnemyBlips[i].color.g,dungeonEnemyBlips[i].color.b,dungeonEnemyBlips[i].color.a
-			dungeonEnemyBlips[i]:SetVertexColor(r,g,b,a) 
+		
+		if dungeonEnemyBlips[i].selected == true then 
+            local currentPull = db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]].value.currentPull
+            local colorIdx = (currentPull % #MethodDungeonTools.pullColors) + 1
+            if colorIdx == 0 then colorIdx = 1 end
+            local pColor = MethodDungeonTools.pullColors[colorIdx]
+            dungeonEnemyBlips[i]:SetVertexColor(pColor[1], pColor[2], pColor[3], 1)
+        else
+			r, g, b, a = dungeonEnemyBlips[i].color.r, dungeonEnemyBlips[i].color.g, dungeonEnemyBlips[i].color.b, dungeonEnemyBlips[i].color.a
+			dungeonEnemyBlips[i]:SetVertexColor(r, g, b, a) 
 		end
+
 		--select/deselect linked npcs
 		if not ignoreLinked then
 			for idx=1,numDungeonEnemyBlips do
@@ -978,15 +1005,21 @@ function MethodDungeonTools:UpdateEnemyBlipSelection(i, forceDeselect, ignoreLin
 					else
 						dungeonEnemyBlips[idx].selected = dungeonEnemyBlips[i].selected
 					end			
-					if dungeonEnemyBlips[idx].selected == true then dungeonEnemyBlips[idx]:SetVertexColor(0,1,0,1) else
-						local r,g,b,a = dungeonEnemyBlips[idx].color.r,dungeonEnemyBlips[idx].color.g,dungeonEnemyBlips[idx].color.b,dungeonEnemyBlips[idx].color.a
-						dungeonEnemyBlips[idx]:SetVertexColor(r,g,b,a) 
+					
+                    if dungeonEnemyBlips[idx].selected == true then 
+                        local currentPull = db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]].value.currentPull
+                        local colorIdx = (currentPull % #MethodDungeonTools.pullColors) + 1
+                        if colorIdx == 0 then colorIdx = 1 end
+                        local pColor = MethodDungeonTools.pullColors[colorIdx]
+                        dungeonEnemyBlips[idx]:SetVertexColor(pColor[1], pColor[2], pColor[3], 1)
+                    else
+						r, g, b, a = dungeonEnemyBlips[idx].color.r, dungeonEnemyBlips[idx].color.g, dungeonEnemyBlips[idx].color.b, dungeonEnemyBlips[idx].color.a
+						dungeonEnemyBlips[idx]:SetVertexColor(r, g, b, a) 
 					end
 				end
 			end
 		end
 	end
-	
 end
 
 local lastModelId
@@ -1865,6 +1898,7 @@ function MethodDungeonTools:UpdateDungeonEnemies()
 	for k,v in pairs(dungeonEnemyBlips) do
 		v:Hide()
 		if v.patrolIndicator then v.patrolIndicator:Hide() end
+        if v.fontString then v.fontString:Hide() end
 	end
 	local idx = 1
 	if MethodDungeonTools.dungeonEnemies[db.currentDungeonIdx] then
@@ -1879,6 +1913,12 @@ function MethodDungeonTools:UpdateDungeonEnemies()
 						if not dungeonEnemyBlips[idx] then 
 							dungeonEnemyBlips[idx] = MethodDungeonTools.main_frame.mapPanelFrame:CreateTexture("MethodDungeonToolsDungeonEnemyBlip"..idx,"OVERLAY")
 							dungeonEnemyBlips[idx].selected = false
+                            dungeonEnemyBlips[idx].fontString = MethodDungeonTools.main_frame.mapPanelFrame:CreateFontString("MethodDungeonToolsDungeonEnemyBlip"..idx.."Text", "OVERLAY", "GameFontHighlightSmall")
+                            local font, size = dungeonEnemyBlips[idx].fontString:GetFont()
+                            dungeonEnemyBlips[idx].fontName = font
+                            dungeonEnemyBlips[idx].fontString:SetFont(font, 9, "OUTLINE")
+                            dungeonEnemyBlips[idx].fontString:SetPoint("CENTER", dungeonEnemyBlips[idx], "CENTER", 0, 0)
+                            dungeonEnemyBlips[idx].fontString:SetJustifyH("CENTER")
 						end
 						dungeonEnemyBlips[idx].count = data["count"]
 						dungeonEnemyBlips[idx].name = data["name"]
@@ -1928,7 +1968,13 @@ function MethodDungeonTools:UpdateDungeonEnemies()
                             end
                         end
 
-						if dungeonEnemyBlips[idx].selected == true then dungeonEnemyBlips[idx]:SetVertexColor(0,1,0,1) else
+						if dungeonEnemyBlips[idx].selected == true then 
+                            local currentPull = db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]].value.currentPull
+                            local colorIdx = (currentPull % #MethodDungeonTools.pullColors) + 1
+                            if colorIdx == 0 then colorIdx = 1 end
+                            local pColor = MethodDungeonTools.pullColors[colorIdx]
+                            dungeonEnemyBlips[idx]:SetVertexColor(pColor[1], pColor[2], pColor[3], 1)
+                        else
 							local r,g,b,a = dungeonEnemyBlips[idx].color.r,dungeonEnemyBlips[idx].color.g,dungeonEnemyBlips[idx].color.b,dungeonEnemyBlips[idx].color.a
 							dungeonEnemyBlips[idx]:SetVertexColor(r,g,b,a)							
 						end
@@ -1937,6 +1983,21 @@ function MethodDungeonTools:UpdateDungeonEnemies()
 
 						
 						dungeonEnemyBlips[idx]:Show()
+                        
+                        if dungeonEnemyBlips[idx].fontString then
+                            dungeonEnemyBlips[idx].fontString:Show()
+                            if data["count"] and data["count"] > 0 then
+                                local countStr = tostring(data["count"])
+                                if string.len(countStr) > 2 then
+                                    dungeonEnemyBlips[idx].fontString:SetFont(dungeonEnemyBlips[idx].fontName, 5, "OUTLINE")
+                                else
+                                    dungeonEnemyBlips[idx].fontString:SetFont(dungeonEnemyBlips[idx].fontName, 9, "OUTLINE")
+                                end
+                                dungeonEnemyBlips[idx].fontString:SetText(countStr)
+                            else
+                                dungeonEnemyBlips[idx].fontString:SetText("")
+                            end
+                        end
 						
 						
 						--clear patrol flag
@@ -2632,7 +2693,7 @@ function MethodDungeonTools:SetSelectionToPull(pull)
                 for j,cloneIdx in pairs(clones) do
                     for k,v in ipairs(dungeonEnemyBlips) do
                         if (v.enemyIdx == enemyIdx) and (v.cloneIdx == cloneIdx) then
-                            MethodDungeonTools:UpdateEnemyBlipSelection(k,nil,true,true)
+                            MethodDungeonTools:UpdateEnemyBlipSelection(k,nil,true,pullIdx)
                         end
                     end
                 end
