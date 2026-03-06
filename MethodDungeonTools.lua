@@ -2336,10 +2336,7 @@ function MethodDungeonTools:UpdateDungeonEnemies()
 											(patrolCheckDataTeeming == true)
 											or (
 												patrolCheckDataTeeming == false
-												and (
-													not patrolCheckClone.teeming
-													or patrolCheckClone.teeming == false
-												)
+												and (not patrolCheckClone.teeming or patrolCheckClone.teeming == false)
 											)
 										then
 											if clone.g and patrolCheckClone.g then
@@ -3936,7 +3933,111 @@ function initFrames()
 			},
 		},
 	}
-	MethodDungeonTools:RegisterOptions()
+end
 
-	main_frame:Hide()
+-- Add MDT Forces to GameTooltip
+local mdtTooltipDebug = true
+
+GameTooltip:HookScript("OnTooltipSetUnit", function(self)
+	local _, unit = self:GetUnit()
+	if not unit then
+		return
+	end
+
+	local guid = UnitGUID(unit)
+	if not guid then
+		return
+	end
+
+	local id
+	if guid:find("-") then
+		id = tonumber(select(6, strsplit("-", guid)))
+	else
+		id = tonumber(guid:sub(-12, -9), 16)
+	end
+
+	if mdtTooltipDebug then
+		print("MDT Навели мышку: " .. unit .. " GUID: " .. guid .. " ID: " .. tostring(id))
+	end
+
+	if id and MethodDungeonTools and MethodDungeonTools.dungeonEnemies then
+		for dIdx, dEnemies in pairs(MethodDungeonTools.dungeonEnemies) do
+			if dEnemies[id] then
+				local enemyData = dEnemies[id]
+				local countData = MethodDungeonTools.dungeonTotalCount[dIdx]
+				if countData and enemyData.count and enemyData.count > 0 then
+					local teeming = false
+					if
+						db
+						and db.presets
+						and db.presets[dIdx]
+						and db.currentPreset
+						and db.currentPreset[dIdx]
+						and db.presets[dIdx][db.currentPreset[dIdx]]
+					then
+						teeming = db.presets[dIdx][db.currentPreset[dIdx]].value.teeming
+					end
+
+					local total = teeming and countData.teeming or countData.normal
+					if total and total > 0 then
+						local percent = (enemyData.count / total) * 100
+						self:AddLine(string.format("MDT: %.2f%%", percent), 0, 1, 0)
+						self:Show()
+					end
+				end
+				break
+			end
+		end
+	end
+end)
+
+-- MDT Tracker Command for Sirus
+SLASH_MDTTRACK1 = "/mdttrack"
+SlashCmdList["MDTTRACK"] = function(msg)
+	if not MDT_LastP then
+		MDT_LastP = 0
+	end
+
+	local c = C_GlobalStorage.GetVar("ASMSG_CHALLENGE_MODE_CREATURE_KILLED")
+	local p = c and c.total and math.min(c.total, 100) or 0
+	local diff = p - MDT_LastP
+	MDT_LastP = p
+
+	local targetName = UnitName("target") or "Unknown"
+	local guid = UnitGUID("target")
+	local id = 0
+	if guid then
+		if guid:find("-") then
+			id = tonumber(select(6, strsplit("-", guid)))
+		else
+			id = tonumber(guid:sub(-12, -9), 16)
+		end
+	end
+
+	if not MethodDungeonToolsDB then
+		MethodDungeonToolsDB = {}
+	end
+	if not MethodDungeonToolsDB.MobDataTally then
+		MethodDungeonToolsDB.MobDataTally = {}
+	end
+
+	table.insert(MethodDungeonToolsDB.MobDataTally, {
+		name = targetName,
+		id = id,
+		percent = diff,
+		totalPercent = p,
+		date = date("%Y-%m-%d %H:%M:%S"),
+	})
+
+	print(
+		"|cFF00FF00[MDT Tracker]|r Записано: "
+			.. targetName
+			.. " ("
+			.. id
+			.. ") дал "
+			.. diff
+			.. "% (Всего: "
+			.. p
+			.. "%)"
+	)
 end
