@@ -2,3 +2,6 @@ generate_utgarde_mobs.py
 world_creature.csv
 syntax_check.lua
 test.lua
+check_indices.lua
+run_test.lua
+setup.lua
