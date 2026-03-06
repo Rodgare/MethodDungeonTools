@@ -5,3 +5,5 @@ test.lua
 check_indices.lua
 run_test.lua
 setup.lua
+generate_mobs.py
+temp.txt
