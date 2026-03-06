@@ -32,4 +32,5 @@ AceGUIWidget-MethodDungeonToolsNewPullButton.lua
 MethodDungeonTools.lua
 Transmission.lua
 UtgardeKeep.lua
+DrakTharonKeep.lua
 
