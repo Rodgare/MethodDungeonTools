@@ -892,7 +892,8 @@ function MethodDungeonTools:UpdateEnemiesSelected()
 	for pullIdx,pull in pairs(preset.value.pulls) do
 		if pullIdx <= db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]].value.currentPull then
 			for enemyIdx,clones in pairs(pull) do
-				local enemyData = MethodDungeonTools.dungeonEnemies[db.currentDungeonIdx][enemyIdx]
+				local dungeonData = MethodDungeonTools.dungeonEnemies[db.currentDungeonIdx]
+				local enemyData = dungeonData and dungeonData[enemyIdx] or nil
 				if enemyData and enemyData["clones"] then
 					for k,v in pairs(clones) do
 						if enemyData["clones"][v] then
@@ -908,7 +909,8 @@ function MethodDungeonTools:UpdateEnemiesSelected()
 			break
 		end
 	end
-	MethodDungeonTools:Progressbar_SetValue(MethodDungeonTools.main_frame.sidePanel.ProgressBar, pullCurrent,grandTotal,teeming==true and MethodDungeonTools.dungeonTotalCount[db.currentDungeonIdx].teeming or MethodDungeonTools.dungeonTotalCount[db.currentDungeonIdx].normal)
+	local totalCountData = MethodDungeonTools.dungeonTotalCount[db.currentDungeonIdx] or {teeming=100, normal=100}
+	MethodDungeonTools:Progressbar_SetValue(MethodDungeonTools.main_frame.sidePanel.ProgressBar, pullCurrent,grandTotal,teeming==true and totalCountData.teeming or totalCountData.normal)
 	
 	
 end
@@ -973,7 +975,8 @@ MethodDungeonTools.pullColors = {
 function MethodDungeonTools:UpdateEnemyBlipSelection(i, forceDeselect, ignoreLinked, pullIdx)
 	local r, g, b, a = 0, 1, 0, 1
 
-	local enemyData = MethodDungeonTools.dungeonEnemies[db.currentDungeonIdx][dungeonEnemyBlips[i].enemyIdx]
+	local dungeonData = MethodDungeonTools.dungeonEnemies[db.currentDungeonIdx]
+	local enemyData = dungeonData and dungeonData[dungeonEnemyBlips[i].enemyIdx] or nil
 	local scale = enemyData and enemyData.scale or 1
 	local baseSize = 10 * scale
 
@@ -991,17 +994,14 @@ function MethodDungeonTools:UpdateEnemyBlipSelection(i, forceDeselect, ignoreLin
 			dungeonEnemyBlips[i].selected = not dungeonEnemyBlips[i].selected		
 		end
 		
-		if dungeonEnemyBlips[i].selected == true then 
+        if dungeonEnemyBlips[i].selected == true then 
             local currentPull = db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]].value.currentPull
             local colorIdx = (currentPull % #MethodDungeonTools.pullColors) + 1
             if colorIdx == 0 then colorIdx = 1 end
             local pColor = MethodDungeonTools.pullColors[colorIdx]
             dungeonEnemyBlips[i]:SetVertexColor(pColor[1], pColor[2], pColor[3], 1)
-            dungeonEnemyBlips[i]:SetSize(baseSize * 1.15, baseSize * 1.15)
-            if dungeonEnemyBlips[i].outline then
-            	dungeonEnemyBlips[i].outline:SetVertexColor(pColor[1], pColor[2], pColor[3], 1)
-            	dungeonEnemyBlips[i].outline:Show() 
-            end
+            dungeonEnemyBlips[i]:SetSize(baseSize * 1.3, baseSize * 1.3)
+            if dungeonEnemyBlips[i].outline then dungeonEnemyBlips[i].outline:Hide() end
         else
 			r, g, b, a = dungeonEnemyBlips[i].color.r, dungeonEnemyBlips[i].color.g, dungeonEnemyBlips[i].color.b, dungeonEnemyBlips[i].color.a
 			dungeonEnemyBlips[i]:SetVertexColor(r, g, b, a) 
@@ -1018,16 +1018,23 @@ function MethodDungeonTools:UpdateEnemyBlipSelection(i, forceDeselect, ignoreLin
 					else
 						dungeonEnemyBlips[idx].selected = dungeonEnemyBlips[i].selected
 					end			
-					
+					local linkedEnemyData = dungeonData and dungeonData[dungeonEnemyBlips[idx].enemyIdx] or nil
+					local linkedScale = linkedEnemyData and linkedEnemyData.scale or 1
+					local linkedBaseSize = 10 * linkedScale
+
                     if dungeonEnemyBlips[idx].selected == true then 
                         local currentPull = db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]].value.currentPull
                         local colorIdx = (currentPull % #MethodDungeonTools.pullColors) + 1
                         if colorIdx == 0 then colorIdx = 1 end
                         local pColor = MethodDungeonTools.pullColors[colorIdx]
                         dungeonEnemyBlips[idx]:SetVertexColor(pColor[1], pColor[2], pColor[3], 1)
+                        dungeonEnemyBlips[idx]:SetSize(linkedBaseSize * 1.3, linkedBaseSize * 1.3)
+                        if dungeonEnemyBlips[idx].outline then dungeonEnemyBlips[idx].outline:Hide() end
                     else
 						r, g, b, a = dungeonEnemyBlips[idx].color.r, dungeonEnemyBlips[idx].color.g, dungeonEnemyBlips[idx].color.b, dungeonEnemyBlips[idx].color.a
 						dungeonEnemyBlips[idx]:SetVertexColor(r, g, b, a) 
+                        dungeonEnemyBlips[idx]:SetSize(linkedBaseSize, linkedBaseSize)
+                        if dungeonEnemyBlips[idx].outline then dungeonEnemyBlips[idx].outline:Hide() end
 					end
 				end
 			end
@@ -2731,7 +2738,8 @@ function MethodDungeonTools:SetSelectionToPull(pull)
 	local pullEnemies = db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]].value.pulls[pull]
 	if pullEnemies then
 		for enemyIdx, clones in pairs(pullEnemies) do
-			local enemyData = MethodDungeonTools.dungeonEnemies[db.currentDungeonIdx][enemyIdx]
+			local dungeonData = MethodDungeonTools.dungeonEnemies[db.currentDungeonIdx]
+			local enemyData = dungeonData and dungeonData[enemyIdx] or nil
 			if enemyData and enemyData.clones then
 				for _, cloneIdx in pairs(clones) do
 					local clone = enemyData.clones[cloneIdx]
@@ -2797,7 +2805,8 @@ function MethodDungeonTools:UpdatePullButtonNPCData(idx)
 	if preset.value.pulls[idx] then
 		local enemyTableIdx = 0
 		for enemyIdx,clones in pairs(preset.value.pulls[idx]) do
-            local enemyData = MethodDungeonTools.dungeonEnemies[db.currentDungeonIdx][enemyIdx]
+            local dungeonData = MethodDungeonTools.dungeonEnemies[db.currentDungeonIdx]
+            local enemyData = dungeonData and dungeonData[enemyIdx] or nil
             if enemyData then
                 local incremented = false
                 local npcId = enemyData["id"]
