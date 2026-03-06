@@ -818,7 +818,7 @@ function MethodDungeonTools:Progressbar_SetValue(self, pullCurrent,totalCurrent,
 		self.Bar:SetStatusBarColor(0.26,0.42,1)
 	end
 	self.Bar:SetValue(percent);
-	self.Bar.Label:SetText(pullCurrent.." ("..totalCurrent.."/"..totalMax..")");
+	self.Bar.Label:SetText(pullCurrent.."% ("..totalCurrent.."/"..totalMax.."%) ");
 	self.AnimValue = percent;
 end
 
@@ -973,11 +973,17 @@ MethodDungeonTools.pullColors = {
 function MethodDungeonTools:UpdateEnemyBlipSelection(i, forceDeselect, ignoreLinked, pullIdx)
 	local r, g, b, a = 0, 1, 0, 1
 
+	local enemyData = MethodDungeonTools.dungeonEnemies[db.currentDungeonIdx][dungeonEnemyBlips[i].enemyIdx]
+	local scale = enemyData and enemyData.scale or 1
+	local baseSize = 10 * scale
+
 	if pullIdx then
 		local colorIdx = (pullIdx % #MethodDungeonTools.pullColors) + 1
 		if colorIdx == 0 then colorIdx = 1 end
 		local pColor = MethodDungeonTools.pullColors[colorIdx]
 		dungeonEnemyBlips[i]:SetVertexColor(pColor[1], pColor[2], pColor[3], 0.7)
+        dungeonEnemyBlips[i]:SetSize(baseSize, baseSize)
+        if dungeonEnemyBlips[i].outline then dungeonEnemyBlips[i].outline:Hide() end
 	else
 		if forceDeselect and forceDeselect == true then
 			dungeonEnemyBlips[i].selected = false
@@ -991,9 +997,16 @@ function MethodDungeonTools:UpdateEnemyBlipSelection(i, forceDeselect, ignoreLin
             if colorIdx == 0 then colorIdx = 1 end
             local pColor = MethodDungeonTools.pullColors[colorIdx]
             dungeonEnemyBlips[i]:SetVertexColor(pColor[1], pColor[2], pColor[3], 1)
+            dungeonEnemyBlips[i]:SetSize(baseSize * 1.15, baseSize * 1.15)
+            if dungeonEnemyBlips[i].outline then
+            	dungeonEnemyBlips[i].outline:SetVertexColor(pColor[1], pColor[2], pColor[3], 1)
+            	dungeonEnemyBlips[i].outline:Show() 
+            end
         else
 			r, g, b, a = dungeonEnemyBlips[i].color.r, dungeonEnemyBlips[i].color.g, dungeonEnemyBlips[i].color.b, dungeonEnemyBlips[i].color.a
 			dungeonEnemyBlips[i]:SetVertexColor(r, g, b, a) 
+            dungeonEnemyBlips[i]:SetSize(baseSize, baseSize)
+            if dungeonEnemyBlips[i].outline then dungeonEnemyBlips[i].outline:Hide() end
 		end
 
 		--select/deselect linked npcs
@@ -1937,9 +1950,20 @@ function MethodDungeonTools:UpdateDungeonEnemies()
 						dungeonEnemyBlips[idx].level = data["level"]
 						dungeonEnemyBlips[idx]:SetDrawLayer("OVERLAY", 7)
 						dungeonEnemyBlips[idx]:SetTexture("Interface\\AddOns\\"..addonName.."\\Textures\\Circle_White.tga")
+						
+						if not dungeonEnemyBlips[idx].outline then
+							dungeonEnemyBlips[idx].outline = MethodDungeonTools.main_frame.mapPanelFrame:CreateTexture("MethodDungeonToolsDungeonEnemyBlip"..idx.."Outline","OVERLAY")
+							dungeonEnemyBlips[idx].outline:SetDrawLayer("OVERLAY", 6)
+							dungeonEnemyBlips[idx].outline:SetTexture("Interface\\AddOns\\"..addonName.."\\Textures\\Circle_White.tga")
+							dungeonEnemyBlips[idx].outline:SetVertexColor(1, 1, 1, 1)
+							dungeonEnemyBlips[idx].outline:Hide()
+						end
 						dungeonEnemyBlips[idx]:SetWidth(10*data["scale"])
 						dungeonEnemyBlips[idx]:SetHeight(10*data["scale"])
 						dungeonEnemyBlips[idx]:SetPoint("CENTER",MethodDungeonTools.main_frame.mapPanelTile1,"TOPLEFT",clone.x,clone.y)
+						dungeonEnemyBlips[idx].outline:SetPoint("CENTER", dungeonEnemyBlips[idx], "CENTER", 0, 0)
+						dungeonEnemyBlips[idx].outline:SetWidth((10*data["scale"]) * 1.3)
+						dungeonEnemyBlips[idx].outline:SetHeight((10*data["scale"]) * 1.3)
 
                         --color patrol
                         dungeonEnemyBlips[idx].patrolFollower = nil
@@ -2699,7 +2723,67 @@ function MethodDungeonTools:SetSelectionToPull(pull)
                 end
             end
         end
+    end
+	
+	-- Centering map on current pull
+	local avgX, avgY = 0, 0
+	local count = 0
+	local pullEnemies = db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]].value.pulls[pull]
+	if pullEnemies then
+		for enemyIdx, clones in pairs(pullEnemies) do
+			local enemyData = MethodDungeonTools.dungeonEnemies[db.currentDungeonIdx][enemyIdx]
+			if enemyData and enemyData.clones then
+				for _, cloneIdx in pairs(clones) do
+					local clone = enemyData.clones[cloneIdx]
+					if clone and clone.x and clone.y then
+						avgX = avgX + clone.x
+						avgY = avgY + clone.y
+						count = count + 1
+					end
+				end
+			end
+		end
 	end
+	
+	if count > 0 then
+		avgX = avgX / count
+		avgY = avgY / count
+		
+		local scrollFrame = MethodDungeonTools.main_frame.scrollFrame
+		local mapScale = MethodDungeonTools.main_frame.mapPanelFrame:GetScale()
+		
+		if mapScale > 1.05 and scrollFrame.maxX and scrollFrame.maxY then
+			-- Map dimensions are 856x642
+			local mapW, mapH = 856, 642
+			local viewW = scrollFrame:GetWidth() or 840
+			local viewH = scrollFrame:GetHeight() or 555
+			
+			local targetX = avgX * mapScale
+			local targetY = -avgY * mapScale
+			
+			local rangeX = (mapW * mapScale) - viewW
+			local rangeY = (mapH * mapScale) - viewH
+			
+			local targetScrollH, targetScrollV = 0, 0
+			
+			if rangeX > 0 and scrollFrame.maxX and scrollFrame.maxX > 0 then
+				local fractionX = (targetX - (viewW / 2)) / rangeX
+				targetScrollH = fractionX * scrollFrame.maxX
+			end
+			
+			if rangeY > 0 and scrollFrame.maxY and scrollFrame.maxY > 0 then
+				local fractionY = (targetY - (viewH / 2)) / rangeY
+				targetScrollV = fractionY * scrollFrame.maxY
+			end
+			
+			targetScrollH = math.max(0, math.min(targetScrollH, scrollFrame.maxX or 0))
+			targetScrollV = math.max(0, math.min(targetScrollV, scrollFrame.maxY or 0))
+			
+			scrollFrame:SetHorizontalScroll(targetScrollH)
+			scrollFrame:SetVerticalScroll(targetScrollV)
+		end
+	end
+	
 	MethodDungeonTools:UpdateEnemiesSelected()	
 end
 
@@ -3308,4 +3392,5 @@ function initFrames()
 
 	main_frame:Hide();
 end
+
 
