@@ -1472,11 +1472,17 @@ function MethodDungeonTools:MakeMapTexture(frame)
 			frameX=(frameX/mapScale)+scrollH
 			frameY=(frameY/mapScale)+scrollV
 			
-			if db.devMode and MouseIsOver(scrollFrame) then
-				MethodDungeonTools.main_frame.CoordinateDisplay:SetText(string.format("X: %.2f, Y: %.2f", frameX, -frameY))
-				MethodDungeonTools.main_frame.CoordinateDisplay:Show()
+			if db.devMode then
+				MethodDungeonTools.main_frame.GridToggle:Show()
+                if MouseIsOver(scrollFrame) then
+				    MethodDungeonTools.main_frame.CoordinateDisplay:SetText(string.format("X: %.2f, Y: %.2f", frameX, -frameY))
+                    MethodDungeonTools.main_frame.CoordinateDisplay:Show()
+                else
+                    MethodDungeonTools.main_frame.CoordinateDisplay:Hide()
+                end
 			else
-				MethodDungeonTools.main_frame.CoordinateDisplay:Hide()
+				MethodDungeonTools.main_frame.GridToggle:Hide()
+                MethodDungeonTools.main_frame.CoordinateDisplay:Hide()
 			end
 			
 			--MethodDungeonTools.main_frame.topPanelString:SetText(string.format("%.1f",frameX).."    "..string.format("%.1f",frameY));
@@ -3096,6 +3102,84 @@ function initFrames()
 	main_frame.CoordinateDisplay:SetTextColor(1, 1, 1, 1)
 	main_frame.CoordinateDisplay:SetPoint("BOTTOMLEFT", main_frame, "BOTTOMLEFT", 10, 10)
 	main_frame.CoordinateDisplay:Hide()
+
+	main_frame.GridToggle = CreateFrame("CheckButton", "MethodDungeonToolsGridToggle", main_frame, "UICheckButtonTemplate")
+	main_frame.GridToggle:SetPoint("BOTTOMLEFT", main_frame.CoordinateDisplay, "TOPLEFT", 0, 5)
+	main_frame.GridToggle.text:SetText("Grid")
+	main_frame.GridToggle:SetScript("OnClick", function(self)
+		MethodDungeonTools:ToggleGrid()
+	end)
+	main_frame.GridToggle:Hide()
+
+    MethodDungeonTools.GridLines = {}
+    function MethodDungeonTools:ToggleGrid()
+        local show = main_frame.GridToggle:GetChecked()
+        if show then
+            MethodDungeonTools:DrawGrid()
+        else
+            for _, line in pairs(MethodDungeonTools.GridLines) do
+                line:Hide()
+            end
+        end
+    end
+
+    function MethodDungeonTools:DrawGrid()
+        local show = main_frame.GridToggle:GetChecked()
+        if not show then return end
+
+        local mapPanelFrame = main_frame.mapPanelFrame
+        local width = mapPanelFrame:GetWidth() or 1000
+        local height = mapPanelFrame:GetHeight() or 1000
+        local step = 50 -- 50 units
+        local lineIdx = 1
+
+        -- Horizontals
+        for y = 0, height, step do
+            local line = MethodDungeonTools.GridLines[lineIdx]
+            if not line then
+                line = mapPanelFrame:CreateTexture(nil, "OVERLAY")
+                line:SetTexture("Interface\\Buttons\\WHITE8X8")
+                MethodDungeonTools.GridLines[lineIdx] = line
+            end
+            if (y / step) % 2 == 0 then
+                line:SetVertexColor(1, 0, 0, 0.8) -- Red thick
+                line:SetHeight(1)
+            else
+                line:SetVertexColor(1, 1, 1, 0.2) -- White thin
+                line:SetHeight(0.5)
+            end
+            line:ClearAllPoints()
+            line:SetPoint("TOPLEFT", mapPanelFrame, "TOPLEFT", 0, -y)
+            line:SetPoint("BOTTOMRIGHT", mapPanelFrame, "TOPRIGHT", 0, -y)
+            line:Show()
+            lineIdx = lineIdx + 1
+        end
+
+        -- Verticals
+        for x = 0, width, step do
+            local line = MethodDungeonTools.GridLines[lineIdx]
+            if not line then
+                line = mapPanelFrame:CreateTexture(nil, "OVERLAY")
+                line:SetTexture("Interface\\Buttons\\WHITE8X8")
+                MethodDungeonTools.GridLines[lineIdx] = line
+            end
+            if (x / step) % 2 == 0 then
+                line:SetVertexColor(1, 0, 0, 0.8) -- Red thick
+                line:SetWidth(1)
+            else
+                line:SetVertexColor(1, 1, 1, 0.2) -- White thin
+                line:SetWidth(0.5)
+            end
+            line:ClearAllPoints()
+            line:SetPoint("TOPLEFT", mapPanelFrame, "TOPLEFT", x, 0)
+            line:SetPoint("BOTTOMRIGHT", mapPanelFrame, "BOTTOMLEFT", x, 0)
+            line:Show()
+            lineIdx = lineIdx + 1
+        end
+        for i = lineIdx, #MethodDungeonTools.GridLines do
+            MethodDungeonTools.GridLines[i]:Hide()
+        end
+    end
 
 	--pullTooltip
 	do
