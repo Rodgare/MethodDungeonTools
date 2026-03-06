@@ -68,7 +68,6 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
             [4] = {x = 399.7612915964,y = -431.32582490775,sublevel=1,g=27},
             [5] = {x = 419.11953725747,y = -460.9271217479,sublevel=1,g=28},
             [6] = {x = 331.50457175151,y = -356.47216400996,sublevel=2,g=30},
-            [7] = {x = 0, y = -0, sublevel=1, g=1},
         },
     },
     [2] = { -- Map ID 28419 to array index in lua
@@ -77,7 +76,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
         ["health"] = 999,
         ["level"] = 80,
         ["creatureType"] = "Humanoid",
-        ["count"] = 4,
+        ["count"] = 0.74,
         ["color"] = {r=1,g=1,b=1,a=0.8},
         ["scale"] = 1,
         ["clones"] = {
@@ -101,7 +100,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
         ["health"] = 999,
         ["level"] = 80,
         ["creatureType"] = "Humanoid",
-        ["count"] = 4,
+        ["count"] = 1.34,
         ["color"] = {r=1,g=1,b=1,a=0.8},
         ["scale"] = 1,
         ["clones"] = {
@@ -118,7 +117,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
         ["health"] = 999,
         ["level"] = 80,
         ["creatureType"] = "Humanoid",
-        ["count"] = 4,
+        ["count"] = 1.34,
         ["color"] = {r=1,g=1,b=1,a=0.8},
         ["scale"] = 1,
         ["clones"] = {
@@ -133,7 +132,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
         ["health"] = 999,
         ["level"] = 80,
         ["creatureType"] = "Humanoid",
-        ["count"] = 4,
+        ["count"] = 1.34,
         ["color"] = {r=1,g=1,b=1,a=0.8},
         ["scale"] = 1,
         ["clones"] = {
@@ -154,7 +153,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
         ["health"] = 999,
         ["level"] = 80,
         ["creatureType"] = "Humanoid",
-        ["count"] = 4,
+        ["count"] = 1.34,
         ["color"] = {r=1,g=1,b=1,a=0.8},
         ["scale"] = 1,
         ["clones"] = {
@@ -169,7 +168,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
         ["health"] = 999,
         ["level"] = 80,
         ["creatureType"] = "Humanoid",
-        ["count"] = 4,
+        ["count"] = 1.34,
         ["color"] = {r=1,g=1,b=1,a=0.8},
         ["scale"] = 1,
         ["clones"] = {
@@ -202,7 +201,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
         ["health"] = 999,
         ["level"] = 80,
         ["creatureType"] = "Humanoid",
-        ["count"] = 4,
+        ["count"] = 1.34,
         ["color"] = {r=1,g=1,b=1,a=0.8},
         ["scale"] = 1,
         ["clones"] = {
@@ -215,7 +214,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
         ["health"] = 999,
         ["level"] = 80,
         ["creatureType"] = "Humanoid",
-        ["count"] = 4,
+        ["count"] = 3.61,
         ["color"] = {r=1,g=1,b=1,a=0.8},
         ["scale"] = 1,
         ["clones"] = {
@@ -233,7 +232,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
         ["health"] = 999,
         ["level"] = 80,
         ["creatureType"] = "Humanoid",
-        ["count"] = 4,
+        ["count"] = 0.36,
         ["color"] = {r=1,g=1,b=1,a=0.8},
         ["scale"] = 1,
         ["clones"] = {
@@ -265,7 +264,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
         ["health"] = 999,
         ["level"] = 80,
         ["creatureType"] = "Humanoid",
-        ["count"] = 4,
+        ["count"] = 1.34,
         ["color"] = {r=1,g=1,b=1,a=0.8},
         ["scale"] = 1,
         ["clones"] = {
@@ -289,7 +288,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
         ["health"] = 999,
         ["level"] = 80,
         ["creatureType"] = "Humanoid",
-        ["count"] = 4,
+        ["count"] = 0.51,
         ["color"] = {r=1,g=1,b=1,a=0.8},
         ["scale"] = 1,
         ["clones"] = {
@@ -308,7 +307,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
         ["health"] = 999,
         ["level"] = 80,
         ["creatureType"] = "Humanoid",
-        ["count"] = 4,
+        ["count"] = 1.34,
         ["color"] = {r=1,g=1,b=1,a=0.8},
         ["scale"] = 1,
         ["clones"] = {
@@ -327,7 +326,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
         ["health"] = 999,
         ["level"] = 80,
         ["creatureType"] = "Humanoid",
-        ["count"] = 4,
+        ["count"] = 1.34,
         ["color"] = {r=1,g=1,b=1,a=0.8},
         ["scale"] = 1,
         ["clones"] = {
@@ -348,7 +347,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
         ["health"] = 999,
         ["level"] = 80,
         ["creatureType"] = "Humanoid",
-        ["count"] = 4,
+        ["count"] = 1.34,
         ["color"] = {r=1,g=1,b=1,a=0.8},
         ["scale"] = 1,
         ["clones"] = {
@@ -361,7 +360,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
         ["health"] = 999,
         ["level"] = 80,
         ["creatureType"] = "Humanoid",
-        ["count"] = 4,
+        ["count"] = 1.34,
         ["color"] = {r=1,g=1,b=1,a=0.8},
         ["scale"] = 1,
         ["clones"] = {
