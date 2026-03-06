@@ -33,4 +33,4 @@ MethodDungeonTools.lua
 Transmission.lua
 UtgardeKeep.lua
 DrakTharonKeep.lua
-
+HallsOfLightning.lua
