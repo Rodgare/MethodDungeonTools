@@ -5,7 +5,7 @@ local pi = math.pi
 MethodDungeonTools.dungeonTotalCount[dungeonIndex] = {normal = 100, teeming = 100, teemingEnabled = false}
 
 MethodDungeonTools.dungeonBosses[dungeonIndex] = {
-    [1] = {
+    [1] = { -- 1-й ярус
         [1] = {
             ["name"] = "Принц Келесет",
             ["encounterID"] = 1502,
@@ -15,7 +15,9 @@ MethodDungeonTools.dungeonBosses[dungeonIndex] = {
             ["x"] = 242, -- 193.121
             ["y"] = -350, -- 197.492
         },
-        [2] = { -- Map ID 24200 to array index in lua
+    },
+    [2] = { -- 2-й ярус
+        [1] = { -- Скарвальд Строитель
             ["id"] = 24200,
             ["name"] = "Скарвальд Строитель",
             ["encounterID"] = 1502,
@@ -24,7 +26,7 @@ MethodDungeonTools.dungeonBosses[dungeonIndex] = {
             ["x"] = 480.04847946033,
             ["y"] = -350.15135697648,
         },
-        [3] = { -- Map ID 24201 to array index in lua
+        [2] = { -- Далронн Контролирующий
             ["id"] = 24201,
             ["name"] = "Далронн Контролирующий",
             ["encounterID"] = 1502,
@@ -33,14 +35,16 @@ MethodDungeonTools.dungeonBosses[dungeonIndex] = {
             ["x"] = 506.12259296777,
             ["y"] = -344.62048382483,
         },
-        [4] = { -- Map ID 23954 to array index in lua
+    },
+    [3] = { -- 3-й ярус
+        [1] = { -- Ингвар Расхититель
             ["id"] = 23954,
             ["name"] = "Ингвар Расхититель",
             ["encounterID"] = 1502,
             ["displayId"] = 23954,
             ["health"] = 90276936,
-            ["x"] = 242,
-            ["y"] = -350,
+            ["x"] = 630,
+            ["y"] = -200,
         },
     }
 }
@@ -101,11 +105,11 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
         ["color"] = {r=1,g=1,b=1,a=0.8},
         ["scale"] = 1,
         ["clones"] = {
-            [1] = {x = 789.38, y = -519.0, sublevel=1, g=1},
-            [2] = {x = 409.72, y = -225.13, sublevel=1, g=1},
-            [3] = {x = 430.5, y = -287.7, sublevel=1, g=1},
-            [4] = {x = 630.02, y = -162.3, sublevel=1, g=1},
-            [5] = {x = 389.98, y = -252.87, sublevel=1, g=1},
+            [1] = {x = 400.45393962152,y = -120.64843978879,sublevel=2,g=34},
+            [2] = {x = 262.61472365692,y = -212.79473359646,sublevel=3,g=35},
+            [3] = {x = 252.89015391791,y = -191.52215873475,sublevel=3,g=35},
+            [4] = {x = 365.16251108634,y = -182.57254335499,sublevel=3,g=36},
+            [5] = {x = 454.61362489908,y = -283.2317578108,sublevel=3,g=38},
         },
     },
     [4] = { -- Map ID 24071 to array index in lua
@@ -118,9 +122,9 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
         ["color"] = {r=1,g=1,b=1,a=0.8},
         ["scale"] = 1,
         ["clones"] = {
-            [1] = {x = 442.0, y = -213.53, sublevel=1, g=1},
-            [2] = {x = 638.22, y = -152.45, sublevel=1, g=1},
-            [3] = {x = 373.29, y = -246.5, sublevel=1, g=1},
+            [1] = {x = 378.11776063066,y = -108.53524586963,sublevel=2,g=34},
+            [2] = {x = 272.94710519049,y = -181.18977720117,sublevel=3,g=35},
+            [3] = {x = 373.42290803238,y = -171.07985176826,sublevel=3,g=36},
         },
     },
     [5] = { -- Map ID 24078 to array index in lua
@@ -202,23 +206,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
         ["color"] = {r=1,g=1,b=1,a=0.8},
         ["scale"] = 1,
         ["clones"] = {
-            [1] = {x = 530.27, y = -996.39, sublevel=1, g=1},
-            [2] = {x = 801.13, y = -945.66, sublevel=1, g=1},
-            [3] = {x = 785.0, y = -1127.53, sublevel=1, g=1},
-            [4] = {x = 660.98, y = -1191.61, sublevel=1, g=1},
-            [5] = {x = 656.41, y = -1240.34, sublevel=1, g=1},
-            [6] = {x = 490.39, y = -416.3, sublevel=1, g=1},
-            [7] = {x = 811.26, y = -831.39, sublevel=1, g=1},
-            [8] = {x = 820.99, y = -704.04, sublevel=1, g=1},
-            [9] = {x = 350.99, y = -128.03, sublevel=1, g=1},
-            [10] = {x = 338.95, y = -124.37, sublevel=1, g=1},
-            [11] = {x = 1160.59, y = -202.73, sublevel=1, g=1},
-            [12] = {x = 1164.98, y = -232.14, sublevel=1, g=1},
-            [13] = {x = 830.9, y = -231.83, sublevel=1, g=1},
-            [14] = {x = 926.14, y = -310.63, sublevel=1, g=1},
-            [15] = {x = 385.91, y = -137.87, sublevel=1, g=1},
-            [16] = {x = 880.49, y = 336.13, sublevel=1, g=1},
-            [17] = {x = 1166.0, y = -251.44, sublevel=1, g=1},
+            [1] = {x = 437.51165771937,y = -157.61356316579,sublevel=3,g=37},
         },
     },
     [9] = { -- Map ID 24083 to array index in lua
@@ -236,7 +224,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
             [3] = {x = 304.814500706,y = -136.66770934343,sublevel=1,g=12},
             [4] = {x = 295.16049796037,y = -229.26088670693,sublevel=1,g=14},
             [5] = {x = 231.60017445985,y = -203.4698262914,sublevel=1,g=15},
-            [6] = {x = 816.15, y = -354.25, sublevel=1, g=1},
+            [6] = {x = 429.61040365718,y = -174.63160509913,sublevel=3,g=37},
         },
     },
     [10] = { -- Map ID 24084 to array index in lua
@@ -295,24 +283,6 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
             [4] = {x = 346.5720447229,y = -479.3883801858,sublevel=1,g=26},
         },
     },
-    [13] = { -- Map ID 24864 to array index in lua
-        ["id"] = 24864,
-        ["name"] = "Рабочий из клана Укротителей драконов",
-        ["health"] = 999,
-        ["level"] = 80,
-        ["creatureType"] = "Humanoid",
-        ["count"] = 4,
-        ["color"] = {r=1,g=1,b=1,a=0.8},
-        ["scale"] = 1,
-        ["clones"] = {
-            [1] = {x = 849.43, y = -726.0, sublevel=1, g=1},
-            [2] = {x = 820.79, y = -765.95, sublevel=1, g=1},
-            [3] = {x = 787.06, y = -745.81, sublevel=1, g=1},
-            [4] = {x = 796.05, y = -739.62, sublevel=1, g=1},
-            [5] = {x = 870.94, y = -669.56, sublevel=1, g=1},
-            [6] = {x = 787.22, y = -729.32, sublevel=1, g=1},
-        },
-    },
     [15] = { -- Map ID 29735 to array index in lua
         ["id"] = 29735,
         ["name"] = "Дикий ворг",
@@ -325,10 +295,10 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
         ["clones"] = {
             [1] = {x = 438.87264133354,y = -454.10333630516,sublevel=1,g=28},
             [2] = {x = 229.41052449811,y = -370.69638524762,sublevel=2,g=29},
-            [3] = {x = 326.72, y = -683.11, sublevel=1, g=1},
-            [4] = {x = 640.78, y = -140.45, sublevel=1, g=1},
-            [5] = {x = 624.63, y = -138.35, sublevel=1, g=1},
-            [6] = {x = 216.21, y = -782.56, sublevel=1, g=1},
+            [3] = {x = 349.71916642511,y = -182.21339950602,sublevel=3,g=36},
+            [4] = {x = 357.26127567323,y = -167.48834254272,sublevel=3,g=36},
+            [5] = {x = 445.75718461942,y = -300.47084068153,sublevel=3,g=38},
+            [6] = {x = 473.95020287413,y = -287.35482224395,sublevel=3,g=38},
         },
     },
 
@@ -368,8 +338,8 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
             [5] = {x = 424.86587358611,y = -477.44788732364,sublevel=1,g=28},
             [6] = {x = 324.39340744431,y = -335.13878780258,sublevel=2,g=30},
             [7] = {x = 356.78852995499,y = -346.9906505051,sublevel=2,g=30},
-            [8] = {x = 5.68, y = -346.35, sublevel=1, g=1},
-            [9] = {x = -71.89, y = -356.38, sublevel=1, g=1},
+            [8] = {x = 398.17477175669,y = -101.24177367529,sublevel=2,g=34},
+            [9] = {x = 280.2405474581,y = -207.32463693239,sublevel=3,g=35},
         },
     },
     [24] = { -- Map ID 28410 to array index in lua
@@ -382,7 +352,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
         ["color"] = {r=1,g=1,b=1,a=0.8},
         ["scale"] = 1,
         ["clones"] = {
-            [1] = {x = 794.81, y = -543.05, sublevel=1, g=1},
+            [1] = {x = 461.38007974051,y = -294.53775227516,sublevel=3,g=38},
         },
     },
     [26] = { -- Map ID 24082 to array index in lua
