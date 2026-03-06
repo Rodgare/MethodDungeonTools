@@ -34,3 +34,8 @@ Transmission.lua
 UtgardeKeep.lua
 DrakTharonKeep.lua
 HallsOfLightning.lua
+HellfireRamparts.lua
+ManaTombs.lua
+TheBloodFurnace.lua
+TheSlavePens.lua
+Ahnkahet.lua
