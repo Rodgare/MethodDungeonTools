@@ -169,7 +169,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
         ["color"] = {r=1,g=1,b=1,a=0.8},
         ["scale"] = 1,
         ["clones"] = {
-            [1] = {x = 543.99455992459,y = -300.880347877,sublevel=1,g=4,patrolFacing=(32/32)*pi,patrol={
+            [1] = {x = 543.99455992459,y = -300.880347877,sublevel=1,g=2,patrolFacing=(32/32)*pi,patrol={
 				[1] = {x = 532.97541941661,y = -302.52616246018},
                 [2] = {x = 543.99455992459,y = -300.880347877},
                 [3] = {x = 554.59986410095,y = -295.87248874778},
