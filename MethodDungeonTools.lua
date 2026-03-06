@@ -1415,7 +1415,7 @@ function MethodDungeonTools:MakeMapTexture(frame)
 		frame.scrollFrame:EnableMouse(true)
 		frame.scrollFrame:SetScript("OnMouseDown", function(self, button)
 			local scrollFrame = MethodDungeonTools.main_frame.scrollFrame			
-			if ( button == "LeftButton" and scrollFrame.zoomedIn ) then
+			if ( button == "LeftButton" and scrollFrame.zoomedIn and not IsAltKeyDown() ) then
 				scrollFrame.panning = true;
 				local x, y = GetCursorPosition();
 				scrollFrame.cursorX = x;
@@ -1469,43 +1469,52 @@ function MethodDungeonTools:MakeMapTexture(frame)
 			local scrollV = scrollFrame:GetVerticalScroll();
 			local frameX = (cursorX / relativeFrame:GetScale()) - scrollFrame:GetLeft();
 			local frameY = scrollFrame:GetTop() - (cursorY / relativeFrame:GetScale());
+			frameX=(frameX/mapScale)+scrollH
+			frameY=(frameY/mapScale)+scrollV
 			if db.devMode then
-				MethodDungeonTools.main_frame.GridToggle:Show()
                 if MouseIsOver(scrollFrame) then
 				    MethodDungeonTools.main_frame.CoordinateDisplay:SetText(string.format("X: %.2f, Y: %.2f", frameX, -frameY))
                     MethodDungeonTools.main_frame.CoordinateDisplay:Show()
                 else
                     MethodDungeonTools.main_frame.CoordinateDisplay:Hide()
                 end
-
-                -- Drawing Tool logic
-                if IsLeftControlKeyDown() and IsMouseButtonDown("LeftButton") then
-                    if not scrollFrame.isDrawing then
-                        scrollFrame.isDrawing = true
-                        scrollFrame.lastDrawX = frameX
-                        scrollFrame.lastDrawY = -frameY
-                    else
-                        -- Only draw if we moved a bit to save textures
-                        local dist = math.sqrt((frameX - scrollFrame.lastDrawX)^2 + (-frameY - scrollFrame.lastDrawY)^2)
-                        if dist > 5 then
-                            local line = mapPanelFrame:CreateTexture(nil, "OVERLAY")
-                            line:SetTexture("Interface\\Buttons\\WHITE8X8")
-                            line:SetVertexColor(1, 0, 0, 0.8) -- Red lines
-                            DrawLine(line, mapPanelFrame, scrollFrame.lastDrawX, scrollFrame.lastDrawY, frameX, -frameY, 2, 1, "TOPLEFT")
-                            line:Show()
-                            table.insert(MethodDungeonTools.DevDrawLines, line)
-                            
-                            scrollFrame.lastDrawX = frameX
-                            scrollFrame.lastDrawY = -frameY
-                        end
-                    end
-                else
-                    scrollFrame.isDrawing = false
-                end
 			else
-				MethodDungeonTools.main_frame.GridToggle:Hide()
                 MethodDungeonTools.main_frame.CoordinateDisplay:Hide()
 			end
+
+            -- Always show the Clear Lines button
+            MethodDungeonTools.main_frame.GridToggle:Show()
+
+            -- Drawing Tool logic everywhere!
+            if IsAltKeyDown() and IsMouseButtonDown("LeftButton") then
+                if not scrollFrame.isDrawing then
+                    scrollFrame.isDrawing = true
+                    scrollFrame.lastDrawX = frameX
+                    scrollFrame.lastDrawY = -frameY
+                else
+                    -- Only draw if we moved a bit to save textures
+                    local dist = math.sqrt((frameX - scrollFrame.lastDrawX)^2 + (-frameY - scrollFrame.lastDrawY)^2)
+                    if dist > 5 then
+                        local line = mapPanelFrame:CreateTexture(nil, "OVERLAY")
+                        line:SetTexture("Interface\\Buttons\\WHITE8X8")
+                        line:SetVertexColor(1, 0, 0, 0.8) -- Red lines
+                        DrawLine(line, MethodDungeonTools.main_frame.mapPanelTile1, scrollFrame.lastDrawX, scrollFrame.lastDrawY, frameX, -frameY, 2, 1, "TOPLEFT")
+                        line:Show()
+                        table.insert(MethodDungeonTools.DevDrawLines, line)
+                        
+                        scrollFrame.lastDrawX = frameX
+                        scrollFrame.lastDrawY = -frameY
+                    end
+                end
+            else
+                scrollFrame.isDrawing = false
+            end
+
+			if ( scrollFrame.panning ) then
+				local x, y = GetCursorPosition();
+				MethodDungeonTools:OnPan(x, y);
+			end
+
 			local mouseoverBlip 
 			if MouseIsOver(MethodDungeonToolsScrollFrame) and dungeonEnemyBlips then
 				for i=1,numDungeonEnemyBlips do
