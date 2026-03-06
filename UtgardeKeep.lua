@@ -266,9 +266,9 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
             [16] = {x = 252.1302081437,y = -467.75591319573,sublevel=1,g=23},
             [17] = {x = 242.28552287595,y = -463.80044874449,sublevel=1,g=23},
             [18] = {x = 22.76, y = -729.1, sublevel=1, g=1},
-            [18] = {x = 415.86, y = -1005.07, sublevel=1, g=1},
-            [19] = {x = -113.85, y = -836.45, sublevel=1, g=1},
-            [20] = {x = -172.04, y = -643.92, sublevel=1, g=1},
+            [19] = {x = 415.86, y = -1005.07, sublevel=1, g=1},
+            [20] = {x = -113.85, y = -836.45, sublevel=1, g=1},
+            [21] = {x = -172.04, y = -643.92, sublevel=1, g=1},
         },
     },
     [12] = { -- Map ID 24085 to array index in lua
