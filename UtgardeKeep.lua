@@ -1,4 +1,4 @@
-local dungeonIndex = 1
+local dungeonIndex = 8
 local nerfMultiplier = 1
 local pi = math.pi
 
