@@ -427,9 +427,9 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 		["scale"] = 1.2,
 		["color"] = { r = 2, g = 3, b = 4, a = 0.8 },
 		["clones"] = {
-			[1] = { x = 270.66389806117, y = -280.6215397251, sublevel = 1, g = 49 },
-			[2] = { x = 243.79962924977, y = -248.22645611916, sublevel = 1, g = 50 },
-			[3] = { x = 249.33056075853, y = -308.27584712624, sublevel = 1, g = 51 },
+			[1] = { x = 270, y = -280, sublevel = 1, g = 49 },
+			[2] = { x = 243, y = -248, sublevel = 1, g = 50 },
+			[3] = { x = 243, y = -308, sublevel = 1, g = 51 },
 		},
 	},
 }
