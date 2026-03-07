@@ -24,13 +24,13 @@ end
 
 function MethodDungeonTools:SetDisplayInfo(model, id, isNpcId, modelPath)
 	if modelPath and model.SetModel then
-		print("|cFF00FF00[MDT Debug]|r Loading SetModel with path:", modelPath)
+		-- print("|cFF00FF00[MDT Debug]|r Loading SetModel with path:", modelPath)
 		model:SetModel(modelPath)
 		if model.SetLight then
 			model:SetLight(1, 0, 0, -0.707, -0.707, 0.7, 1.0, 1.0, 1.0, 0.8, 1.0, 1.0, 0.8)
 		end
 	elseif model.SetCreature then
-		print("|cFF00FF00[MDT Debug]|r Loading SetCreature with visual NPC ID:", id)
+		-- print("|cFF00FF00[MDT Debug]|r Loading SetCreature with visual NPC ID:", id)
 		model:SetCreature(id)
 	end
 
@@ -334,21 +334,19 @@ local dungeonEnemiesSelected = {}
 -- MethodDungeonTools.dungeonTotalCount = {} -- Initialized at the top now
 
 local dungeonList = {
-	[1] = "Крепость Утгард",
+	[1] = "Ан'кахет: Старое Королевство",
 	[2] = "Крепость Драк'Тарон",
 	[3] = "Чертоги молний",
-	[4] = "Ан'кахет: Старое Королевство",
-	[5] = "Кузня крови",
-	[6] = "Узилище",
-	[7] = "Бастионы адского пламени",
-	[8] = "Гробницы маны",
+	[4] = "Бастионы адского пламени",
+	[5] = "Гробницы маны",
+	[6] = "Кузня крови",
+	[7] = "Узилище",
+	[8] = "Крепость Утгард",
 }
 
 local dungeonSubLevels = {
 	[1] = {
 		[1] = "1-й ярус",
-		[2] = "2-й ярус",
-		[3] = "3-й ярус",
 	},
 	[2] = {
 		[1] = "1-й ярус",
@@ -360,7 +358,6 @@ local dungeonSubLevels = {
 	},
 	[4] = {
 		[1] = "1-й ярус",
-		[2] = "2-й ярус",
 	},
 	[5] = {
 		[1] = "1-й ярус",
@@ -373,16 +370,16 @@ local dungeonSubLevels = {
 	},
 	[8] = {
 		[1] = "1-й ярус",
+		[2] = "2-й ярус",
+		[3] = "3-й ярус",
 	},
 }
 
 -- MethodDungeonTools.dungeonMaps = { -- Initialized at the top now
 MethodDungeonTools.dungeonMaps = {
 	[1] = {
-		[0] = "UtgardeKeep",
-		[1] = "UtgardeKeep1_",
-		[2] = "UtgardeKeep2_",
-		[3] = "UtgardeKeep3_",
+		[0] = "Ahnkahet",
+		[1] = "Ahnkahet1_",
 	},
 	[2] = {
 		[0] = "DrakTharonKeep",
@@ -395,26 +392,26 @@ MethodDungeonTools.dungeonMaps = {
 		[2] = "HallsOfLightning2_",
 	},
 	[4] = {
-		[0] = "Ahnkahet",
-		[1] = "Ahnkahet1_",
-		[2] = "Ahnkahet2_",
-	},
-	[5] = {
-		[0] = "TheBloodFurnace",
-		[1] = "TheBloodFurnace1_",
-	},
-	[6] = {
-		[0] = "TheSlavePens",
-		[1] = "TheSlavePens1_",
-	},
-
-	[7] = {
 		[0] = "HellfireRamparts",
 		[1] = "HellfireRamparts1_",
 	},
-	[8] = {
+	[5] = {
 		[0] = "ManaTombs",
 		[1] = "ManaTombs1_",
+	},
+	[6] = {
+		[0] = "TheBloodFurnace",
+		[1] = "TheBloodFurnace1_",
+	},
+	[7] = {
+		[0] = "TheSlavePens",
+		[1] = "TheSlavePens1_",
+	},
+	[8] = {
+		[0] = "UtgardeKeep",
+		[1] = "UtgardeKeep1_",
+		[2] = "UtgardeKeep2_",
+		[3] = "UtgardeKeep3_",
 	},
 }
 -- MethodDungeonTools.dungeonBosses = {} -- Initialized at top
@@ -1718,6 +1715,24 @@ function MethodDungeonTools:MakeMapTexture(frame)
 					scrollFrame.isDrawing = true
 					scrollFrame.lastDrawX = frameX
 					scrollFrame.lastDrawY = -frameY
+
+					-- Draw an immediate dot at the click position
+					local line = mapPanelFrame:CreateTexture(nil, "OVERLAY")
+					line:SetTexture("Interface\\Buttons\\WHITE8X8")
+					line:SetVertexColor(1, 0, 0, 0.8) -- Red dot
+					DrawLine(
+						line,
+						MethodDungeonTools.main_frame.mapPanelTile1,
+						frameX,
+						-frameY,
+						frameX + 2,
+						-frameY + 2,
+						3,
+						1,
+						"TOPLEFT"
+					)
+					line:Show()
+					table.insert(MethodDungeonTools.DevDrawLines, line)
 				else
 					-- Only draw if we moved a bit to save textures
 					local dist = math.sqrt((frameX - scrollFrame.lastDrawX) ^ 2 + (-frameY - scrollFrame.lastDrawY) ^ 2)
@@ -2741,7 +2756,7 @@ function MethodDungeonTools:UpdateMap(ignoreSetSelection, ignoreReloadPullButton
 		localPath = localPath .. mapName .. "\\"
 	end
 
-	print("MDT Debug: Attempting to load textures from: " .. localPath)
+	-- print("MDT Debug: Attempting to load textures from: " .. localPath)
 	-- Check if fileName is a single file (ends with .blp or .tga)
 	local isSingleFile = fileName:match("%.blp$") or fileName:match("%.tga$")
 
@@ -3956,9 +3971,9 @@ GameTooltip:HookScript("OnTooltipSetUnit", function(self)
 		id = tonumber(guid:sub(-12, -9), 16)
 	end
 
-	if mdtTooltipDebug then
-		print("MDT Навели мышку: " .. unit .. " GUID: " .. guid .. " ID: " .. tostring(id))
-	end
+	-- if mdtTooltipDebug then
+	-- 	print("MDT Навели мышку: " .. unit .. " GUID: " .. guid .. " ID: " .. tostring(id))
+	-- end
 
 	if id and MethodDungeonTools and MethodDungeonTools.dungeonEnemies then
 		for dIdx, dEnemies in pairs(MethodDungeonTools.dungeonEnemies) do
@@ -3991,53 +4006,126 @@ GameTooltip:HookScript("OnTooltipSetUnit", function(self)
 	end
 end)
 
--- MDT Tracker Command for Sirus
-SLASH_MDTTRACK1 = "/mdttrack"
-SlashCmdList["MDTTRACK"] = function(msg)
-	if not MDT_LastP then
-		MDT_LastP = 0
+-- MDT Automated Tracker for Sirus
+local mdtTrackerFrame = CreateFrame("Frame")
+local mdtIsTracking = false
+local mdtLastForces = 0
+local mdtRecentlyDead = {}
+
+mdtTrackerFrame:SetScript("OnEvent", function(self, event, ...)
+	if not mdtIsTracking then
+		return
 	end
+	if event == "COMBAT_LOG_EVENT_UNFILTERED" then
+		-- WoW 3.3.5 args: timestamp, subevent, sourceGUID, sourceName, sourceFlags, destGUID, destName, destFlags
+		local timestamp = select(1, ...)
+		local subevent = select(2, ...)
+		local destGUID = select(6, ...)
+		local destName = select(7, ...)
 
-	local c = C_GlobalStorage.GetVar("ASMSG_CHALLENGE_MODE_CREATURE_KILLED")
-	local p = c and c.total and math.min(c.total, 100) or 0
-	local diff = p - MDT_LastP
-	MDT_LastP = p
+		-- Some custom 3.3.5 cores move subevent to arg 1, check for UNIT_DIED
+		if timestamp == "UNIT_DIED" then
+			subevent = "UNIT_DIED"
+			destGUID = select(5, ...)
+			destName = select(6, ...)
+		end
 
-	local targetName = UnitName("target") or "Unknown"
-	local guid = UnitGUID("target")
-	local id = 0
-	if guid then
-		if guid:find("-") then
-			id = tonumber(select(6, strsplit("-", guid)))
-		else
-			id = tonumber(guid:sub(-12, -9), 16)
+		if subevent == "UNIT_DIED" and destGUID then
+			local id = 0
+			if destGUID:find("-") then
+				id = tonumber(select(6, strsplit("-", destGUID))) or 0
+			else
+				id = tonumber(destGUID:sub(-12, -9), 16) or 0
+			end
+			table.insert(mdtRecentlyDead, { id = id, name = destName or "Unknown", time = GetTime() })
 		end
 	end
+end)
 
-	if not MethodDungeonToolsDB then
-		MethodDungeonToolsDB = {}
+local mdtUpdateTimer = 0
+mdtTrackerFrame:SetScript("OnUpdate", function(self, elapsed)
+	if not mdtIsTracking then
+		return
 	end
-	if not MethodDungeonToolsDB.MobDataTally then
-		MethodDungeonToolsDB.MobDataTally = {}
+	mdtUpdateTimer = mdtUpdateTimer + elapsed
+	if mdtUpdateTimer < 0.2 then
+		return
 	end
+	mdtUpdateTimer = 0
 
-	table.insert(MethodDungeonToolsDB.MobDataTally, {
-		name = targetName,
-		id = id,
-		percent = diff,
-		totalPercent = p,
-		date = date("%Y-%m-%d %H:%M:%S"),
-	})
+	local c = C_GlobalStorage.GetVar("ASMSG_CHALLENGE_MODE_CREATURE_KILLED")
+	local p = c and c.total and math.min(c.total, 100) or mdtLastForces
 
-	print(
-		"|cFF00FF00[MDT Tracker]|r Записано: "
-			.. targetName
-			.. " ("
-			.. id
-			.. ") дал "
-			.. diff
-			.. "% (Всего: "
-			.. p
-			.. "%)"
-	)
+	if p > mdtLastForces then
+		local diff = p - mdtLastForces
+		mdtLastForces = p
+
+		local matched = {}
+		local now = GetTime()
+		for i = #mdtRecentlyDead, 1, -1 do
+			if (now - mdtRecentlyDead[i].time) <= 3 then
+				table.insert(matched, mdtRecentlyDead[i])
+			end
+		end
+
+		if not MethodDungeonToolsDB then
+			MethodDungeonToolsDB = {}
+		end
+		if not MethodDungeonToolsDB.MobDataTally then
+			MethodDungeonToolsDB.MobDataTally = {}
+		end
+
+		local count = #matched
+		if count > 0 then
+			local perMobDiff = diff / count
+			local namesStr = ""
+			for _, mob in ipairs(matched) do
+				namesStr = namesStr .. mob.name .. " (" .. mob.id .. ") "
+				table.insert(MethodDungeonToolsDB.MobDataTally, {
+					name = mob.name,
+					id = mob.id,
+					percent = perMobDiff,
+					totalPercent = p,
+					date = date("%Y-%m-%d %H:%M:%S"),
+				})
+			end
+			print(
+				"|cFF00FF00[MDT Tracker]|r "
+					.. namesStr
+					.. "=> дал суммарно "
+					.. diff
+					.. "% ("
+					.. perMobDiff
+					.. "% каждый)"
+			)
+		else
+			table.insert(MethodDungeonToolsDB.MobDataTally, {
+				name = "Unknown Target",
+				id = 0,
+				percent = diff,
+				totalPercent = p,
+				date = date("%Y-%m-%d %H:%M:%S"),
+			})
+			print("|cFF00FF00[MDT Tracker]|r Неизвестная цель дала " .. diff .. "%")
+		end
+
+		mdtRecentlyDead = {}
+	end
+end)
+
+SLASH_MDTTRACK1 = "/mdttrack"
+SlashCmdList["MDTTRACK"] = function(msg)
+	mdtIsTracking = not mdtIsTracking
+	if mdtIsTracking then
+		local c = C_GlobalStorage.GetVar("ASMSG_CHALLENGE_MODE_CREATURE_KILLED")
+		mdtLastForces = c and c.total and math.min(c.total, 100) or 0
+		mdtTrackerFrame:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
+		print(
+			"|cFF00FF00[MDT Tracker]|r Авто-запись ВКЛЮЧЕНА. Будет следить за смертями."
+		)
+	else
+		mdtTrackerFrame:UnregisterAllEvents()
+		mdtRecentlyDead = {}
+		print("|cFF00FF00[MDT Tracker]|r Авто-запись ВЫКЛЮЧЕНА.")
+	end
 end
