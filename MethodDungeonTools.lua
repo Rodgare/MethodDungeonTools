@@ -998,6 +998,7 @@ function MethodDungeonTools:AddOrRemoveEnemyBlipToCurrentPull(i, add, ignoreGrou
 		end
 	end
 	MethodDungeonTools:UpdatePullButtonNPCData(pull)
+	MethodDungeonTools:UpdateDungeonEnemies()
 end
 
 MethodDungeonTools.pullColors = {
@@ -2236,6 +2237,7 @@ function MethodDungeonTools:UpdateDungeonEnemies()
 								MethodDungeonTools.main_frame.mapPanelFrame
 							)
 							dungeonEnemyBlips[idx]:SetFrameLevel(5)
+							dungeonEnemyBlips[idx]:EnableMouse(false)
 
 							dungeonEnemyBlips[idx].texture = dungeonEnemyBlips[idx]:CreateTexture(nil, "ARTWORK")
 							dungeonEnemyBlips[idx].texture:SetAllPoints()
@@ -2385,6 +2387,27 @@ function MethodDungeonTools:UpdateDungeonEnemies()
 							dungeonEnemyBlips[idx].color.r,
 							dungeonEnemyBlips[idx].color.g,
 							dungeonEnemyBlips[idx].color.b
+
+						-- Check if this enemy is in a pull, color the border accordingly
+						local preset = db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]]
+						dungeonEnemyBlips[idx].pullIdx = nil
+						for pullIdx, pullData in pairs(preset.value.pulls) do
+							if pullData[enemyIdx] then
+								for _, cIdx in pairs(pullData[enemyIdx]) do
+									if cIdx == cloneIdx then
+										local colorIdx = pullIdx % 12
+										if colorIdx == 0 then
+											colorIdx = 12
+										end
+										local pColor = MethodDungeonTools.pullColors[colorIdx]
+										r, g, b = pColor[1], pColor[2], pColor[3]
+										dungeonEnemyBlips[idx].pullIdx = pullIdx
+										break
+									end
+								end
+							end
+						end
+
 						-- Force the circular border to be 100% fully opaque regardless of the database value
 						dungeonEnemyBlips[idx].colorOverlay:SetVertexColor(r, g, b, 1.0)
 
