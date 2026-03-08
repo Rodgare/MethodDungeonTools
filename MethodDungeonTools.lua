@@ -4317,6 +4317,7 @@ function MethodDungeonTools:ShowEnemyInfoFrame(blipIndex)
 					if not sf then
 						sf = CreateFrame("Frame", nil, f)
 						sf:SetSize(160, 30)
+						sf:EnableMouse(true)
 
 						local icon = sf:CreateTexture(nil, "ARTWORK")
 						icon:SetSize(24, 24)
