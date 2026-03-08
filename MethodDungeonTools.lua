@@ -2291,8 +2291,18 @@ function MethodDungeonTools:UpdateDungeonEnemies()
 						-- Fetch spell icon if available
 						local iconTex = "Interface\\AddOns\\" .. addonName .. "\\Textures\\Circle_White.tga"
 						local hasSpellIcon = false
-						if data.spells and data.spells[1] then
-							local _, _, icon = GetSpellInfo(data.spells[1])
+
+						local spellIdForIcon = nil
+						if data.iconId ~= nil then
+							if data.iconId ~= "" then
+								spellIdForIcon = data.iconId
+							end
+						elseif data.spells and data.spells[1] then
+							spellIdForIcon = data.spells[1]
+						end
+
+						if spellIdForIcon then
+							local _, _, icon = GetSpellInfo(spellIdForIcon)
 							if icon then
 								iconTex = icon
 								hasSpellIcon = true
@@ -2395,9 +2405,9 @@ function MethodDungeonTools:UpdateDungeonEnemies()
 							if pullData[enemyIdx] then
 								for _, cIdx in pairs(pullData[enemyIdx]) do
 									if cIdx == cloneIdx then
-										local colorIdx = pullIdx % 12
+										local colorIdx = (pullIdx % #MethodDungeonTools.pullColors) + 1
 										if colorIdx == 0 then
-											colorIdx = 12
+											colorIdx = 1
 										end
 										local pColor = MethodDungeonTools.pullColors[colorIdx]
 										r, g, b = pColor[1], pColor[2], pColor[3]
@@ -4199,8 +4209,22 @@ function MethodDungeonTools:ShowEnemyInfoFrame(blipIndex)
 			return val
 		end
 
+		local function createCopyableLabel(text, parent, yOffset)
+			local lbl = parent:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+			lbl:SetText(text)
+			lbl:SetPoint("TOPLEFT", parent, "TOPLEFT", 235, yOffset)
+			local val = CreateFrame("EditBox", nil, parent)
+			val:SetFontObject("GameFontHighlight")
+			val:SetPoint("TOPLEFT", lbl, "BOTTOMLEFT", -4, -5) -- -4 offset because EditBox padding is weird
+			val:SetSize(160, 15)
+			val:SetAutoFocus(false)
+			val:SetScript("OnEscapePressed", val.ClearFocus)
+			val:SetScript("OnEditFocusGained", val.HighlightText)
+			return val
+		end
+
 		f.infoName = createLabel("Имя", f, -50)
-		f.infoId = createLabel("NPC Id", f, -90)
+		f.infoId = createCopyableLabel("NPC Id", f, -90)
 		f.infoHealth = createLabel("Здоровье", f, -130)
 		f.infoType = createLabel("Тип", f, -170)
 		f.infoLevel = createLabel("Lvl", f, -210)
@@ -4237,6 +4261,7 @@ function MethodDungeonTools:ShowEnemyInfoFrame(blipIndex)
 		-- Stats
 		f.infoName:SetText(data.name or "Unknown")
 		f.infoId:SetText(tostring(data.id or enemyIdx))
+		f.infoId:SetCursorPosition(0)
 
 		local hp = data.health or 0
 		if hp > 1000000 then
