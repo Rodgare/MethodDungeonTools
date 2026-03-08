@@ -4299,11 +4299,65 @@ function MethodDungeonTools:ShowEnemyInfoFrame(blipIndex)
 		if total and total > 0 then
 			pct = (forces / total) * 100
 		end
-		f.infoForces:SetText(string.format("%s (%.2f%%)", tostring(forces), pct))
+		f.infoForces:SetText(string.format("%.2f%%", pct))
+
+		f.spellFrames = f.spellFrames or {}
+		for _, sf in ipairs(f.spellFrames) do
+			sf:Hide()
+		end
 
 		-- Spells
-		f.noSpellsText:Show()
-		-- We will add real spells here later when DB is parsed
+		if data.spells and #data.spells > 0 then
+			f.noSpellsText:Hide()
+			local yOffset = -10
+			for i, spellId in ipairs(data.spells) do
+				local sName, _, sIcon = GetSpellInfo(spellId)
+				if sName then
+					local sf = f.spellFrames[i]
+					if not sf then
+						sf = CreateFrame("Frame", nil, f)
+						sf:SetSize(160, 30)
+
+						local icon = sf:CreateTexture(nil, "ARTWORK")
+						icon:SetSize(24, 24)
+						icon:SetPoint("LEFT", sf, "LEFT", 0, 0)
+						sf.icon = icon
+
+						local nameLbl = sf:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+						nameLbl:SetPoint("LEFT", icon, "RIGHT", 5, 0)
+						nameLbl:SetWidth(125)
+						nameLbl:SetJustifyH("LEFT")
+						nameLbl:SetWordWrap(false)
+						sf.nameLbl = nameLbl
+
+						sf:SetScript("OnEnter", function(self)
+							GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+							GameTooltip:SetHyperlink("spell:" .. self.spellId)
+							GameTooltip:Show()
+						end)
+						sf:SetScript("OnLeave", function(self)
+							GameTooltip:Hide()
+						end)
+
+						f.spellFrames[i] = sf
+					end
+
+					sf.spellId = spellId
+					sf.icon:SetTexture(sIcon)
+					sf.nameLbl:SetText(sName)
+					sf:SetPoint("TOPLEFT", f.spellsTitle, "BOTTOMLEFT", 0, yOffset)
+					sf:Show()
+
+					yOffset = yOffset - 35
+				end
+			end
+			-- if all spells were invalid, show text
+			if yOffset == -10 then
+				f.noSpellsText:Show()
+			end
+		else
+			f.noSpellsText:Show()
+		end
 
 		f:Show()
 	end

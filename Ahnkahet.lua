@@ -57,6 +57,7 @@ MethodDungeonTools.dungeonBosses[dungeonIndex] = {
 MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	[31104] = { -- Map ID 31104 to array index in lua
 		["id"] = 31104,
+		spells = { 56646, 56643, 42746 },
 		["name"] = "Наблюдатель Ан'кахара",
 		["health"] = 117300,
 		["level"] = 80,
@@ -71,6 +72,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[30276] = { -- Map ID 30276 to array index in lua
 		["id"] = 30276,
+		spells = { 59106, 56640, 56632 },
 		["name"] = "Ан'кахарский веретенщик",
 		["health"] = 130330,
 		["level"] = 80,
@@ -92,6 +94,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[30277] = { -- Map ID 30277 to array index in lua
 		["id"] = 30277,
+		spells = { 56646, 56643, 42746, 32714 },
 		["name"] = "Ан'кахарский измельчитель",
 		["health"] = 130330,
 		["level"] = 80,
@@ -111,6 +114,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[30278] = { -- Map ID 30278 to array index in lua
 		["id"] = 30278,
+		spells = { 56702, 56698, 59103, 59102 },
 		["name"] = "Ан'кахарский метатель заклинаний",
 		["health"] = 130330,
 		["level"] = 80,
@@ -132,6 +136,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[30279] = { -- Map ID 30279 to array index in lua
 		["id"] = 30279,
+		spells = { 59109, 56583, 59108, 56581, 56580 },
 		["name"] = "Глубинный ползун",
 		["health"] = 130330,
 		["level"] = 80,
@@ -155,6 +160,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[30283] = { -- Map ID 30283 to array index in lua
 		["id"] = 30283,
+		spells = { 56709, 56707, 61459 },
 		["name"] = "Чумоброд",
 		["health"] = 130330,
 		["level"] = 80,
@@ -171,6 +177,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[30284] = { -- Map ID 30284 to array index in lua
 		["id"] = 30284,
+		spells = { 8599, 19134, 56737, 59107, 56736 },
 		["name"] = "Костомол",
 		["health"] = 130330,
 		["level"] = 80,
@@ -185,6 +192,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[30285] = { -- Map ID 30285 to array index in lua
 		["id"] = 30285,
+		spells = { 61463, 56730, 17439, 56728, 17289, 56733, 59111 },
 		["name"] = "Глаз Талдарама",
 		["health"] = 130330,
 		["level"] = 80,
@@ -204,6 +212,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[30286] = { -- Map ID 30286 to array index in lua
 		["id"] = 30286,
+		spells = { 15063, 57825, 61461, 61462, 56716 },
 		["name"] = "Стужень",
 		["health"] = 130330,
 		["level"] = 80,
@@ -223,6 +232,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[30287] = { -- Map ID 30287 to array index in lua
 		["id"] = 30287,
+		spells = { 59114, 56715 },
 		["name"] = "Бесчинствующий упырь",
 		["health"] = 130330,
 		["level"] = 80,
@@ -250,6 +260,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[30319] = { -- Map ID 30319 to array index in lua
 		["id"] = 30319,
+		spells = { 56898, 61563, 56711, 61562, 12739, 56713, 13338 },
 		["name"] = "Сумеречный черный маг",
 		["health"] = 130330,
 		["level"] = 80,
@@ -267,6 +278,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[30329] = { -- Map ID 30329 to array index in lua
 		["id"] = 30329,
+		spells = { 59116, 56867, 30471, 48193 },
 		["name"] = "Дикий пещерный зверь",
 		["health"] = 130330,
 		["level"] = 80,
@@ -285,6 +297,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[30338] = { -- Map ID 30338 to array index in lua
 		["id"] = 30338,
+		spells = { 56158, 56281, 56354 },
 		["name"] = "Ан'кахарский паук",
 		["health"] = 130330,
 		["level"] = 80,
@@ -331,6 +344,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[30111] = { -- Map ID 30111 to array index in lua
 		["id"] = 30111,
+		spells = { 56858, 61568, 17290, 56713, 61567, 56711 },
 		["name"] = "Сумеречный верующий",
 		["health"] = 130330,
 		["level"] = 80,
@@ -349,6 +363,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[30416] = { -- Map ID 30416 to array index in lua
 		["id"] = 30416,
+		spells = { 17195, 12470 },
 		["name"] = "Укрощенный элементаль огня",
 		["health"] = 130330,
 		["level"] = 80,
@@ -365,6 +380,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[30418] = { -- Map ID 30418 to array index in lua
 		["id"] = 30418,
+		spells = { 59152, 46150, 59169, 22414 },
 		["name"] = "Укрощенный элементаль воздуха",
 		["health"] = 130330,
 		["level"] = 80,
@@ -381,6 +397,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[30419] = { -- Map ID 30419 to array index in lua
 		["id"] = 30419,
+		spells = { 39207, 35735, 56862 },
 		["name"] = "Укрощенный элементаль воды",
 		["health"] = 130330,
 		["level"] = 80,
@@ -397,6 +414,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[30179] = { -- Map ID 30179 to array index in lua
 		["id"] = 30179,
+		spells = { 61570, 28902, 11986, 12550, 56713, 56711 },
 		["name"] = "Сумеречный апостол",
 		["health"] = 130330,
 		["level"] = 80,
@@ -419,6 +437,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[30414] = { -- Map ID 30414 to array index in lua
 		["id"] = 30414,
+		spells = { 60851, 60848, 34322, 60833, 60845 },
 		["name"] = "Позабытый",
 		["health"] = 130330,
 		["level"] = 80,

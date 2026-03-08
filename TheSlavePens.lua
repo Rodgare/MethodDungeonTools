@@ -39,6 +39,7 @@ MethodDungeonTools.dungeonBosses[dungeonIndex] = {
 MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	[17938] = { -- Map ID 17938 to array index in lua
 		["id"] = 17938,
+		spells = {17883, 37668, 32191},
 		["name"] = "Наблюдатель резервуара Кривого Клыка",
 		["health"] = 130330,
 		["level"] = 80,
@@ -56,6 +57,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[17962] = { -- Map ID 17962 to array index in lua
 		["id"] = 17962,
+		spells = {19130, 33787, 8269},
 		["name"] = "Работяга резервуара Кривого Клыка",
 		["health"] = 130330,
 		["level"] = 80,
@@ -81,6 +83,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[17963] = { -- Map ID 17963 to array index in lua
 		["id"] = 17963,
+		spells = {32192, 15531, 12675, 15497, 34880},
 		["name"] = "Раб-бродяга пустошей",
 		["health"] = 130330,
 		["level"] = 80,
@@ -100,6 +103,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[17964] = { -- Map ID 17964 to array index in lua
 		["id"] = 17964,
+		spells = {37662, 13738},
 		["name"] = "Рабочий-бродяга пустошей",
 		["health"] = 130330,
 		["level"] = 80,
@@ -129,6 +133,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[17959] = { -- Map ID 17959 to array index in lua
 		["id"] = 17959,
+		spells = {16172, 6754, 9080},
 		["name"] = "Укротитель резервуара Кривого Клыка",
 		["health"] = 130330,
 		["level"] = 80,
@@ -147,6 +152,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[17960] = { -- Map ID 17960 to array index in lua
 		["id"] = 17960,
+		spells = {30923, 15790, 31555},
 		["name"] = "Ворожея резервуара Кривого Клыка",
 		["health"] = 130330,
 		["level"] = 80,
@@ -163,6 +169,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[17957] = { -- Map ID 17957 to array index in lua
 		["id"] = 17957,
+		spells = {16145, 19134, 15284},
 		["name"] = "Воитель резервуара Кривого Клыка",
 		["health"] = 130330,
 		["level"] = 80,
@@ -185,6 +192,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[17961] = { -- Map ID 17961 to array index in lua
 		["id"] = 17961,
+		spells = {15234, 32193, 32173},
 		["name"] = "Чародейка резервуара Кривого Клыка",
 		["health"] = 130330,
 		["level"] = 80,
@@ -231,6 +239,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[21127] = { -- Map ID 21127 to array index in lua
 		["id"] = 21127,
+		spells = {36872, 15667},
 		["name"] = "Шквальник резервуара Кривого Клыка",
 		["health"] = 130330,
 		["level"] = 80,
@@ -252,6 +261,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[21126] = { -- Map ID 21126 to array index in lua
 		["id"] = 21126,
+		spells = {17139, 34945, 34944},
 		["name"] = "Целительница чешуи резервуара Кривого Клыка",
 		["health"] = 130330,
 		["level"] = 80,
@@ -269,6 +279,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[17958] = { -- Map ID 17958 to array index in lua
 		["id"] = 17958,
+		spells = {15655, 31554},
 		["name"] = "Защитник резервуара Кривого Клыка",
 		["health"] = 130330,
 		["level"] = 80,
@@ -289,6 +300,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[21128] = { -- Map ID 21128 to array index in lua
 		["id"] = 21128,
+		spells = {34984},
 		["name"] = "Скат резервуара Кривого Клыка",
 		["health"] = 130330,
 		["level"] = 80,
@@ -305,6 +317,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[17817] = { -- Map ID 17817 to array index in lua
 		["id"] = 17817,
+		spells = {35760},
 		["name"] = "Большой крабстер",
 		["health"] = 130330,
 		["level"] = 80,
@@ -335,6 +348,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[17816] = { -- Map ID 17816 to array index in lua
 		["id"] = 17816,
+		spells = {31551},
 		["name"] = "Крабстер",
 		["health"] = 130330,
 		["level"] = 80,

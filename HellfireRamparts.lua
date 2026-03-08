@@ -39,6 +39,7 @@ MethodDungeonTools.dungeonBosses[dungeonIndex] = {
 MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	[17259] = { -- Map ID 17259 to array index in lua
 		["id"] = 17259,
+		spells = {16244, 14516, 6713},
 		["name"] = "Алчущий из клана Костеглодов",
 		["health"] = 130330,
 		["level"] = 80,
@@ -69,6 +70,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[17517] = { -- Map ID 17259 to array index in lua
 		["id"] = 17517,
+		spells = {30621},
 		["name"] = "Караульный цитадели Адского Пламени",
 		["health"] = 130330,
 		["level"] = 80,
@@ -83,6 +85,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[17264] = { -- Map ID 17264 to array index in lua
 		["id"] = 17264,
+		spells = {30621},
 		["name"] = "Стервятник из клана Костеглодов",
 		["health"] = 130330,
 		["level"] = 80,
@@ -102,6 +105,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[17269] = { -- Map ID 17269 to array index in lua
 		["id"] = 17269,
+		spells = {36807, 20754, 36808, 15241},
 		["name"] = "Черный маг из клана Кровавой Глазницы",
 		["health"] = 130330,
 		["level"] = 80,
@@ -130,6 +134,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[17270] = { -- Map ID 17270 to array index in lua
 		["id"] = 17270,
+		spells = {31942, 18651, 30614},
 		["name"] = "Лучник из клана Кровавой Глазницы",
 		["health"] = 130330,
 		["level"] = 80,
@@ -148,6 +153,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[17271] = { -- Map ID 17271 to array index in lua
 		["id"] = 17271,
+		spells = {10101, 16856},
 		["name"] = "Разрушитель из клана Костеглодов",
 		["health"] = 130330,
 		["level"] = 80,
@@ -176,6 +182,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[17280] = { -- Map ID 17280 to array index in lua
 		["id"] = 17280,
+		spells = {30636, 30639},
 		["name"] = "Бойцовый пес из клана Изувеченной Длани",
 		["health"] = 130330,
 		["level"] = 80,
@@ -208,6 +215,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[17281] = { -- Map ID 17281 to array index in lua
 		["id"] = 17281,
+		spells = {18501},
 		["name"] = "Потрошитель из клана Костеглодов",
 		["health"] = 130330,
 		["level"] = 80,
@@ -221,6 +229,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[17455] = { -- Map ID 17455 to array index in lua
 		["id"] = 17455,
+		spells = {30635, 10966},
 		["name"] = "Повелитель зверей из клана Костеглодов",
 		["health"] = 130330,
 		["level"] = 80,
@@ -234,6 +243,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[17478] = { -- Map ID 17478 to array index in lua
 		["id"] = 17478,
+		spells = {31059, 30659, 12471, 30615, 15232},
 		["name"] = "Провидец из клана Кровавой Глазницы",
 		["health"] = 130330,
 		["level"] = 80,

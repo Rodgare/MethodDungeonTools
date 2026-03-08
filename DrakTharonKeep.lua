@@ -50,6 +50,7 @@ MethodDungeonTools.dungeonBosses[dungeonIndex] = {
 MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	[26624] = { -- Map ID 26624 to array index in lua
 		["id"] = 26624,
+		spells = {59018, 40504, 49703},
 		["name"] = "Гнусный изрыгатель",
 		["health"] = 130330,
 		["level"] = 81,
@@ -64,6 +65,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[26625] = { -- Map ID 26625 to array index in lua
 		["id"] = 26625,
+		spells = {49704, 49708},
 		["name"] = "Темнопутый паук-отшельник",
 		["health"] = 130330,
 		["level"] = 80,
@@ -81,6 +83,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[26626] = { -- Map ID 26626 to array index in lua
 		["id"] = 26626,
+		spells = {50378, 50379, 49805},
 		["name"] = "Воскреситель из Плети",
 		["health"] = 130330,
 		["level"] = 80,
@@ -95,6 +98,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[26628] = { -- Map ID 26628 to array index in lua
 		["id"] = 26628,
+		spells = {13738},
 		["name"] = "Смертехват Драккари",
 		["health"] = 130330,
 		["level"] = 80,
@@ -110,6 +114,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[26635] = { -- Map ID 26635 to array index in lua
 		["id"] = 26635,
+		spells = {33661, 36093, 48624},
 		["name"] = "Восставший воин Драккари",
 		["health"] = 117000,
 		["level"] = 80,
@@ -133,6 +138,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[26620] = { -- Map ID 26620 to array index in lua
 		["id"] = 26620,
+		spells = {11972, 9080},
 		["name"] = "Страж Драккари",
 		["health"] = 130330,
 		["level"] = 80,
@@ -152,6 +158,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[26623] = { -- Map ID 26623 to array index in lua
 		["id"] = 26623,
+		spells = {35011, 16856},
 		["name"] = "Громила Плети",
 		["health"] = 130330,
 		["level"] = 80,
@@ -165,6 +172,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[26636] = { -- Map ID 26636 to array index in lua
 		["id"] = 26636,
+		spells = {59014, 59015, 49696, 55847, 59013, 49701, 35011},
 		["name"] = "Восставший энергетический маг Драккари",
 		["health"] = 130330,
 		["level"] = 80,
@@ -181,6 +189,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[26637] = { -- Map ID 26637 to array index in lua
 		["id"] = 26637,
+		spells = {49712, 51224, 6253, 49711},
 		["name"] = "Восставший укротитель Драккари",
 		["health"] = 130330,
 		["level"] = 80,
@@ -196,6 +205,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[26638] = { -- Map ID 26638 to array index in lua
 		["id"] = 26638,
+		spells = {50414, 59009, 16001},
 		["name"] = "Восставший всадник на нетопыре из Драккари",
 		["health"] = 130330,
 		["level"] = 80,
@@ -209,6 +219,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[26639] = { -- Map ID 26639 to array index in lua
 		["id"] = 26639,
+		spells = {48895, 48894},
 		["name"] = "Шаман Драккари",
 		["health"] = 130330,
 		["level"] = 80,
@@ -223,6 +234,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[26641] = { -- Map ID 26641 to array index in lua
 		["id"] = 26641,
+		spells = {49710},
 		["name"] = "Потрошитель Драккари",
 		["health"] = 130330,
 		["level"] = 80,
@@ -241,6 +253,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[27431] = { -- Map ID 27431 to array index in lua
 		["id"] = 27431,
+		spells = {8269, 49807, 24236, 49724},
 		["name"] = "Командир Драккари",
 		["health"] = 130330,
 		["level"] = 80,
@@ -254,6 +267,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[26830] = { -- Map ID 26830 to array index in lua
 		["id"] = 26830,
+		spells = {59011, 59010, 51240, 49723, 49721},
 		["name"] = "Восставший рыцарь смерти Драккари",
 		["health"] = 130330,
 		["level"] = 80,
@@ -272,6 +286,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[27871] = { -- Map ID 27871 to array index in lua
 		["id"] = 27871,
+		spells = {50933, 46202},
 		["name"] = "Плотоядный вурдалак",
 		["health"] = 130330,
 		["level"] = 80,
@@ -287,6 +302,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[26621] = { -- Map ID 26621 to array index in lua
 		["id"] = 26621,
+		spells = {49678, 59007, 51917},
 		["name"] = "Вурдалак-мучитель",
 		["health"] = 130330,
 		["level"] = 80,

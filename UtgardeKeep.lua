@@ -57,6 +57,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 		["level"] = 80,
 		["creatureType"] = "Дракон",
 		["id"] = 23961,
+		spells = {59607, 42780, 59606, 57846},
 		["displayId"] = 23961,
 		["count"] = 1.34,
 		["scale"] = 1,
@@ -72,6 +73,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[2] = { -- Map ID 28419 to array index in lua
 		["id"] = 28419,
+		spells = {40414},
 		["name"] = "Бесноватый упырь",
 		["health"] = 999,
 		["level"] = 80,
@@ -96,6 +98,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[3] = { -- Map ID 24069 to array index in lua
 		["id"] = 24069,
+		spells = {9791, 43935, 59599},
 		["name"] = "Костекрушитель из клана Укротителей драконов",
 		["health"] = 999,
 		["level"] = 80,
@@ -113,6 +116,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[4] = { -- Map ID 24071 to array index in lua
 		["id"] = 24071,
+		spells = {31551, 59603, 59605, 32908, 43665, 59604},
 		["name"] = "Разрыватель сердец из клана Укротителей драконов",
 		["health"] = 999,
 		["level"] = 80,
@@ -128,6 +132,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[5] = { -- Map ID 24078 to array index in lua
 		["id"] = 24078,
+		spells = {59608, 8599, 15572},
 		["name"] = "Металлорез из клана Укротителей драконов",
 		["health"] = 999,
 		["level"] = 80,
@@ -164,6 +169,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[7] = { -- Map ID 24080 to array index in lua
 		["id"] = 24080,
+		spells = {42724, 22427, 6713},
 		["name"] = "Оружейник из клана Укротителей драконов",
 		["health"] = 999,
 		["level"] = 80,
@@ -225,6 +231,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[8] = { -- Map ID 24849 to array index in lua
 		["id"] = 24849,
+		spells = {31551, 59603, 59605, 43665, 32908, 59604},
 		["name"] = "Всадник на протодраконе",
 		["health"] = 999,
 		["level"] = 80,
@@ -256,6 +263,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[10] = { -- Map ID 24084 to array index in lua
 		["id"] = 24084,
+		spells = {42702},
 		["name"] = "Туннельный вурдалак",
 		["health"] = 999,
 		["level"] = 80,
@@ -288,6 +296,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[12] = { -- Map ID 24085 to array index in lua
 		["id"] = 24085,
+		spells = {59614, 16244, 59611, 38232, 59613, 35570},
 		["name"] = "Надзиратель из клана Укротителей драконов",
 		["health"] = 999,
 		["level"] = 80,
@@ -326,6 +335,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[15] = { -- Map ID 29735 to array index in lua
 		["id"] = 29735,
+		spells = {55077, 42745},
 		["name"] = "Дикий ворг",
 		["health"] = 999,
 		["level"] = 80,
@@ -345,6 +355,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 
 	[22] = { -- Map ID 23956 to array index in lua
 		["id"] = 23956,
+		spells = {54962, 42772, 59685, 60227, 42972},
 		["name"] = "Стратег из клана Укротителей драконов",
 		["health"] = 999,
 		["level"] = 80,
@@ -364,6 +375,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[23] = { -- Map ID 23960 to array index in lua
 		["id"] = 23960,
+		spells = {42740, 59616, 54965, 59617},
 		["name"] = "Заклинатель рун из клана Укротителей драконов",
 		["health"] = 999,
 		["level"] = 80,
@@ -385,6 +397,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[24] = { -- Map ID 28410 to array index in lua
 		["id"] = 28410,
+		spells = {51586, 51588, 51587},
 		["name"] = "Спиритуалист из клана Укротителей драконов",
 		["health"] = 999,
 		["level"] = 80,
@@ -398,6 +411,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[26] = { -- Map ID 24082 to array index in lua
 		["id"] = 24082,
+		spells = {59696, 54983, 43664, 59695, 38621, 59694},
 		["name"] = "Укротитель протодраконов",
 		["health"] = 999,
 		["level"] = 80,

@@ -39,6 +39,7 @@ MethodDungeonTools.dungeonBosses[dungeonIndex] = {
 MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	[18309] = { -- Map ID 18309 to array index in lua
 		["id"] = 18309,
+		spells = {33865, 34920, 33871},
 		["name"] = "Эфириал-падальщик",
 		["health"] = 130330,
 		["level"] = 80,
@@ -58,6 +59,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[18311] = { -- Map ID 18311 to array index in lua
 		["id"] = 18311,
+		spells = {32315, 8599, 22911, 31403},
 		["name"] = "Эфириал - осквернитель гробниц",
 		["health"] = 130330,
 		["level"] = 80,
@@ -84,6 +86,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[18313] = { -- Map ID 18313 to array index in lua
 		["id"] = 18313,
+		spells = {25603, 22272, 15790, 32353},
 		["name"] = "Эфириал-колдун",
 		["health"] = 130330,
 		["level"] = 80,
@@ -115,6 +118,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[18317] = { -- Map ID 18317 to array index in lua
 		["id"] = 18317,
+		spells = {17139, 37669, 22883, 35944, 34944, 34945},
 		["name"] = "Эфириал-жрец",
 		["health"] = 130330,
 		["level"] = 80,
@@ -144,6 +148,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[18314] = { -- Map ID 18314 to array index in lua
 		["id"] = 18314,
+		spells = {33925, 34940, 39332},
 		["name"] = "Ловчий нексуса",
 		["health"] = 130330,
 		["level"] = 80,
@@ -163,6 +168,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[18331] = { -- Map ID 18331 to array index in lua
 		["id"] = 18331,
+		spells = {34931, 34930, 16592, 34942},
 		["name"] = "Эфириал-черный маг",
 		["health"] = 130330,
 		["level"] = 80,
@@ -188,6 +194,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[19307] = { -- Map ID 19307 to array index in lua
 		["id"] = 19307,
+		spells = {34922, 34322, 38065, 34925},
 		["name"] = "Ужасень Нексуса",
 		["health"] = 130330,
 		["level"] = 80,
@@ -209,6 +216,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[19306] = { -- Map ID 19306 to array index in lua
 		["id"] = 19306,
+		spells = {34933, 15785, 25602},
 		["name"] = "Маносос",
 		["health"] = 130330,
 		["level"] = 80,
@@ -245,6 +253,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[18315] = { -- Map ID 18315 to array index in lua
 		["id"] = 18315,
+		spells = {34920, 38064, 15580, 13323, 17145},
 		["name"] = "Эфириал-чудесник",
 		["health"] = 130330,
 		["level"] = 80,
@@ -262,6 +271,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[18312] = { -- Map ID 18312 to array index in lua
 		["id"] = 18312,
+		spells = {32316, 37470, 37668, 17883},
 		["name"] = "Эфириал-чароплет",
 		["health"] = 130330,
 		["level"] = 80,

@@ -39,6 +39,7 @@ MethodDungeonTools.dungeonBosses[dungeonIndex] = {
 MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	[17491] = { -- Map ID 17491 to array index in lua
 		["id"] = 17491,
+		spells = {30832, 34969, 6434},
 		["name"] = "Разбойник из клана Веселого Черепа",
 		["health"] = 130330,
 		["level"] = 80,
@@ -60,6 +61,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[17370] = { -- Map ID 17370 to array index in lua
 		["id"] = 17370,
+		spells = {14516, 15655},
 		["name"] = "Головорез из клана Веселого Черепа",
 		["health"] = 130330,
 		["level"] = 80,
@@ -86,6 +88,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[17414] = { -- Map ID 17414 to array index in lua
 		["id"] = 17414,
+		spells = {40062, 6726, 30846},
 		["name"] = "Техник из клана Призрачной Луны",
 		["health"] = 130330,
 		["level"] = 80,
@@ -116,6 +119,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[17398] = { -- Map ID 17398 to array index in lua
 		["id"] = 17398,
+		spells = {22427, 31900},
 		["name"] = "Новообращенный орк Скверны",
 		["health"] = 130330,
 		["level"] = 80,
@@ -135,6 +139,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[18894] = { -- Map ID 18894 to array index in lua
 		["id"] = 18894,
+		spells = {15615, 18072},
 		["name"] = "Громила стражи Скверны",
 		["health"] = 130330,
 		["level"] = 80,
@@ -151,6 +156,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[17397] = { -- Map ID 17397 to array index in lua
 		["id"] = 17397,
+		spells = {11978, 31059},
 		["name"] = "Адепт из клана Призрачной Луны",
 		["health"] = 130330,
 		["level"] = 80,
@@ -178,6 +184,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[17477] = { -- Map ID 17477 to array index in lua
 		["id"] = 17477,
+		spells = {16144, 30540, 17290, 15242},
 		["name"] = "Бес цитадели Адского Пламени",
 		["health"] = 130330,
 		["level"] = 80,
@@ -207,6 +214,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[17371] = { -- Map ID 17371 to array index in lua
 		["id"] = 17371,
+		spells = {15472, 33111, 32197, 12739, 32863, 13338},
 		["name"] = "Чернокнижник из клана Призрачной Луны",
 		["health"] = 130330,
 		["level"] = 80,
@@ -235,6 +243,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[17626] = { -- Map ID 17626 to array index in lua
 		["id"] = 17626,
+		spells = {10966, 8599, 18765},
 		["name"] = "Легионер из клана Веселого Черепа",
 		["health"] = 130330,
 		["level"] = 80,
@@ -253,6 +262,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[17395] = { -- Map ID 17395 to array index in lua
 		["id"] = 17395,
+		spells = {16102, 18399, 15242, 17290, 30853, 30851},
 		["name"] = "Призыватель из клана Призрачной Луны",
 		["health"] = 130330,
 		["level"] = 80,
@@ -271,6 +281,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[17624] = { -- Map ID 17624 to array index in lua
 		["id"] = 17624,
+		spells = {9128},
 		["name"] = "Страж-смотритель из клана Веселого Черепа",
 		["health"] = 130330,
 		["level"] = 80,
@@ -285,6 +296,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[17400] = { -- Map ID 17400 to array index in lua
 		["id"] = 17400,
+		spells = {18072, 15615, 27577},
 		["name"] = "Страж Скверны - уничтожитель",
 		["health"] = 130330,
 		["level"] = 80,

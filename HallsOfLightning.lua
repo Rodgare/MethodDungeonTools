@@ -50,6 +50,7 @@ MethodDungeonTools.dungeonBosses[dungeonIndex] = {
 MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	[28961] = { -- Map ID 28961 to array index in lua
 		["id"] = 28961,
+		spells = {16245, 52890, 19134, 23600, 52891},
 		["name"] = "Титановый осадник",
 		["health"] = 130330,
 		["level"] = 81,
@@ -75,6 +76,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[28965] = { -- Map ID 28965 to array index in lua
 		["id"] = 28965,
+		spells = {52879, 16245, 52904, 52885},
 		["name"] = "Титановый грозоносец",
 		["health"] = 130330,
 		["level"] = 81,
@@ -102,6 +104,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[28547] = { -- Map ID 28547 to array index in lua
 		["id"] = 28547,
+		spells = {60236, 59169, 53044},
 		["name"] = "Бушующий вихрь",
 		["health"] = 130330,
 		["level"] = 81,
@@ -145,6 +148,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[28826] = { -- Map ID 28826 to array index in lua
 		["id"] = 28826,
+		spells = {59168, 59167, 53043, 52905},
 		["name"] = "Загробник ярости бурь",
 		["health"] = 130330,
 		["level"] = 81,
@@ -162,6 +166,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[28578] = { -- Map ID 28578 to array index in lua
 		["id"] = 28578,
+		spells = {42724, 15655, 59142},
 		["name"] = "Разоритель из закаленной стали",
 		["health"] = 117300,
 		["level"] = 81,
@@ -182,6 +187,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[28579] = { -- Map ID 28579 to array index in lua
 		["id"] = 28579,
+		spells = {61369, 59259, 52740},
 		["name"] = "Берсерк из закаленной стали",
 		["health"] = 117300,
 		["level"] = 81,
@@ -200,6 +206,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[28835] = { -- Map ID 28835 to array index in lua
 		["id"] = 28835,
+		spells = {53167, 59151, 61596, 61579, 59152, 53068},
 		["name"] = "Создание клана Закаленных Бурей",
 		["health"] = 130330,
 		["level"] = 81,
@@ -219,6 +226,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[28580] = { -- Map ID 28580 to array index in lua
 		["id"] = 28580,
+		spells = {61515, 52754, 59148, 61507, 52755, 16100, 59147},
 		["name"] = "Небоход из закаленной стали",
 		["health"] = 117300,
 		["level"] = 81,
@@ -237,6 +245,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[28836] = { -- Map ID 28836 to array index in lua
 		["id"] = 28836,
+		spells = {61581, 53049, 53048},
 		["name"] = "Рунодел клана Закаленных Бурей",
 		["health"] = 130330,
 		["level"] = 81,
@@ -259,6 +268,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[28581] = { -- Map ID 28581 to array index in lua
 		["id"] = 28581,
+		spells = {52778, 59085, 59166},
 		["name"] = "Тактик клана Закаленных Бурей",
 		["health"] = 113400,
 		["level"] = 81,
@@ -283,6 +293,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[28837] = { -- Map ID 28837 to array index in lua
 		["id"] = 28837,
+		spells = {59165, 53045, 34423, 37978, 53047},
 		["name"] = "Часовой клана Закаленных Бурей",
 		["health"] = 130330,
 		["level"] = 81,
@@ -301,6 +312,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[28582] = { -- Map ID 28582 to array index in lua
 		["id"] = 28582,
+		spells = {59160, 52773, 52774},
 		["name"] = "Лекарь клана Закаленных Бурей",
 		["health"] = 117300,
 		["level"] = 81,
@@ -318,6 +330,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[28838] = { -- Map ID 28838 to array index in lua
 		["id"] = 28838,
+		spells = {53059, 59178, 58619},
 		["name"] = "Титановый воин",
 		["health"] = 130330,
 		["level"] = 81,
@@ -337,6 +350,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[28583] = { -- Map ID 28583 to array index in lua
 		["id"] = 28583,
+		spells = {52531, 59141},
 		["name"] = "Волдырный парозлоб",
 		["health"] = 117300,
 		["level"] = 81,
@@ -362,6 +376,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[28584] = { -- Map ID 28584 to array index in lua
 		["id"] = 28584,
+		spells = {59183, 59182, 52624, 53788},
 		["name"] = "Необузданный огненный шторм",
 		["health"] = 117300,
 		["level"] = 81,
@@ -383,6 +398,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[28585] = { -- Map ID 28585 to array index in lua
 		["id"] = 28585,
+		spells = {61510, 22424, 23113, 61509},
 		["name"] = "Шлак",
 		["health"] = 38100,
 		["level"] = 81,
@@ -409,6 +425,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[28920] = { -- Map ID 28920 to array index in lua
 		["id"] = 28920,
+		spells = {59155, 53071, 32315, 59154, 53072},
 		["name"] = "Великан из клана Закаленных Бурей",
 		["health"] = 130330,
 		["level"] = 81,
