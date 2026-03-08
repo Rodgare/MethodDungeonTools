@@ -92,7 +92,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 		["level"] = 80,
 		["creatureType"] = "Гуманоид",
 		["count"] = 0,
-		["scale"] = 0.7,
+		["scale"] = 0.5,
 		["color"] = { r = 2, g = 3, b = 4, a = 0.8 },
 		["clones"] = {
 			[1] = { x = 227.73258690155, y = -254.09765212544, sublevel = 1, g = 9 },
@@ -113,7 +113,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 		["level"] = 80,
 		["creatureType"] = "Гуманоид",
 		["count"] = 0,
-		["scale"] = 0,
+		["scale"] = 0.5,
 		["color"] = { r = 2, g = 3, b = 4, a = 0.8 },
 		["clones"] = {
 			[1] = { x = 42.250385560122, y = -208.44527469943, sublevel = 1, g = 3 },
