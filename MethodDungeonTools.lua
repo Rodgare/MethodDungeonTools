@@ -32,16 +32,15 @@ function MethodDungeonTools:SetDisplayInfo(model, id, isNpcId, modelPath)
 		model:SetCreature(id)
 	end
 
-	-- Camera 1 = full-body view in WoW 3.3.5 (camera 0 is portrait/face zoom)
+	-- Camera 0 = reset, then Z=-2.5 zooms out to show full body regardless of DBC camera preset
 	if model.SetCamera then
-		model:SetCamera(1)
+		model:SetCamera(0)
 	end
 	if model.SetModelScale then
 		model:SetModelScale(1)
 	end
-	-- Shift model down slightly so full body is visible and centered
 	if model.SetPosition then
-		model:SetPosition(0, 0, -0.5)
+		model:SetPosition(0, 0, -2)
 	end
 	if model.SetFacing then
 		model:SetFacing(0)
@@ -3362,6 +3361,7 @@ function MethodDungeonTools:UpdatePullButtonNPCData(idx)
 							enemyTable[enemyTableIdx].id = npcId
 							enemyTable[enemyTableIdx].count = enemyData["count"]
 							enemyTable[enemyTableIdx].displayId = enemyData["displayId"]
+							enemyTable[enemyTableIdx].iconId = enemyData["iconId"]
 							enemyTable[enemyTableIdx].quantity = enemyTable[enemyTableIdx].quantity + 1
 							enemyTable[enemyTableIdx].name = name
 							enemyTable[enemyTableIdx].level = level
