@@ -7,3 +7,5 @@ run_test.lua
 setup.lua
 generate_mobs.py
 temp.txt
+inject_spells.py
+world_smart_scripts.csv
