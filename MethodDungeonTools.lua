@@ -24,25 +24,24 @@ end
 
 function MethodDungeonTools:SetDisplayInfo(model, id, isNpcId, modelPath)
 	if modelPath and model.SetModel then
-		-- print("|cFF00FF00[MDT Debug]|r Loading SetModel with path:", modelPath)
 		model:SetModel(modelPath)
 		if model.SetLight then
 			model:SetLight(1, 0, 0, -0.707, -0.707, 0.7, 1.0, 1.0, 1.0, 0.8, 1.0, 1.0, 0.8)
 		end
 	elseif model.SetCreature then
-		-- print("|cFF00FF00[MDT Debug]|r Loading SetCreature with visual NPC ID:", id)
 		model:SetCreature(id)
 	end
 
-	-- Force WotLK camera bounds (handles models missing DBC scale offsets)
+	-- Camera 1 = full-body view in WoW 3.3.5 (camera 0 is portrait/face zoom)
 	if model.SetCamera then
-		model:SetCamera(0)
+		model:SetCamera(1)
 	end
 	if model.SetModelScale then
 		model:SetModelScale(1)
 	end
+	-- Shift model down slightly so full body is visible and centered
 	if model.SetPosition then
-		model:SetPosition(0, 0, 0)
+		model:SetPosition(0, 0, -0.5)
 	end
 	if model.SetFacing then
 		model:SetFacing(0)
