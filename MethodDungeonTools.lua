@@ -4111,9 +4111,9 @@ mdtTrackerFrame:SetScript("OnEvent", function(self, event, ...)
 			end
 		end
 		-- Debug print - remove after identifying GUID format
-		print(
-			"|cFFFFFF00[MDT Debug]|r DIED guid=" .. tostring(destGUID) .. " name=" .. tostring(destName) .. " id=" .. id
-		)
+		-- print(
+		-- 	"|cFFFFFF00[MDT Debug]|r DIED guid=" .. tostring(destGUID) .. " name=" .. tostring(destName) .. " id=" .. id
+		-- )
 		-- Record all non-player deaths (creatures, pets, etc.)
 		if destGUID and not destGUID:find("Player") then
 			table.insert(mdtRecentlyDead, { id = id, name = destName or "Unknown", time = GetTime() })
@@ -4222,10 +4222,7 @@ SlashCmdList["MDTTRACK"] = function(msg)
 		)
 	else
 		mdtRecentlyDead = {}
-		local savedCount = MethodDungeonToolsDB
-				and MethodDungeonToolsDB.MobDataTally
-				and #MethodDungeonToolsDB.MobDataTally
-			or 0
+		local savedCount = db.MobDataTally and #db.MobDataTally or 0
 		print(
 			"|cFF00FF00[MDT Tracker]|r Авто-запись ВЫКЛЮЧЕНА. Итого записей: "
 				.. savedCount
@@ -4237,7 +4234,7 @@ end
 -- Command: /mdtdump  — вывести последние 20 записей в чат
 SLASH_MDTDUMP1 = "/mdtdump"
 SlashCmdList["MDTDUMP"] = function()
-	local tally = MethodDungeonToolsDB and MethodDungeonToolsDB.MobDataTally
+	local tally = db and db.MobDataTally
 	if not tally or #tally == 0 then
 		print("|cFFFF0000[MDT Tracker]|r Нет сохранённых данных.")
 		return
@@ -4261,8 +4258,8 @@ end
 -- Command: /mdtclear — очистить все записи
 SLASH_MDTCLEAR1 = "/mdtclear"
 SlashCmdList["MDTCLEAR"] = function()
-	if MethodDungeonToolsDB then
-		MethodDungeonToolsDB.MobDataTally = {}
+	if db then
+		db.MobDataTally = {}
 	end
 	print("|cFF00FF00[MDT Tracker]|r Все записи очищены.")
 end
