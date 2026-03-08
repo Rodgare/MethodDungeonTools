@@ -1,8 +1,8 @@
 ## Interface: 30300
 ## Title: Method Dungeon Tools (Sirus)
 ## Author: Nnogga, Sirus Edition by Coda
-## Version: 1.5.1
-## Notes: Tool for planning and optimizing Mythic+ dungeon runs
+## Version: 1.0.0
+## Notes: Инструмент для планирования и оптимизации прохождения подземелий Mythic+.
 ## OptionalDeps: LibStub, LibUIDropDownMenu
 ## SavedVariables: MethodDungeonToolsDB
 
