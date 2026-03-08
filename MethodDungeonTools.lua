@@ -1570,7 +1570,7 @@ function MethodDungeonTools:MakeMapTexture(frame)
 		frame.scrollFrame:EnableMouse(true)
 		frame.scrollFrame:SetScript("OnMouseDown", function(self, button)
 			local scrollFrame = MethodDungeonTools.main_frame.scrollFrame
-			if button == "LeftButton" and scrollFrame.zoomedIn and not IsAltKeyDown() then
+			if button == "LeftButton" and scrollFrame.zoomedIn and not IsControlKeyDown() then
 				scrollFrame.panning = true
 				local x, y = GetCursorPosition()
 				scrollFrame.cursorX = x
@@ -1660,7 +1660,7 @@ function MethodDungeonTools:MakeMapTexture(frame)
 			MethodDungeonTools.main_frame.GridToggle:Show()
 
 			-- Drawing Tool logic everywhere!
-			if IsAltKeyDown() and IsMouseButtonDown("LeftButton") then
+			if IsControlKeyDown() and IsMouseButtonDown("LeftButton") then
 				if not scrollFrame.isDrawing then
 					scrollFrame.isDrawing = true
 					scrollFrame.lastDrawX = frameX
