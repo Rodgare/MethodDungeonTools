@@ -1839,19 +1839,18 @@ function MethodDungeonTools:MakeMapTexture(frame)
 				)
 				local group = data.g and " (G " .. data.g .. ")" or ""
 				tooltip.String:SetText(
-					"\n\n"
-						.. data.name
+					data.name
 						.. " "
 						.. data.cloneIdx
 						.. group
-						.. "\nLevel "
+						.. "\nLvl "
 						.. data.level
 						.. " "
 						.. data.creatureType
 						.. "\n"
 						.. MethodDungeonTools:FormatEnemyHealth(health)
 						.. " HP\n"
-						.. "Enemy Forces: "
+						.. "Получаемые %: "
 						.. data.count
 						.. "%"
 				)
@@ -3812,10 +3811,10 @@ function initFrames()
 		tooltip.String:SetJustifyH("LEFT")
 		tooltip.String:SetJustifyV("CENTER")
 		tooltip.String:SetWidth(tooltip:GetWidth())
-		tooltip.String:SetHeight(80)
+		tooltip.String:SetHeight(125)
 		tooltip.String:SetWidth(120)
 		tooltip.String:SetText(" ")
-		tooltip.String:SetPoint("TOPLEFT", tooltip, "TOPLEFT", 110, -7)
+		tooltip.String:SetPoint("LEFT", tooltip, "LEFT", 110, 0)
 		tooltip.String:Show()
 	end
 
@@ -3855,7 +3854,7 @@ function initFrames()
 		})
 		MethodDungeonTools.pullTooltip:SetClampedToScreen(true)
 		MethodDungeonTools.pullTooltip:SetFrameStrata("TOOLTIP")
-		MethodDungeonTools.pullTooltip.myHeight = 160
+		MethodDungeonTools.pullTooltip.myHeight = 250
 		MethodDungeonTools.pullTooltip:SetSize(250, MethodDungeonTools.pullTooltip.myHeight)
 		MethodDungeonTools.pullTooltip:Hide()
 
