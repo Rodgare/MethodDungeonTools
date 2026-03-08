@@ -162,6 +162,15 @@ SLASH_METHODDUNGEONTOOLS3 = "/methoddungeontools"
 --LUA API
 local pi, tinsert = math.pi, table.insert
 
+function MethodDungeonTools:ToggleDevMode()
+	db.devMode = not db.devMode
+	if db.devMode then
+		print("|cFF00FF00[MDT]|r DevMode ENABLED. Right-click enemies for context menu.")
+	else
+		print("|cFF00FF00[MDT]|r DevMode DISABLED. Right-click enemies for Enemy Info.")
+	end
+end
+
 function SlashCmdList.METHODDUNGEONTOOLS(cmd, editbox)
 	local rqst, arg = strsplit(" ", cmd)
 	if rqst == "devmode" then
@@ -179,6 +188,7 @@ local initFrames
 -------------------------
 local defaultSavedVars = {
 	global = {
+		devMode = false,
 		currentDungeonIdx = 1,
 		currentDifficulty = 15,
 		xoffset = 0,
@@ -1669,9 +1679,23 @@ function MethodDungeonTools:MakeMapTexture(frame)
 					end
 				end
 			elseif (button == "RightButton") and MouseIsOver(MethodDungeonToolsScrollFrame) then
-				cursorX, cursorY = GetCursorPosition()
-				L_EasyMenu(MethodDungeonTools.contextMenuList, frame.contextDropdown, "cursor", 0, -15, "MENU", 5)
-				frame.contextDropdown:Show()
+				local clickedBlip = nil
+				if numDungeonEnemyBlips then
+					for i = 1, numDungeonEnemyBlips do
+						if dungeonEnemyBlips[i] and MouseIsOver(dungeonEnemyBlips[i]) then
+							clickedBlip = i
+							break
+						end
+					end
+				end
+
+				if clickedBlip and not db.devMode then
+					MethodDungeonTools:ShowEnemyInfoFrame(clickedBlip)
+				else
+					cursorX, cursorY = GetCursorPosition()
+					L_EasyMenu(MethodDungeonTools.contextMenuList, frame.contextDropdown, "cursor", 0, -15, "MENU", 5)
+					frame.contextDropdown:Show()
+				end
 			end
 		end)
 
@@ -1769,21 +1793,32 @@ function MethodDungeonTools:MakeMapTexture(frame)
 
 			local mouseoverBlip
 			if MouseIsOver(MethodDungeonToolsScrollFrame) and dungeonEnemyBlips then
-				for i = 1, numDungeonEnemyBlips do
-					if MouseIsOver(dungeonEnemyBlips[i]) then
-						mouseoverBlip = i
-						break
+				-- Prevent tooltips if hovering the Enemy Info window
+				local isOverInfo = MethodDungeonTools.EnemyInfoFrame
+					and MethodDungeonTools.EnemyInfoFrame:IsShown()
+					and MouseIsOver(MethodDungeonTools.EnemyInfoFrame)
+				if not isOverInfo then
+					for i = 1, numDungeonEnemyBlips do
+						if MouseIsOver(dungeonEnemyBlips[i]) then
+							mouseoverBlip = i
+							break
+						end
 					end
 				end
 			end
 			local mouseOverBoss
 			--handle mouseover on bosses
 			if MouseIsOver(MethodDungeonToolsScrollFrame) and dungeonBossButtons then
-				for k, v in pairs(dungeonBossButtons) do
-					if MouseIsOver(v) then
-						mouseoverBlip = nil
-						mouseOverBoss = k
-						break
+				local isOverInfo = MethodDungeonTools.EnemyInfoFrame
+					and MethodDungeonTools.EnemyInfoFrame:IsShown()
+					and MouseIsOver(MethodDungeonTools.EnemyInfoFrame)
+				if not isOverInfo then
+					for k, v in pairs(dungeonBossButtons) do
+						if MouseIsOver(v) then
+							mouseoverBlip = nil
+							mouseOverBoss = k
+							break
+						end
 					end
 				end
 			end
@@ -4127,5 +4162,149 @@ SlashCmdList["MDTTRACK"] = function(msg)
 		mdtTrackerFrame:UnregisterAllEvents()
 		mdtRecentlyDead = {}
 		print("|cFF00FF00[MDT Tracker]|r Авто-запись ВЫКЛЮЧЕНА.")
+	end
+end
+
+function MethodDungeonTools:ShowEnemyInfoFrame(blipIndex)
+	if not self.EnemyInfoFrame then
+		local f = CreateFrame("Frame", "MDTEnemyInfoFrame", self.main_frame)
+		f:SetSize(600, 450)
+		f:SetPoint("CENTER", UIParent, "CENTER")
+		f:SetFrameStrata("DIALOG")
+		f:EnableMouse(true)
+		f:SetMovable(true)
+		f:RegisterForDrag("LeftButton")
+		f:SetScript("OnDragStart", f.StartMoving)
+		f:SetScript("OnDragStop", f.StopMovingOrSizing)
+		f:SetScript("OnEnter", function() end) -- Block tooltips from showing
+		f:SetScript("OnLeave", function() end)
+
+		-- Background
+		f:SetBackdrop({
+			bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
+			edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border",
+			tile = true,
+			tileSize = 32,
+			edgeSize = 32,
+			insets = { left = 8, right = 8, top = 8, bottom = 8 },
+		})
+
+		-- Title
+		f.title = f:CreateFontString(nil, "OVERLAY", "GameFontHighlightLarge")
+		f.title:SetPoint("TOP", 0, -15)
+
+		-- Close Button
+		f.closeBtn = CreateFrame("Button", nil, f, "UIPanelCloseButton")
+		f.closeBtn:SetPoint("TOPRIGHT", -5, -5)
+
+		-- Backgrounds for columns
+		local leftBg = f:CreateTexture(nil, "BACKGROUND")
+		self:SetColorTexture(leftBg, 0.05, 0.05, 0.05, 0.8)
+		leftBg:SetPoint("TOPLEFT", 15, -45)
+		leftBg:SetSize(200, 390)
+
+		local midBg = f:CreateTexture(nil, "BACKGROUND")
+		self:SetColorTexture(midBg, 0.1, 0.1, 0.1, 0.5)
+		midBg:SetPoint("TOPLEFT", 225, -45)
+		midBg:SetSize(180, 390)
+
+		local rightBg = f:CreateTexture(nil, "BACKGROUND")
+		self:SetColorTexture(rightBg, 0.1, 0.1, 0.1, 0.5)
+		rightBg:SetPoint("TOPLEFT", 415, -45)
+		rightBg:SetSize(170, 390)
+
+		-- Left Panel: Model
+		f.model = CreateFrame("PlayerModel", nil, f)
+		f.model:SetSize(190, 380)
+		f.model:SetPoint("TOPLEFT", 20, -50)
+
+		-- Middle Panel: Info
+		local function createLabel(text, parent, yOffset)
+			local lbl = parent:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+			lbl:SetText(text)
+			lbl:SetPoint("TOPLEFT", parent, "TOPLEFT", 235, yOffset)
+			local val = parent:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+			val:SetPoint("TOPLEFT", lbl, "BOTTOMLEFT", 0, -5)
+			val:SetWidth(160)
+			val:SetJustifyH("LEFT")
+			return val
+		end
+
+		f.infoName = createLabel("Имя", f, -50)
+		f.infoId = createLabel("NPC Id", f, -90)
+		f.infoHealth = createLabel("Здоровье", f, -130)
+		f.infoType = createLabel("Тип", f, -170)
+		f.infoLevel = createLabel("Lvl", f, -210)
+		f.infoForces = createLabel("Количество %", f, -250)
+
+		-- Right Panel: Spells
+		f.spellsTitle = f:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+		f.spellsTitle:SetText("Spells")
+		f.spellsTitle:SetPoint("TOPLEFT", f, "TOPLEFT", 425, -50)
+
+		f.noSpellsText = f:CreateFontString(nil, "OVERLAY", "GameFontDisable")
+		f.noSpellsText:SetPoint("TOPLEFT", f.spellsTitle, "BOTTOMLEFT", 0, -10)
+		f.noSpellsText:SetText("No spells recorded yet.")
+
+		self.EnemyInfoFrame = f
+	end
+
+	local f = self.EnemyInfoFrame
+	local enemyData = MethodDungeonTools.dungeonEnemies[db.currentDungeonIdx]
+	local blip = dungeonEnemyBlips[blipIndex]
+	local enemyIdx = blip and blip.enemyIdx
+
+	if enemyIdx and enemyData and enemyData[enemyIdx] then
+		local data = enemyData[enemyIdx]
+		f.title:SetText(data.name or "Unknown")
+
+		-- Model
+		if data.displayId then
+			self:SetDisplayInfo(f.model, data.displayId, true)
+		else
+			self:SetDisplayInfo(f.model, data.id or enemyIdx, true)
+		end
+
+		-- Stats
+		f.infoName:SetText(data.name or "Unknown")
+		f.infoId:SetText(tostring(data.id or enemyIdx))
+
+		local hp = data.health or 0
+		if hp > 1000000 then
+			f.infoHealth:SetText(string.format("%.2fm", hp / 1000000))
+		elseif hp > 1000 then
+			f.infoHealth:SetText(string.format("%.1fk", hp / 1000))
+		else
+			f.infoHealth:SetText(tostring(hp))
+		end
+
+		f.infoType:SetText(data.creatureType or "Unknown")
+		f.infoLevel:SetText(tostring(data.level or "??"))
+
+		local forces = data.count or 0
+		local total = 100
+		local cd = MethodDungeonTools.dungeonTotalCount[db.currentDungeonIdx]
+		if cd then
+			local tmg = false
+			if db.presets and db.presets[db.currentDungeonIdx] then
+				local p = db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]]
+				if p and p.value then
+					tmg = p.value.teeming
+				end
+			end
+			total = tmg and cd.teeming or cd.normal
+		end
+
+		local pct = 0
+		if total and total > 0 then
+			pct = (forces / total) * 100
+		end
+		f.infoForces:SetText(string.format("%s (%.2f%%)", tostring(forces), pct))
+
+		-- Spells
+		f.noSpellsText:Show()
+		-- We will add real spells here later when DB is parsed
+
+		f:Show()
 	end
 end
