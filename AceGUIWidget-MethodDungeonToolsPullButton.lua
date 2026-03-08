@@ -206,15 +206,16 @@ local methods = {
 				local _, _, icon = GetSpellInfo(data.iconId)
 				iconTexture = icon
 			end
+			local portrait = self.enemyPortraits[idx].icon
 			if iconTexture then
-				self.enemyPortraits[idx]:SetTexture(iconTexture)
-				self.enemyPortraits[idx]:SetTexCoord(0.08, 0.92, 0.08, 0.92)
+				portrait:SetTexture(iconTexture)
+				portrait:SetTexCoord(0.08, 0.92, 0.08, 0.92)
 			elseif data.displayId then
-				SetPortraitTexture(self.enemyPortraits[idx], data.displayId)
-				self.enemyPortraits[idx]:SetTexCoord(0, 1, 0, 1)
+				SetPortraitTexture(portrait, data.displayId)
+				portrait:SetTexCoord(0, 1, 0, 1)
 			else
-				self.enemyPortraits[idx]:SetTexture("Interface\\Icons\\INV_Misc_QuestionMark")
-				self.enemyPortraits[idx]:SetTexCoord(0.08, 0.92, 0.08, 0.92)
+				portrait:SetTexture("Interface\\Icons\\INV_Misc_QuestionMark")
+				portrait:SetTexCoord(0.08, 0.92, 0.08, 0.92)
 			end
 			self.enemyPortraits[idx]:Show()
 			self.enemyPortraits[idx].overlay:Show()
@@ -306,34 +307,43 @@ local function Constructor()
 		renamebox:Hide()
 	end)
 
-	--enemy portraits
+	--enemy portraits — Frame-контейнеры с нарастающим frameLevel (как иконки на карте)
 	local enemyPortraits = {}
+	local baseLevel = button:GetFrameLevel() + 2
 
 	for i = 1, maxPortraitCount do
-		-- Иконка спелла — нижний слой (sublevel 1)
-		enemyPortraits[i] = button:CreateTexture(nil, "ARTWORK", nil, 1)
-		enemyPortraits[i]:SetSize(height - 9, height - 9)
+		-- Каждый последующий фрейм имеет более высокий level → перекрывает предыдущий
+		local f = CreateFrame("Frame", nil, button)
+		f:SetSize(height, height)
+		f:SetFrameLevel(baseLevel + i * 2)
 		if i == 1 then
-			enemyPortraits[i]:SetPoint("LEFT", icon, "RIGHT", -5, 0)
+			f:SetPoint("LEFT", icon, "RIGHT", -5, 0)
 		else
-			enemyPortraits[i]:SetPoint("LEFT", enemyPortraits[i - 1], "RIGHT", -2, 0)
+			f:SetPoint("LEFT", enemyPortraits[i - 1], "RIGHT", -2, 0)
 		end
-		enemyPortraits[i]:Hide()
+		f:Hide()
 
-		-- Circle_Border.tga — верхний слой (sublevel 2), создаёт круглую рамку
-		enemyPortraits[i].overlay = button:CreateTexture(nil, "ARTWORK", nil, 2)
-		enemyPortraits[i].overlay:SetTexture("Interface\\Addons\\MethodDungeonTools\\Textures\\Circle_Border")
-		enemyPortraits[i].overlay:SetPoint("CENTER", enemyPortraits[i], "CENTER")
-		enemyPortraits[i].overlay:SetSize(height + 6, height + 6)
-		enemyPortraits[i].overlay:Hide()
+		-- Иконка спелла — нижний слой внутри фрейма
+		f.icon = f:CreateTexture(nil, "BACKGROUND")
+		f.icon:SetSize(height - 9, height - 9)
+		f.icon:SetPoint("CENTER", f, "CENTER")
 
-		enemyPortraits[i].fontString = button:CreateFontString(nil, "OVERLAY", nil)
-		enemyPortraits[i].fontString:SetFont("Fonts\\FRIZQT__.TTF", 10, "OUTLINE")
-		enemyPortraits[i].fontString:SetTextColor(1, 1, 1, 1)
-		enemyPortraits[i].fontString:SetWidth(25)
-		enemyPortraits[i].fontString:SetHeight(10)
-		enemyPortraits[i].fontString:SetPoint("BOTTOM", enemyPortraits[i], "BOTTOM", 0, 0)
-		enemyPortraits[i].fontString:Hide()
+		-- Circle_Border — верхний слой, образует круглую рамку поверх иконки
+		f.overlay = f:CreateTexture(nil, "OVERLAY")
+		f.overlay:SetTexture("Interface\\Addons\\MethodDungeonTools\\Textures\\Circle_Border")
+		f.overlay:SetPoint("CENTER", f, "CENTER")
+		f.overlay:SetSize(height + 4, height + 4)
+
+		-- Текст "x2" под иконкой
+		f.fontString = f:CreateFontString(nil, "OVERLAY")
+		f.fontString:SetFont("Fonts\\FRIZQT__.TTF", 10, "OUTLINE")
+		f.fontString:SetTextColor(1, 1, 1, 1)
+		f.fontString:SetWidth(25)
+		f.fontString:SetHeight(10)
+		f.fontString:SetPoint("BOTTOM", f, "BOTTOM", 0, 0)
+		f.fontString:Hide()
+
+		enemyPortraits[i] = f
 	end
 
 	local widget = {
