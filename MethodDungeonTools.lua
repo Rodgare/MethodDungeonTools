@@ -2262,19 +2262,24 @@ function MethodDungeonTools:UpdateDungeonEnemies()
 						dungeonEnemyBlips[idx].creatureType = data["creatureType"]
 						dungeonEnemyBlips[idx].health = data["health"]
 						dungeonEnemyBlips[idx].level = data["level"]
-						dungeonEnemyBlips[idx]:SetDrawLayer("OVERLAY", 7)
+						dungeonEnemyBlips[idx]:SetDrawLayer("OVERLAY", 2)
 
-						-- Create color overlay if it doesn't exist
+						-- Create color background border if it doesn't exist
 						if not dungeonEnemyBlips[idx].colorOverlay then
 							local colorOverlay = MethodDungeonTools.main_frame.mapPanelFrame:CreateTexture(
 								"MethodDungeonToolsDungeonEnemyBlip" .. idx .. "ColorOverlay",
 								"OVERLAY"
 							)
-							colorOverlay:SetDrawLayer("OVERLAY", 8)
-							-- This is a built-in game texture with a hole in the middle, perfect for our circular buttons
-							colorOverlay:SetTexture("Interface\\Minimap\\MiniMap-TrackingBorder")
+							colorOverlay:SetDrawLayer("OVERLAY", 7)
+							-- Custom generated ring mask to perfectly crop the corners of the square
+							colorOverlay:SetTexture(
+								"Interface\\AddOns\\" .. addonName .. "\\Textures\\Circle_Border.tga"
+							)
 							colorOverlay:SetPoint("CENTER", dungeonEnemyBlips[idx], "CENTER", 0, 0)
 							dungeonEnemyBlips[idx].colorOverlay = colorOverlay
+						else
+							-- Ensure it stays on top even if reused
+							dungeonEnemyBlips[idx].colorOverlay:SetDrawLayer("OVERLAY", 7)
 						end
 
 						-- Fetch spell icon if available
@@ -2291,8 +2296,8 @@ function MethodDungeonTools:UpdateDungeonEnemies()
 						dungeonEnemyBlips[idx]:SetTexture(iconTex)
 
 						if hasSpellIcon then
-							-- Reset texcoord, the border will cover the corners
-							dungeonEnemyBlips[idx]:SetTexCoord(0, 1, 0, 1)
+							-- Crop spell icon to remove its inherent black border so it feels fully circular
+							dungeonEnemyBlips[idx]:SetTexCoord(0.08, 0.92, 0.08, 0.92)
 						else
 							dungeonEnemyBlips[idx]:SetTexCoord(0, 1, 0, 1)
 						end
@@ -2302,17 +2307,20 @@ function MethodDungeonTools:UpdateDungeonEnemies()
 								"MethodDungeonToolsDungeonEnemyBlip" .. idx .. "Outline",
 								"OVERLAY"
 							)
-							dungeonEnemyBlips[idx].outline:SetDrawLayer("OVERLAY", 6)
+							dungeonEnemyBlips[idx].outline:SetDrawLayer("OVERLAY", 1)
 							dungeonEnemyBlips[idx].outline:SetTexture(
 								"Interface\\AddOns\\" .. addonName .. "\\Textures\\Circle_White.tga"
 							)
 							dungeonEnemyBlips[idx].outline:SetVertexColor(1, 1, 1, 1)
 							dungeonEnemyBlips[idx].outline:Hide()
+						else
+							dungeonEnemyBlips[idx].outline:SetDrawLayer("OVERLAY", 1)
 						end
 						dungeonEnemyBlips[idx]:SetWidth(10 * data["scale"])
 						dungeonEnemyBlips[idx]:SetHeight(10 * data["scale"])
-						dungeonEnemyBlips[idx].colorOverlay:SetWidth(18 * data["scale"])
-						dungeonEnemyBlips[idx].colorOverlay:SetHeight(18 * data["scale"])
+						-- The thicker generated ring size requires a 1.6x multiplier for perfect crop
+						dungeonEnemyBlips[idx].colorOverlay:SetWidth(16 * data["scale"])
+						dungeonEnemyBlips[idx].colorOverlay:SetHeight(16 * data["scale"])
 						dungeonEnemyBlips[idx]:SetPoint(
 							"CENTER",
 							MethodDungeonTools.main_frame.mapPanelTile1,
@@ -2369,12 +2377,12 @@ function MethodDungeonTools:UpdateDungeonEnemies()
 							end
 						end
 
-						local r, g, b, a =
+						local r, g, b =
 							dungeonEnemyBlips[idx].color.r,
 							dungeonEnemyBlips[idx].color.g,
-							dungeonEnemyBlips[idx].color.b,
-							dungeonEnemyBlips[idx].color.a
-						dungeonEnemyBlips[idx].colorOverlay:SetVertexColor(r, g, b, a)
+							dungeonEnemyBlips[idx].color.b
+						-- Force the circular border to be 100% fully opaque regardless of the database value
+						dungeonEnemyBlips[idx].colorOverlay:SetVertexColor(r, g, b, 1.0)
 
 						dungeonEnemyBlips[idx]:Show()
 						dungeonEnemyBlips[idx].colorOverlay:Show()
