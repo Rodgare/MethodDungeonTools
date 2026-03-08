@@ -2230,17 +2230,22 @@ function MethodDungeonTools:UpdateDungeonEnemies()
 						db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]].value.teeming
 					if (teeming == true) or (teeming == false and ((not clone.teeming) or clone.teeming == false)) then
 						if not dungeonEnemyBlips[idx] then
-							dungeonEnemyBlips[idx] = MethodDungeonTools.main_frame.mapPanelFrame:CreateTexture(
+							dungeonEnemyBlips[idx] = CreateFrame(
+								"Button",
 								"MethodDungeonToolsDungeonEnemyBlip" .. idx,
-								"OVERLAY"
+								MethodDungeonTools.main_frame.mapPanelFrame
 							)
+							dungeonEnemyBlips[idx]:SetFrameLevel(5)
+
+							dungeonEnemyBlips[idx].texture = dungeonEnemyBlips[idx]:CreateTexture(nil, "ARTWORK")
+							dungeonEnemyBlips[idx].texture:SetAllPoints()
+
 							dungeonEnemyBlips[idx].selected = false
-							dungeonEnemyBlips[idx].fontString =
-								MethodDungeonTools.main_frame.mapPanelFrame:CreateFontString(
-									"MethodDungeonToolsDungeonEnemyBlip" .. idx .. "Text",
-									"OVERLAY",
-									"GameFontHighlightSmall"
-								)
+							dungeonEnemyBlips[idx].fontString = dungeonEnemyBlips[idx]:CreateFontString(
+								"MethodDungeonToolsDungeonEnemyBlip" .. idx .. "Text",
+								"OVERLAY",
+								"GameFontHighlightSmall"
+							)
 							local font, size = dungeonEnemyBlips[idx].fontString:GetFont()
 							dungeonEnemyBlips[idx].fontName = font
 							dungeonEnemyBlips[idx].fontString:SetFont(font, 9, "OUTLINE")
@@ -2262,11 +2267,10 @@ function MethodDungeonTools:UpdateDungeonEnemies()
 						dungeonEnemyBlips[idx].creatureType = data["creatureType"]
 						dungeonEnemyBlips[idx].health = data["health"]
 						dungeonEnemyBlips[idx].level = data["level"]
-						dungeonEnemyBlips[idx]:SetDrawLayer("OVERLAY", 2)
 
 						-- Create color background border if it doesn't exist
 						if not dungeonEnemyBlips[idx].colorOverlay then
-							local colorOverlay = MethodDungeonTools.main_frame.mapPanelFrame:CreateTexture(
+							local colorOverlay = dungeonEnemyBlips[idx]:CreateTexture(
 								"MethodDungeonToolsDungeonEnemyBlip" .. idx .. "ColorOverlay",
 								"OVERLAY"
 							)
@@ -2293,17 +2297,17 @@ function MethodDungeonTools:UpdateDungeonEnemies()
 							end
 						end
 
-						dungeonEnemyBlips[idx]:SetTexture(iconTex)
+						dungeonEnemyBlips[idx].texture:SetTexture(iconTex)
 
 						if hasSpellIcon then
 							-- Crop spell icon to remove its inherent black border so it feels fully circular
-							dungeonEnemyBlips[idx]:SetTexCoord(0.08, 0.92, 0.08, 0.92)
+							dungeonEnemyBlips[idx].texture:SetTexCoord(0.08, 0.92, 0.08, 0.92)
 						else
-							dungeonEnemyBlips[idx]:SetTexCoord(0, 1, 0, 1)
+							dungeonEnemyBlips[idx].texture:SetTexCoord(0, 1, 0, 1)
 						end
 
 						if not dungeonEnemyBlips[idx].outline then
-							dungeonEnemyBlips[idx].outline = MethodDungeonTools.main_frame.mapPanelFrame:CreateTexture(
+							dungeonEnemyBlips[idx].outline = dungeonEnemyBlips[idx]:CreateTexture(
 								"MethodDungeonToolsDungeonEnemyBlip" .. idx .. "Outline",
 								"OVERLAY"
 							)
@@ -2334,7 +2338,7 @@ function MethodDungeonTools:UpdateDungeonEnemies()
 
 						--color patrol
 						dungeonEnemyBlips[idx].patrolFollower = nil
-						dungeonEnemyBlips[idx]:SetVertexColor(1, 1, 1, 1) -- Reset icon color
+						dungeonEnemyBlips[idx].texture:SetVertexColor(1, 1, 1, 1) -- Reset icon color
 
 						if clone.patrol then
 							dungeonEnemyBlips[idx].color = patrolColor
