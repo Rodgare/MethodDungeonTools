@@ -1556,12 +1556,6 @@ function MethodDungeonTools:MakeMapTexture(frame)
 		})
 	end
 
-	tinsert(MethodDungeonTools.contextMenuList, {
-		text = "Close",
-		notCheckable = 1,
-		func = frame.contextDropdown:Hide(),
-	})
-
 	-- Scroll Frame
 	if frame.scrollFrame == nil then
 		frame.scrollFrame = CreateFrame("ScrollFrame", "MethodDungeonToolsScrollFrame", frame)
