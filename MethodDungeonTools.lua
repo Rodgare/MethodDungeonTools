@@ -288,6 +288,7 @@ local defaultSavedVars = {
 			[13] = 1,
 			[14] = 1,
 		},
+		MobDataTally = {},
 	},
 }
 
@@ -4019,123 +4020,251 @@ local mdtTrackerFrame = CreateFrame("Frame")
 local mdtIsTracking = false
 local mdtLastForces = 0
 local mdtRecentlyDead = {}
+local mdtUpdateTimer = 0
 
+-- Cache of recently targeted units: guid -> {id, name}
+local mdtTargetCache = {}
+
+mdtTrackerFrame:RegisterEvent("PLAYER_TARGET_CHANGED")
+mdtTrackerFrame:RegisterEvent("UPDATE_MOUSEOVER_UNIT")
+
+-- Helper: extract NPC ID from a GUID string
+local function GUIDtoNPCID(guid)
+	if not guid then
+		return 0
+	end
+	-- Modern TrinityCore format: "Creature-0-MapID-InstanceID-Diff-NpcID-UID"
+	if guid:find("-") then
+		local parts = { strsplit("-", guid) }
+		if #parts >= 6 then
+			return tonumber(parts[6]) or 0
+		end
+		return 0
+	end
+	-- Old Wrath hex GUID: 0xF130XXXXXXNNNNXXXX
+	-- Type is high nibbles, entry is in mid bytes
+	-- Parse as 64-bit hex: entry = (hex >> 24) & 0xFFFFF isn't doable without BitLib
+	-- Try sub-string extraction (bytes 5-8 of the hex part)
+	local hex = guid:match("^0?[xX]?(%x+)$")
+	if hex and #hex >= 12 then
+		-- NPC ID is typically in characters 5-10 of the 16-char hex
+		local candidate = tonumber(hex:sub(5, 10), 16) or 0
+		if candidate > 0 and candidate < 1000000 then
+			return candidate
+		end
+		-- fallback: last 4 bytes upper half
+		return tonumber(hex:sub(-12, -9), 16) or 0
+	end
+	return 0
+end
+
+local function CacheUnit(unitid)
+	if not UnitExists(unitid) then
+		return
+	end
+	if UnitIsPlayer(unitid) then
+		return
+	end
+	local guid = UnitGUID(unitid)
+	if not guid then
+		return
+	end
+	local name = UnitName(unitid) or "Unknown"
+	local id = GUIDtoNPCID(guid)
+	mdtTargetCache[guid] = { id = id, name = name }
+end
+
+-- Listen for UNIT_DIED in COMBAT_LOG
+mdtTrackerFrame:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 mdtTrackerFrame:SetScript("OnEvent", function(self, event, ...)
 	if not mdtIsTracking then
 		return
 	end
-	if event == "COMBAT_LOG_EVENT_UNFILTERED" then
-		-- WoW 3.3.5 args: timestamp, subevent, sourceGUID, sourceName, sourceFlags, destGUID, destName, destFlags
-		local timestamp = select(1, ...)
-		local subevent = select(2, ...)
-		local destGUID = select(6, ...)
-		local destName = select(7, ...)
+	-- Standard WoW 3.3.5: the FIRST arg is timestamp, second IS the subevent
+	-- But Sirus may pass subevent as arg[1] directly in some builds
+	local arg1 = select(1, ...)
+	local arg2 = select(2, ...)
 
-		-- Some custom 3.3.5 cores move subevent to arg 1, check for UNIT_DIED
-		if timestamp == "UNIT_DIED" then
-			subevent = "UNIT_DIED"
-			destGUID = select(5, ...)
-			destName = select(6, ...)
-		end
+	local subevent, destGUID, destName
 
-		if subevent == "UNIT_DIED" and destGUID then
-			local id = 0
-			if destGUID:find("-") then
-				id = tonumber(select(6, strsplit("-", destGUID))) or 0
-			else
-				id = tonumber(destGUID:sub(-12, -9), 16) or 0
+	if arg1 == "UNIT_DIED" then
+		-- Sirus sometimes drops timestamp
+		subevent = "UNIT_DIED"
+		destGUID = select(5, ...) -- (subevent, sourceGUID, sourceName, sourceFlags, destGUID, destName)
+		destName = select(6, ...)
+	elseif arg2 == "UNIT_DIED" then
+		-- Standard layout: (timestamp, subevent, sourceGUID, sourceName, sourceFlags, destGUID, destName, ...)
+		subevent = "UNIT_DIED"
+		destGUID = select(6, ...)
+		destName = select(7, ...)
+	end
+
+	if subevent == "UNIT_DIED" and destGUID then
+		local id = GUIDtoNPCID(destGUID)
+		-- Also try our target cache for better ID match
+		if mdtTargetCache[destGUID] then
+			if id == 0 then
+				id = mdtTargetCache[destGUID].id
 			end
+			if not destName or destName == "Unknown" then
+				destName = mdtTargetCache[destGUID].name
+			end
+		end
+		-- Debug print - remove after identifying GUID format
+		print(
+			"|cFFFFFF00[MDT Debug]|r DIED guid=" .. tostring(destGUID) .. " name=" .. tostring(destName) .. " id=" .. id
+		)
+		-- Record all non-player deaths (creatures, pets, etc.)
+		if destGUID and not destGUID:find("Player") then
 			table.insert(mdtRecentlyDead, { id = id, name = destName or "Unknown", time = GetTime() })
 		end
+	elseif event == "PLAYER_TARGET_CHANGED" then
+		CacheUnit("target")
+	elseif event == "UPDATE_MOUSEOVER_UNIT" then
+		CacheUnit("mouseover")
 	end
 end)
 
-local mdtUpdateTimer = 0
 mdtTrackerFrame:SetScript("OnUpdate", function(self, elapsed)
 	if not mdtIsTracking then
 		return
 	end
 	mdtUpdateTimer = mdtUpdateTimer + elapsed
-	if mdtUpdateTimer < 0.2 then
+	if mdtUpdateTimer < 0.5 then
 		return
 	end
 	mdtUpdateTimer = 0
 
-	local c = C_GlobalStorage.GetVar("ASMSG_CHALLENGE_MODE_CREATURE_KILLED")
-	local p = c and c.total and math.min(c.total, 100) or mdtLastForces
+	-- Try to read forces from Sirus C_GlobalStorage
+	local p = mdtLastForces
+	local ok, cData = pcall(function()
+		return C_GlobalStorage
+			and C_GlobalStorage.GetVar
+			and C_GlobalStorage.GetVar("ASMSG_CHALLENGE_MODE_CREATURE_KILLED")
+	end)
+	if ok and cData and cData.total then
+		p = math.min(cData.total, 100)
+	end
 
 	if p > mdtLastForces then
 		local diff = p - mdtLastForces
 		mdtLastForces = p
 
-		local matched = {}
+		if not db.MobDataTally then
+			db.MobDataTally = {}
+		end
+
 		local now = GetTime()
+		local matched = {}
 		for i = #mdtRecentlyDead, 1, -1 do
-			if (now - mdtRecentlyDead[i].time) <= 3 then
+			if (now - mdtRecentlyDead[i].time) <= 5 then
 				table.insert(matched, mdtRecentlyDead[i])
 			end
 		end
 
-		if not MethodDungeonToolsDB then
-			MethodDungeonToolsDB = {}
-		end
-		if not MethodDungeonToolsDB.MobDataTally then
-			MethodDungeonToolsDB.MobDataTally = {}
-		end
-
 		local count = #matched
 		if count > 0 then
-			local perMobDiff = diff / count
-			local namesStr = ""
+			local perMob = math.floor((diff / count) * 100) / 100
+			local msg = ""
 			for _, mob in ipairs(matched) do
-				namesStr = namesStr .. mob.name .. " (" .. mob.id .. ") "
-				table.insert(MethodDungeonToolsDB.MobDataTally, {
+				msg = msg .. mob.name .. " (" .. mob.id .. ") "
+				table.insert(db.MobDataTally, {
 					name = mob.name,
 					id = mob.id,
-					percent = perMobDiff,
+					percent = perMob,
 					totalPercent = p,
 					date = date("%Y-%m-%d %H:%M:%S"),
 				})
 			end
 			print(
 				"|cFF00FF00[MDT Tracker]|r "
-					.. namesStr
-					.. "=> дал суммарно "
-					.. diff
-					.. "% ("
-					.. perMobDiff
+					.. msg
+					.. "=> "
+					.. string.format("%.2f", diff)
+					.. "% (по "
+					.. string.format("%.2f", perMob)
 					.. "% каждый)"
 			)
 		else
-			table.insert(MethodDungeonToolsDB.MobDataTally, {
+			-- Forces changed but nobody died in our list - record as unknown
+			table.insert(db.MobDataTally, {
 				name = "Unknown Target",
 				id = 0,
 				percent = diff,
 				totalPercent = p,
 				date = date("%Y-%m-%d %H:%M:%S"),
 			})
-			print("|cFF00FF00[MDT Tracker]|r Неизвестная цель дала " .. diff .. "%")
+			print(
+				"|cFFFF8800[MDT Tracker]|r Неизвестная цель дала "
+					.. string.format("%.2f", diff)
+					.. "%"
+			)
 		end
-
 		mdtRecentlyDead = {}
 	end
 end)
 
+-- Command: /mdttrack
 SLASH_MDTTRACK1 = "/mdttrack"
 SlashCmdList["MDTTRACK"] = function(msg)
 	mdtIsTracking = not mdtIsTracking
 	if mdtIsTracking then
-		local c = C_GlobalStorage.GetVar("ASMSG_CHALLENGE_MODE_CREATURE_KILLED")
-		mdtLastForces = c and c.total and math.min(c.total, 100) or 0
-		mdtTrackerFrame:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
+		local ok, cData = pcall(function()
+			return C_GlobalStorage
+				and C_GlobalStorage.GetVar
+				and C_GlobalStorage.GetVar("ASMSG_CHALLENGE_MODE_CREATURE_KILLED")
+		end)
+		mdtLastForces = (ok and cData and cData.total) and math.min(cData.total, 100) or 0
+		mdtRecentlyDead = {}
+		print("|cFF00FF00[MDT Tracker]|r Авто-запись ВКЛЮЧЕНА. Текущий % = " .. mdtLastForces)
 		print(
-			"|cFF00FF00[MDT Tracker]|r Авто-запись ВКЛЮЧЕНА. Будет следить за смертями."
+			"|cFF00FF00[MDT Tracker]|r Убивай мобов — результаты появятся в чате и сохранятся в SavedVariables."
 		)
 	else
-		mdtTrackerFrame:UnregisterAllEvents()
 		mdtRecentlyDead = {}
-		print("|cFF00FF00[MDT Tracker]|r Авто-запись ВЫКЛЮЧЕНА.")
+		local savedCount = MethodDungeonToolsDB
+				and MethodDungeonToolsDB.MobDataTally
+				and #MethodDungeonToolsDB.MobDataTally
+			or 0
+		print(
+			"|cFF00FF00[MDT Tracker]|r Авто-запись ВЫКЛЮЧЕНА. Итого записей: "
+				.. savedCount
+				.. ". Данные в MethodDungeonTools.lua (SavedVariables)."
+		)
 	end
+end
+
+-- Command: /mdtdump  — вывести последние 20 записей в чат
+SLASH_MDTDUMP1 = "/mdtdump"
+SlashCmdList["MDTDUMP"] = function()
+	local tally = MethodDungeonToolsDB and MethodDungeonToolsDB.MobDataTally
+	if not tally or #tally == 0 then
+		print("|cFFFF0000[MDT Tracker]|r Нет сохранённых данных.")
+		return
+	end
+	local start = math.max(1, #tally - 19)
+	print(
+		"|cFF00FF00[MDT Tracker]|r Последние записи ("
+			.. start
+			.. "-"
+			.. #tally
+			.. " из "
+			.. #tally
+			.. "):"
+	)
+	for i = start, #tally do
+		local e = tally[i]
+		print(string.format("  #%d %s [%d] => %.2f%%  (total %.2f%%)", i, e.name, e.id, e.percent, e.totalPercent))
+	end
+end
+
+-- Command: /mdtclear — очистить все записи
+SLASH_MDTCLEAR1 = "/mdtclear"
+SlashCmdList["MDTCLEAR"] = function()
+	if MethodDungeonToolsDB then
+		MethodDungeonToolsDB.MobDataTally = {}
+	end
+	print("|cFF00FF00[MDT Tracker]|r Все записи очищены.")
 end
 
 function MethodDungeonTools:ShowEnemyInfoFrame(blipIndex)
