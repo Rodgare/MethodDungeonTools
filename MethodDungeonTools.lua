@@ -303,6 +303,7 @@ do
 	function MethodDungeonTools.ADDON_LOADED(self, addon)
 		if addon == "MethodDungeonTools" then
 			db = LibStub("AceDB-3.0"):New("MethodDungeonToolsDB", defaultSavedVars).global
+			db.devMode = false -- always start with devMode off; use /mdt devmode to enable
 			initFrames()
 			icon:Register("MethodDungeonTools", LDB, db.minimap)
 			if not db.minimap.hide then
@@ -791,7 +792,7 @@ function MethodDungeonTools:MakeSidePanel(frame)
 
 	--Difficulty Selection
 	frame.sidePanel.DifficultySliderLabel = MethodDungeonTools:AceGUI_Create("Label")
-	frame.sidePanel.DifficultySliderLabel:SetText(" Level: ")
+	frame.sidePanel.DifficultySliderLabel:SetText(" Lvl: ")
 	frame.sidePanel.DifficultySliderLabel:SetWidth(35)
 	frame.sidePanel.WidgetGroup:AddChild(frame.sidePanel.DifficultySliderLabel)
 
@@ -3362,6 +3363,7 @@ function MethodDungeonTools:UpdatePullButtonNPCData(idx)
 							end
 							enemyTable[enemyTableIdx].quantity = enemyTable[enemyTableIdx].quantity or 0
 							enemyTable[enemyTableIdx].npcId = npcId
+							enemyTable[enemyTableIdx].id = npcId
 							enemyTable[enemyTableIdx].count = enemyData["count"]
 							enemyTable[enemyTableIdx].displayId = enemyData["displayId"]
 							enemyTable[enemyTableIdx].quantity = enemyTable[enemyTableIdx].quantity + 1
@@ -3854,7 +3856,7 @@ function initFrames()
 		})
 		MethodDungeonTools.pullTooltip:SetClampedToScreen(true)
 		MethodDungeonTools.pullTooltip:SetFrameStrata("TOOLTIP")
-		MethodDungeonTools.pullTooltip.myHeight = 250
+		MethodDungeonTools.pullTooltip.myHeight = 150
 		MethodDungeonTools.pullTooltip:SetSize(250, MethodDungeonTools.pullTooltip.myHeight)
 		MethodDungeonTools.pullTooltip:Hide()
 
@@ -3905,7 +3907,7 @@ function initFrames()
 		botString:SetJustifyV("TOP")
 		botString:SetHeight(23)
 		botString:SetWidth(250)
-		botString.defaultText = "Enemy Forces: %d\nTotal: %d/%d"
+		botString.defaultText = "Получаемые %: %d\nTotal: %d/%d"
 		botString:SetPoint("TOPLEFT", heading, "LEFT", -12, -7)
 		botString:Hide()
 	end
