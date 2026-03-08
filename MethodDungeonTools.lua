@@ -1025,48 +1025,11 @@ function MethodDungeonTools:UpdateEnemyBlipSelection(i, forceDeselect, ignoreLin
 	local scale = enemyData and enemyData.scale or 1
 	local baseSize = 10 * scale
 
-	if pullIdx then
-		local colorIdx = (pullIdx % #MethodDungeonTools.pullColors) + 1
-		if colorIdx == 0 then
-			colorIdx = 1
-		end
-		local pColor = MethodDungeonTools.pullColors[colorIdx]
-		dungeonEnemyBlips[i]:SetVertexColor(pColor[1], pColor[2], pColor[3], 0.7)
-		dungeonEnemyBlips[i]:SetSize(baseSize, baseSize)
-		if dungeonEnemyBlips[i].outline then
-			dungeonEnemyBlips[i].outline:Hide()
-		end
-	else
+	if not pullIdx then
 		if forceDeselect and forceDeselect == true then
 			dungeonEnemyBlips[i].selected = false
 		else
 			dungeonEnemyBlips[i].selected = not dungeonEnemyBlips[i].selected
-		end
-
-		if dungeonEnemyBlips[i].selected == true then
-			local currentPull =
-				db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]].value.currentPull
-			local colorIdx = (currentPull % #MethodDungeonTools.pullColors) + 1
-			if colorIdx == 0 then
-				colorIdx = 1
-			end
-			local pColor = MethodDungeonTools.pullColors[colorIdx]
-			dungeonEnemyBlips[i]:SetVertexColor(pColor[1], pColor[2], pColor[3], 1)
-			dungeonEnemyBlips[i]:SetSize(baseSize * 1.3, baseSize * 1.3)
-			if dungeonEnemyBlips[i].outline then
-				dungeonEnemyBlips[i].outline:Hide()
-			end
-		else
-			r, g, b, a =
-				dungeonEnemyBlips[i].color.r,
-				dungeonEnemyBlips[i].color.g,
-				dungeonEnemyBlips[i].color.b,
-				dungeonEnemyBlips[i].color.a
-			dungeonEnemyBlips[i]:SetVertexColor(r, g, b, a)
-			dungeonEnemyBlips[i]:SetSize(baseSize, baseSize)
-			if dungeonEnemyBlips[i].outline then
-				dungeonEnemyBlips[i].outline:Hide()
-			end
 		end
 
 		--select/deselect linked npcs
@@ -1077,35 +1040,6 @@ function MethodDungeonTools:UpdateEnemyBlipSelection(i, forceDeselect, ignoreLin
 						dungeonEnemyBlips[idx].selected = false
 					else
 						dungeonEnemyBlips[idx].selected = dungeonEnemyBlips[i].selected
-					end
-					local linkedEnemyData = dungeonData and dungeonData[dungeonEnemyBlips[idx].enemyIdx] or nil
-					local linkedScale = linkedEnemyData and linkedEnemyData.scale or 1
-					local linkedBaseSize = 10 * linkedScale
-
-					if dungeonEnemyBlips[idx].selected == true then
-						local currentPull =
-							db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]].value.currentPull
-						local colorIdx = (currentPull % #MethodDungeonTools.pullColors) + 1
-						if colorIdx == 0 then
-							colorIdx = 1
-						end
-						local pColor = MethodDungeonTools.pullColors[colorIdx]
-						dungeonEnemyBlips[idx]:SetVertexColor(pColor[1], pColor[2], pColor[3], 1)
-						dungeonEnemyBlips[idx]:SetSize(linkedBaseSize * 1.3, linkedBaseSize * 1.3)
-						if dungeonEnemyBlips[idx].outline then
-							dungeonEnemyBlips[idx].outline:Hide()
-						end
-					else
-						r, g, b, a =
-							dungeonEnemyBlips[idx].color.r,
-							dungeonEnemyBlips[idx].color.g,
-							dungeonEnemyBlips[idx].color.b,
-							dungeonEnemyBlips[idx].color.a
-						dungeonEnemyBlips[idx]:SetVertexColor(r, g, b, a)
-						dungeonEnemyBlips[idx]:SetSize(linkedBaseSize, linkedBaseSize)
-						if dungeonEnemyBlips[idx].outline then
-							dungeonEnemyBlips[idx].outline:Hide()
-						end
 					end
 				end
 			end
@@ -2263,6 +2197,9 @@ function MethodDungeonTools:UpdateDungeonEnemies()
 	end
 	for k, v in pairs(dungeonEnemyBlips) do
 		v:Hide()
+		if v.colorOverlay then
+			v.colorOverlay:Hide()
+		end
 		if v.patrolIndicator then
 			v.patrolIndicator:Hide()
 		end
@@ -2326,9 +2263,39 @@ function MethodDungeonTools:UpdateDungeonEnemies()
 						dungeonEnemyBlips[idx].health = data["health"]
 						dungeonEnemyBlips[idx].level = data["level"]
 						dungeonEnemyBlips[idx]:SetDrawLayer("OVERLAY", 7)
-						dungeonEnemyBlips[idx]:SetTexture(
-							"Interface\\AddOns\\" .. addonName .. "\\Textures\\Circle_White.tga"
-						)
+
+						-- Create color overlay if it doesn't exist
+						if not dungeonEnemyBlips[idx].colorOverlay then
+							local colorOverlay = MethodDungeonTools.main_frame.mapPanelFrame:CreateTexture(
+								"MethodDungeonToolsDungeonEnemyBlip" .. idx .. "ColorOverlay",
+								"OVERLAY"
+							)
+							colorOverlay:SetDrawLayer("OVERLAY", 8)
+							-- This is a built-in game texture with a hole in the middle, perfect for our circular buttons
+							colorOverlay:SetTexture("Interface\\Minimap\\MiniMap-TrackingBorder")
+							colorOverlay:SetPoint("CENTER", dungeonEnemyBlips[idx], "CENTER", 0, 0)
+							dungeonEnemyBlips[idx].colorOverlay = colorOverlay
+						end
+
+						-- Fetch spell icon if available
+						local iconTex = "Interface\\AddOns\\" .. addonName .. "\\Textures\\Circle_White.tga"
+						local hasSpellIcon = false
+						if data.spells and data.spells[1] then
+							local _, _, icon = GetSpellInfo(data.spells[1])
+							if icon then
+								iconTex = icon
+								hasSpellIcon = true
+							end
+						end
+
+						dungeonEnemyBlips[idx]:SetTexture(iconTex)
+
+						if hasSpellIcon then
+							-- Reset texcoord, the border will cover the corners
+							dungeonEnemyBlips[idx]:SetTexCoord(0, 1, 0, 1)
+						else
+							dungeonEnemyBlips[idx]:SetTexCoord(0, 1, 0, 1)
+						end
 
 						if not dungeonEnemyBlips[idx].outline then
 							dungeonEnemyBlips[idx].outline = MethodDungeonTools.main_frame.mapPanelFrame:CreateTexture(
@@ -2344,6 +2311,8 @@ function MethodDungeonTools:UpdateDungeonEnemies()
 						end
 						dungeonEnemyBlips[idx]:SetWidth(10 * data["scale"])
 						dungeonEnemyBlips[idx]:SetHeight(10 * data["scale"])
+						dungeonEnemyBlips[idx].colorOverlay:SetWidth(18 * data["scale"])
+						dungeonEnemyBlips[idx].colorOverlay:SetHeight(18 * data["scale"])
 						dungeonEnemyBlips[idx]:SetPoint(
 							"CENTER",
 							MethodDungeonTools.main_frame.mapPanelTile1,
@@ -2357,10 +2326,9 @@ function MethodDungeonTools:UpdateDungeonEnemies()
 
 						--color patrol
 						dungeonEnemyBlips[idx].patrolFollower = nil
+						dungeonEnemyBlips[idx]:SetVertexColor(1, 1, 1, 1) -- Reset icon color
+
 						if clone.patrol then
-							dungeonEnemyBlips[idx]:SetTexture(
-								"Interface\\AddOns\\" .. addonName .. "\\Textures\\Circle_White.tga"
-							)
 							dungeonEnemyBlips[idx].color = patrolColor
 						else
 							--iterate over all enemies again to find if this npc is linked to a patrol
@@ -2391,11 +2359,6 @@ function MethodDungeonTools:UpdateDungeonEnemies()
 										then
 											if clone.g and patrolCheckClone.g then
 												if clone.g == patrolCheckClone.g and patrolCheckClone.patrol then
-													dungeonEnemyBlips[idx]:SetTexture(
-														"Interface\\AddOns\\"
-															.. addonName
-															.. "\\Textures\\Circle_White.tga"
-													)
 													dungeonEnemyBlips[idx].color = patrolColor
 													dungeonEnemyBlips[idx].patrolFollower = true
 												end
@@ -2406,47 +2369,18 @@ function MethodDungeonTools:UpdateDungeonEnemies()
 							end
 						end
 
-						if dungeonEnemyBlips[idx].selected == true then
-							local currentPull =
-								db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]].value.currentPull
-							local colorIdx = (currentPull % #MethodDungeonTools.pullColors) + 1
-							if colorIdx == 0 then
-								colorIdx = 1
-							end
-							local pColor = MethodDungeonTools.pullColors[colorIdx]
-							dungeonEnemyBlips[idx]:SetVertexColor(pColor[1], pColor[2], pColor[3], 1)
-						else
-							local r, g, b, a =
-								dungeonEnemyBlips[idx].color.r,
-								dungeonEnemyBlips[idx].color.g,
-								dungeonEnemyBlips[idx].color.b,
-								dungeonEnemyBlips[idx].color.a
-							dungeonEnemyBlips[idx]:SetVertexColor(r, g, b, a)
-						end
+						local r, g, b, a =
+							dungeonEnemyBlips[idx].color.r,
+							dungeonEnemyBlips[idx].color.g,
+							dungeonEnemyBlips[idx].color.b,
+							dungeonEnemyBlips[idx].color.a
+						dungeonEnemyBlips[idx].colorOverlay:SetVertexColor(r, g, b, a)
 
 						dungeonEnemyBlips[idx]:Show()
+						dungeonEnemyBlips[idx].colorOverlay:Show()
 
 						if dungeonEnemyBlips[idx].fontString then
-							dungeonEnemyBlips[idx].fontString:Show()
-							if data["count"] and data["count"] > 0 then
-								local countStr = tostring(data["count"])
-								if string.len(countStr) > 2 then
-									dungeonEnemyBlips[idx].fontString:SetFont(
-										dungeonEnemyBlips[idx].fontName,
-										5,
-										"OUTLINE"
-									)
-								else
-									dungeonEnemyBlips[idx].fontString:SetFont(
-										dungeonEnemyBlips[idx].fontName,
-										9,
-										"OUTLINE"
-									)
-								end
-								dungeonEnemyBlips[idx].fontString:SetText(countStr)
-							else
-								dungeonEnemyBlips[idx].fontString:SetText("")
-							end
+							dungeonEnemyBlips[idx].fontString:Hide()
 						end
 
 						--clear patrol flag
@@ -4332,7 +4266,7 @@ function MethodDungeonTools:ShowEnemyInfoFrame(blipIndex)
 						sf.nameLbl = nameLbl
 
 						sf:SetScript("OnEnter", function(self)
-							GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+							GameTooltip:SetOwner(self, "ANCHOR_CURSOR")
 							GameTooltip:SetHyperlink("spell:" .. self.spellId)
 							GameTooltip:Show()
 						end)
