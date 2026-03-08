@@ -1179,17 +1179,14 @@ function MethodDungeonTools:UpdatePullTooltip(tooltip)
 								tooltip.Model:ClearModel()
 							end
 							MethodDungeonTools:SetDisplayInfo(tooltip.Model, modelId, isNpcId, modelPath)
+							if tooltip.Model.SetModelScale then
+								tooltip.Model:SetModelScale(0.6)
+							end
 							tooltip.Model.lastModelId = cacheId
 						end
 						--topString
 						local newLine = "\n"
-						local text = newLine
-							.. newLine
-							.. newLine
-							.. v.enemyData.name
-							.. " x"
-							.. v.enemyData.quantity
-							.. newLine
+						local text = v.enemyData.name .. " x" .. v.enemyData.quantity .. newLine
 						text = text .. "Level " .. v.enemyData.level .. " " .. v.enemyData.creatureType .. newLine
 						--ViragDevTool_AddData(v.enemyData)
 						local fortified = false
@@ -3856,59 +3853,46 @@ function initFrames()
 		})
 		MethodDungeonTools.pullTooltip:SetClampedToScreen(true)
 		MethodDungeonTools.pullTooltip:SetFrameStrata("TOOLTIP")
-		MethodDungeonTools.pullTooltip.myHeight = 150
+		MethodDungeonTools.pullTooltip.myHeight = 120
 		MethodDungeonTools.pullTooltip:SetSize(250, MethodDungeonTools.pullTooltip.myHeight)
 		MethodDungeonTools.pullTooltip:Hide()
 
+		-- 3D модель слева
 		MethodDungeonTools.pullTooltip.Model = CreateFrame("PlayerModel", nil, MethodDungeonTools.pullTooltip)
 		MethodDungeonTools.pullTooltip.Model:SetFrameLevel(5)
-
+		MethodDungeonTools.pullTooltip.Model:SetSize(90, 90)
+		MethodDungeonTools.pullTooltip.Model:SetPoint("TOPLEFT", MethodDungeonTools.pullTooltip, "TOPLEFT", 10, -15)
 		MethodDungeonTools.pullTooltip.Model.fac = 0
-		if true then
-			MethodDungeonTools.pullTooltip.Model:SetScript("OnUpdate", function(self, elapsed)
-				self.fac = self.fac + 0.5
-				if self.fac >= 360 then
-					self.fac = 0
-				end
-				self:SetFacing(math.pi * 2 / 360 * self.fac)
-			end)
-		else
-			MethodDungeonTools.pullTooltip.Model:SetFacing(math.pi * 2 / 360 * 2)
-		end
+		MethodDungeonTools.pullTooltip.Model:SetScript("OnUpdate", function(self, elapsed)
+			self.fac = self.fac + 0.5
+			if self.fac >= 360 then
+				self.fac = 0
+			end
+			self:SetFacing(math.pi * 2 / 360 * self.fac)
+		end)
 
-		MethodDungeonTools.pullTooltip.Model:SetSize(110, 110)
-		MethodDungeonTools.pullTooltip.Model:SetPoint("TOPLEFT", MethodDungeonTools.pullTooltip, "TOPLEFT", 7, -7)
-
-		MethodDungeonTools.pullTooltip.topString =
-			MethodDungeonTools.pullTooltip:CreateFontString("MethodDungeonToolsToolTipString")
+		-- Текст справа от модели
+		MethodDungeonTools.pullTooltip.topString = MethodDungeonTools.pullTooltip:CreateFontString(nil, "OVERLAY")
 		MethodDungeonTools.pullTooltip.topString:SetFont("Fonts\\FRIZQT__.TTF", 10)
 		MethodDungeonTools.pullTooltip.topString:SetTextColor(1, 1, 1, 1)
 		MethodDungeonTools.pullTooltip.topString:SetJustifyH("LEFT")
-		MethodDungeonTools.pullTooltip.topString:SetJustifyV("TOP")
-		MethodDungeonTools.pullTooltip.topString:SetHeight(110)
+		MethodDungeonTools.pullTooltip.topString:SetJustifyV("CENTER")
+		MethodDungeonTools.pullTooltip.topString:SetHeight(100)
 		MethodDungeonTools.pullTooltip.topString:SetWidth(130)
-		MethodDungeonTools.pullTooltip.topString:SetPoint("TOPLEFT", MethodDungeonTools.pullTooltip, "TOPLEFT", 110, -7)
+		MethodDungeonTools.pullTooltip.topString:SetPoint("LEFT", MethodDungeonTools.pullTooltip, "LEFT", 112, 0)
 		MethodDungeonTools.pullTooltip.topString:Hide()
 
-		local heading = MethodDungeonTools.pullTooltip:CreateTexture(nil, "TOOLTIP")
-		heading:SetHeight(8)
-		heading:SetPoint("LEFT", 12, -30)
-		heading:SetPoint("RIGHT", MethodDungeonTools.pullTooltip, "RIGHT", -12, -30)
-		heading:SetTexture("Interface\\Tooltips\\UI-Tooltip-Border")
-		heading:SetTexCoord(0.81, 0.94, 0.5, 1)
-		heading:Show()
-
-		MethodDungeonTools.pullTooltip.botString =
-			MethodDungeonTools.pullTooltip:CreateFontString("MethodDungeonToolsToolTipString")
+		-- botString — строка с суммарным % пула внизу
+		MethodDungeonTools.pullTooltip.botString = MethodDungeonTools.pullTooltip:CreateFontString(nil, "OVERLAY")
 		local botString = MethodDungeonTools.pullTooltip.botString
 		botString:SetFont("Fonts\\FRIZQT__.TTF", 10)
-		botString:SetTextColor(1, 1, 1, 1)
-		botString:SetJustifyH("TOP")
-		botString:SetJustifyV("TOP")
-		botString:SetHeight(23)
+		botString:SetTextColor(1, 0.82, 0, 1)
+		botString:SetJustifyH("CENTER")
+		botString:SetJustifyV("BOTTOM")
+		botString:SetHeight(20)
 		botString:SetWidth(250)
-		botString.defaultText = "Получаемые %: %d\nTotal: %d/%d"
-		botString:SetPoint("TOPLEFT", heading, "LEFT", -12, -7)
+		botString.defaultText = "Получаемые %%: %d  |  Всего: %d/%d"
+		botString:SetPoint("BOTTOM", MethodDungeonTools.pullTooltip, "BOTTOM", 0, 14)
 		botString:Hide()
 	end
 
