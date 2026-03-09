@@ -12,6 +12,7 @@ MethodDungeonTools.dungeonBosses[dungeonIndex] = {
 			["id"] = 28586,
 			["displayId"] = 28586,
 			["health"] = 90276936,
+			spells = { 52890, 19134, 23600, 52891 },
 			["x"] = 411.55428850967,
 			["y"] = -402.65782094358,
 		},
@@ -443,7 +444,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	[28920] = { -- Map ID 28920 to array index in lua
 		["id"] = 28920,
 		spells = { 59155, 53071, 32315 },
-		["iconId"] = 32315,
+		["iconId"] = 53071,
 		["name"] = "Великан из клана Закаленных Бурей",
 		["health"] = 130330,
 		["level"] = 81,
