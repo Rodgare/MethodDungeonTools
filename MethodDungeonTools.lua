@@ -1779,16 +1779,43 @@ function MethodDungeonTools:MakeMapTexture(frame)
 				--handle clicks on enemy blips
 				if MouseIsOver(MethodDungeonToolsScrollFrame) then
 					for i = 1, numDungeonEnemyBlips do
-						if MouseIsOver(dungeonEnemyBlips[i]) then
+						if dungeonEnemyBlips[i] and MouseIsOver(dungeonEnemyBlips[i]) then
 							local isCTRLKeyDown = IsControlKeyDown()
-							MethodDungeonTools:AddOrRemoveEnemyBlipToCurrentPull(
-								i,
-								not dungeonEnemyBlips[i].selected,
-								isCTRLKeyDown
-							)
-							MethodDungeonTools:UpdateEnemyBlipSelection(i, nil, isCTRLKeyDown)
-							MethodDungeonTools:UpdateEnemiesSelected()
-							break
+							local isShiftKeyDown = IsShiftKeyDown()
+							if isShiftKeyDown then
+								-- 1. Create the pull entry in DB first
+								MethodDungeonTools:PresetsAddPull()
+								local newPullIdx = 0
+								for _ in
+									pairs(
+										db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]].value.pulls
+									)
+								do
+									newPullIdx = newPullIdx + 1
+								end
+								-- 2. Set it as current in the DB
+								db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]].value.currentPull =
+									newPullIdx
+								-- 3. Add the NPC to this new pull (this also handles linked NPCs)
+								MethodDungeonTools:AddOrRemoveEnemyBlipToCurrentPull(i, true, isCTRLKeyDown)
+								-- 4. Reload UI (buttons and map blips)
+								MethodDungeonTools:ReloadPullButtons()
+								MethodDungeonTools:SetSelectionToPull(newPullIdx)
+								MethodDungeonTools:UpdateEnemiesSelected()
+								MethodDungeonTools:UpdateDungeonEnemies()
+								break
+							else
+								-- Normal click handling
+								MethodDungeonTools:AddOrRemoveEnemyBlipToCurrentPull(
+									i,
+									not dungeonEnemyBlips[i].selected,
+									isCTRLKeyDown
+								)
+								MethodDungeonTools:UpdateEnemyBlipSelection(i, nil, isCTRLKeyDown)
+								MethodDungeonTools:UpdateEnemiesSelected()
+								MethodDungeonTools:UpdateDungeonEnemies()
+								break
+							end
 						end
 					end
 				end
@@ -3734,7 +3761,9 @@ function MethodDungeonTools:UpdatePullButtonNPCData(idx)
 			end
 		end
 	end
-	frame.newPullButtons[idx]:SetNPCData(enemyTable)
+	if frame.newPullButtons[idx] then
+		frame.newPullButtons[idx]:SetNPCData(enemyTable)
+	end
 end
 
 ---ReloadPullButtons
