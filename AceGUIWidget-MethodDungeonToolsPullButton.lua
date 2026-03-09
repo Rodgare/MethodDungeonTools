@@ -138,7 +138,9 @@ local methods = {
 		tinsert(self.menu, {
 			text = "Close",
 			notCheckable = 1,
-			func = MethodDungeonTools.main_frame.sidePanel.optionsDropDown:Hide(),
+			func = function()
+				MethodDungeonTools.main_frame.sidePanel.optionsDropDown:Hide()
+			end,
 		})
 
 		--Set pullNumber
@@ -316,6 +318,7 @@ local function Constructor()
 		local f = CreateFrame("Frame", nil, button)
 		f:SetSize(height, height)
 		f:SetFrameLevel(baseLevel + i * 2)
+		f:EnableMouse(false)
 		if i == 1 then
 			f:SetPoint("LEFT", icon, "RIGHT", -5, 0)
 		else

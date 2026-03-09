@@ -913,9 +913,7 @@ function MethodDungeonTools:MakeSidePanel(frame)
 		db.presets[db.currentDungeonIdx][curPresetIdx].value = {}
 	end
 
-	if not db.presets[db.currentDungeonIdx][curPresetIdx + 1] then
-		db.presets[db.currentDungeonIdx][curPresetIdx + 1] = { text = "<New Preset>", value = 0 }
-	end
+	-- removed redundant <New Preset> logic here, now handled in EnsureDBTables
 
 	-- local breakLine = MethodDungeonTools:AceGUI_Create("Label")
 	-- breakLine:SetFullWidth(true)
@@ -2894,8 +2892,10 @@ function MethodDungeonTools:CreateDungeonPresetDropdown(frame)
 	-- Dungeon Preset Dropdown using LibUIDropDownMenu
 	local presetDD = CreateFrame("Frame", "MDTDungeonPresetDropdown", frame, "L_UIDropDownMenuTemplate")
 	presetDD:SetPoint("TOPLEFT", frame, "TOPLEFT", -12, -5)
-	presetDD:SetFrameStrata("HIGH")
 	presetDD:SetFrameLevel(20)
+	presetDD:SetSize(180, 20)
+	presetDD:EnableMouse(false)
+	_G[presetDD:GetName() .. "Button"]:EnableMouse(true)
 	frame.DungeonPresetDropdown = presetDD
 
 	L_UIDropDownMenu_Initialize(presetDD, function(self, level)
@@ -2930,8 +2930,10 @@ function MethodDungeonTools:CreateDungeonSelectDropdown(frame)
 	-- Sublevel Dropdown using LibUIDropDownMenu
 	local sublevelDD = CreateFrame("Frame", "MDTDungeonSublevelDropdown", frame, "L_UIDropDownMenuTemplate")
 	sublevelDD:SetPoint("TOPLEFT", frame.topPanel, "TOPLEFT", -15, -54)
-	sublevelDD:SetFrameStrata("HIGH")
 	sublevelDD:SetFrameLevel(20)
+	sublevelDD:SetSize(180, 20)
+	sublevelDD:EnableMouse(false)
+	_G[sublevelDD:GetName() .. "Button"]:EnableMouse(true)
 	frame.DungeonSublevelSelectDropdown = sublevelDD
 
 	L_UIDropDownMenu_Initialize(sublevelDD, function(self, level)
@@ -2965,8 +2967,10 @@ function MethodDungeonTools:CreateDungeonSelectDropdown(frame)
 	-- Dungeon Select Dropdown using LibUIDropDownMenu
 	local dungeonDD = CreateFrame("Frame", "MDTDungeonSelectDropdown", frame, "L_UIDropDownMenuTemplate")
 	dungeonDD:SetPoint("TOPLEFT", frame.topPanel, "TOPLEFT", -15, -28)
-	dungeonDD:SetFrameStrata("HIGH")
 	dungeonDD:SetFrameLevel(20)
+	dungeonDD:SetSize(180, 20)
+	dungeonDD:EnableMouse(false)
+	_G[dungeonDD:GetName() .. "Button"]:EnableMouse(true)
 	frame.DungeonSelectDropdown = dungeonDD
 
 	L_UIDropDownMenu_Initialize(dungeonDD, function(self, level)
@@ -3019,11 +3023,18 @@ function MethodDungeonTools:EnsureDBTables()
 	currentPreset.value.pulls[currentPreset.value.currentPull] = currentPreset.value.pulls[currentPreset.value.currentPull]
 		or {}
 
-	for k, v in pairs(currentPreset.value.pulls) do
-		if k == 0 then
-			currentPreset.value.pulls[0] = nil
-			break
+	-- Sanitize presets: remove all "<New Preset>" and add one at the end
+	local presets = db.presets[db.currentDungeonIdx]
+	for i = #presets, 1, -1 do
+		if presets[i].text == "<New Preset>" or presets[i].value == 0 then
+			table.remove(presets, i)
 		end
+	end
+	table.insert(presets, { text = "<New Preset>", value = 0 })
+
+	-- Ensure currentPreset index is still valid after sanitization
+	if db.currentPreset[db.currentDungeonIdx] > #presets then
+		db.currentPreset[db.currentDungeonIdx] = 1
 	end
 end
 
@@ -3226,22 +3237,30 @@ function MethodDungeonTools:CreateNewPreset(name)
 		end
 	end
 	if duplicate == false then
-		db.presets[db.currentDungeonIdx][countPresets + 1] = db.presets[db.currentDungeonIdx][countPresets] --put <New Preset> at the end of the list
-
-		local startingPointPresetIdx = MethodDungeonTools.main_frame.PresetCreationDropDown:GetValue() - 1
-		if startingPointPresetIdx > 0 then
-			db.presets[db.currentDungeonIdx][countPresets] =
-				MethodDungeonTools:CopyObject(db.presets[db.currentDungeonIdx][startingPointPresetIdx])
-			db.presets[db.currentDungeonIdx][countPresets].text = name
-		else
-			db.presets[db.currentDungeonIdx][countPresets] = { text = name, value = {} }
+		-- Find and remove existing <New Preset>
+		local presets = db.presets[db.currentDungeonIdx]
+		for i = #presets, 1, -1 do
+			if presets[i].text == "<New Preset>" or presets[i].value == 0 then
+				table.remove(presets, i)
+			end
 		end
 
-		db.currentPreset[db.currentDungeonIdx] = countPresets
+		local startingPointPresetIdx = MethodDungeonTools.main_frame.PresetCreationDropDown:GetValue() - 1
+		local newPreset
+		if startingPointPresetIdx > 0 then
+			newPreset = MethodDungeonTools:CopyObject(db.presets[db.currentDungeonIdx][startingPointPresetIdx])
+			newPreset.text = name
+		else
+			newPreset = { text = name, value = { currentSublevel = 1, pulls = {} } }
+		end
+		table.insert(presets, newPreset)
+		db.currentPreset[db.currentDungeonIdx] = #presets
+
+		-- Re-add <New Preset> at the end
+		table.insert(presets, { text = "<New Preset>", value = 0 })
+
 		MethodDungeonTools.main_frame.presetCreationFrame:Hide()
-		MethodDungeonTools.main_frame.sidePanel.DungeonPresetDropdown:SetValue(
-			db.presets[db.currentDungeonIdx][countPresets].value
-		)
+		L_UIDropDownMenu_Refresh(MethodDungeonTools.main_frame.sidePanel.DungeonPresetDropdown)
 		MethodDungeonTools:UpdateMap()
 	else
 		MethodDungeonTools.main_frame.presetCreationLabel:SetText("'" .. name .. "' already exists.")
@@ -3277,9 +3296,7 @@ function MethodDungeonTools:MakePresetImportFrame(frame)
 	frame.presetImportFrame:SetLayout("Flow")
 	frame.presetImportFrame:SetCallback("OnClose", function(widget)
 		if MethodDungeonTools.main_frame.sidePanel.DungeonPresetDropdown then
-			MethodDungeonTools.main_frame.sidePanel.DungeonPresetDropdown:SetValue(
-				db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]].value
-			)
+			L_UIDropDownMenu_Refresh(MethodDungeonTools.main_frame.sidePanel.DungeonPresetDropdown)
 			if db.currentPreset[db.currentDungeonIdx] ~= 1 then
 				MethodDungeonTools.main_frame.sidePanelDeleteButton:SetDisabled(false)
 			end
@@ -3331,9 +3348,7 @@ function MethodDungeonTools:MakePresetCreationFrame(frame)
 	frame.presetCreationFrame:SetLayout("Flow")
 	frame.presetCreationFrame:SetCallback("OnClose", function(widget)
 		if MethodDungeonTools.main_frame.sidePanel.DungeonPresetDropdown then
-			MethodDungeonTools.main_frame.sidePanel.DungeonPresetDropdown:SetValue(
-				db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]].value
-			)
+			L_UIDropDownMenu_Refresh(MethodDungeonTools.main_frame.sidePanel.DungeonPresetDropdown)
 			if db.currentPreset[db.currentDungeonIdx] ~= 1 then
 				MethodDungeonTools.main_frame.sidePanelDeleteButton:SetDisabled(false)
 			end
@@ -3436,17 +3451,22 @@ function MethodDungeonTools:ImportPreset(preset)
 	end
 
 	preset.text = name
-	local countPresets = 0
+	local presets = db.presets[db.currentDungeonIdx]
 
-	for k, v in pairs(db.presets[db.currentDungeonIdx]) do
-		countPresets = countPresets + 1
+	-- Find and remove existing <New Preset>
+	for i = #presets, 1, -1 do
+		if presets[i].text == "<New Preset>" or presets[i].value == 0 then
+			table.remove(presets, i)
+		end
 	end
-	db.presets[db.currentDungeonIdx][countPresets + 1] = db.presets[db.currentDungeonIdx][countPresets] --put <New Preset> at the end of the list
-	db.presets[db.currentDungeonIdx][countPresets] = preset
-	db.currentPreset[db.currentDungeonIdx] = countPresets
-	MethodDungeonTools.main_frame.sidePanel.DungeonPresetDropdown:SetValue(
-		db.presets[db.currentDungeonIdx][countPresets].value
-	)
+
+	table.insert(presets, preset)
+	db.currentPreset[db.currentDungeonIdx] = #presets
+
+	-- Re-add <New Preset> at the end
+	table.insert(presets, { text = "<New Preset>", value = 0 })
+
+	L_UIDropDownMenu_Refresh(MethodDungeonTools.main_frame.sidePanel.DungeonPresetDropdown)
 	MethodDungeonTools:UpdateMap()
 end
 
@@ -3547,10 +3567,7 @@ function MethodDungeonTools:SetMapSublevel(pull)
 	end
 
 	--update dropdown
-	local frame = MethodDungeonTools.main_frame
-	self.main_frame.DungeonSublevelSelectDropdown:SetValue(
-		db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]].value.currentSublevel
-	)
+	L_UIDropDownMenu_Refresh(self.main_frame.DungeonSublevelSelectDropdown)
 	if shouldResetZoom then
 		MethodDungeonTools:ZoomMap(1, true)
 	end
@@ -3823,9 +3840,7 @@ end
 function MethodDungeonTools:RenamePreset(renameText)
 	db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]].text = renameText
 	MethodDungeonTools.main_frame.RenameFrame:Hide()
-	MethodDungeonTools.main_frame.sidePanel.DungeonPresetDropdown:SetValue(
-		db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]].value
-	)
+	L_UIDropDownMenu_Refresh(MethodDungeonTools.main_frame.sidePanel.DungeonPresetDropdown)
 end
 
 function MethodDungeonTools:MakeRenameFrame(frame)
