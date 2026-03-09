@@ -52,7 +52,7 @@
 * **Discord:** [Stratocaster](https://discordapp.com/users/123456789012345678)
 * [Гитхаб](https://github.com/Rodgare/MethodDungeonTools)
 
-**🎨 Известные баги**
+**🎨 Известные баги**  
 3д модельки могут не подгружаться до входа в данж, пока непонятно как это фиксить, так работает на уровне клиента игры
 =======
 * **Discord:** [Stratocaster](https://discordapp.com/users/123456789012345678)
