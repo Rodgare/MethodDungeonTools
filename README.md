@@ -6,7 +6,7 @@
 **🗺️ Установка**
 
 После скачивания не забудьте удалить -main из названия папки, чтобы в результате название папки получилось MethodDungeonTools без -main.  
-  Правильное название MethodDungeonTools
+  Правильное название MethodDungeonTools  
   Неправильное название MethodDungeonTools-main
 
 
