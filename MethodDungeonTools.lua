@@ -1800,7 +1800,7 @@ function MethodDungeonTools:MakeMapTexture(frame)
 								MethodDungeonTools:AddOrRemoveEnemyBlipToCurrentPull(i, true, isCTRLKeyDown)
 								-- 4. Reload UI (buttons and map blips)
 								MethodDungeonTools:ReloadPullButtons()
-								MethodDungeonTools:SetSelectionToPull(newPullIdx)
+								MethodDungeonTools:SetSelectionToPull(newPullIdx, true)
 								MethodDungeonTools:UpdateEnemiesSelected()
 								MethodDungeonTools:UpdateDungeonEnemies()
 								break
@@ -3600,7 +3600,7 @@ function MethodDungeonTools:SetMapSublevel(pull)
 	end
 end
 
-function MethodDungeonTools:SetSelectionToPull(pull)
+function MethodDungeonTools:SetSelectionToPull(pull, noAutoCenter)
 	--if pull is not specified set pull to last pull in preset (for adding new pulls)
 	if not pull then
 		local count = 0
@@ -3647,62 +3647,54 @@ function MethodDungeonTools:SetSelectionToPull(pull)
 	end
 
 	-- Centering map on current pull
-	local avgX, avgY = 0, 0
-	local count = 0
-	local pullEnemies = db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]].value.pulls[pull]
-	if pullEnemies then
-		for enemyIdx, clones in pairs(pullEnemies) do
-			local dungeonData = MethodDungeonTools.dungeonEnemies[db.currentDungeonIdx]
-			local enemyData = dungeonData and dungeonData[enemyIdx] or nil
-			if enemyData and enemyData.clones then
-				for _, cloneIdx in pairs(clones) do
-					local clone = enemyData.clones[cloneIdx]
-					if clone and clone.x and clone.y then
-						avgX = avgX + clone.x
-						avgY = avgY + clone.y
-						count = count + 1
+	if not noAutoCenter then
+		local avgX, avgY = 0, 0
+		local count = 0
+		local pullEnemies = db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]].value.pulls[pull]
+		if pullEnemies then
+			for enemyIdx, clones in pairs(pullEnemies) do
+				local dungeonData = MethodDungeonTools.dungeonEnemies[db.currentDungeonIdx]
+				local enemyData = dungeonData and dungeonData[enemyIdx] or nil
+				if enemyData and enemyData.clones then
+					for _, cloneIdx in pairs(clones) do
+						local clone = enemyData.clones[cloneIdx]
+						if clone and clone.x and clone.y then
+							avgX = avgX + clone.x
+							avgY = avgY + clone.y
+							count = count + 1
+						end
 					end
 				end
 			end
 		end
-	end
-
-	if count > 0 then
-		avgX = avgX / count
-		avgY = avgY / count
-
-		local scrollFrame = MethodDungeonTools.main_frame.scrollFrame
-		local mapScale = MethodDungeonTools.main_frame.mapPanelFrame:GetScale()
-
-		if mapScale > 1.05 and scrollFrame.maxX and scrollFrame.maxY then
-			-- Map dimensions are 856x642
-			local mapW, mapH = 856, 642
-			local viewW = scrollFrame:GetWidth() or 840
-			local viewH = scrollFrame:GetHeight() or 555
-
-			local targetX = avgX * mapScale
-			local targetY = -avgY * mapScale
-
-			local rangeX = (mapW * mapScale) - viewW
-			local rangeY = (mapH * mapScale) - viewH
-
-			local targetScrollH, targetScrollV = 0, 0
-
-			if rangeX > 0 and scrollFrame.maxX and scrollFrame.maxX > 0 then
-				local fractionX = (targetX - (viewW / 2)) / rangeX
-				targetScrollH = fractionX * scrollFrame.maxX
+		if count > 0 then
+			avgX = avgX / count
+			avgY = avgY / count
+			local scrollFrame = MethodDungeonTools.main_frame.scrollFrame
+			local mapScale = MethodDungeonTools.main_frame.mapPanelFrame:GetScale()
+			if mapScale > 1.05 and scrollFrame.maxX and scrollFrame.maxY then
+				-- Map dimensions are 856x642
+				local mapW, mapH = 856, 642
+				local viewW = scrollFrame:GetWidth() or 840
+				local viewH = scrollFrame:GetHeight() or 555
+				local targetX = avgX * mapScale
+				local targetY = -avgY * mapScale
+				local rangeX = (mapW * mapScale) - viewW
+				local rangeY = (mapH * mapScale) - viewH
+				local targetScrollH, targetScrollV = 0, 0
+				if rangeX > 0 and scrollFrame.maxX and scrollFrame.maxX > 0 then
+					local fractionX = (targetX - (viewW / 2)) / rangeX
+					targetScrollH = fractionX * scrollFrame.maxX
+				end
+				if rangeY > 0 and scrollFrame.maxY and scrollFrame.maxY > 0 then
+					local fractionY = (targetY - (viewH / 2)) / rangeY
+					targetScrollV = fractionY * scrollFrame.maxY
+				end
+				targetScrollH = math.max(0, math.min(targetScrollH, scrollFrame.maxX or 0))
+				targetScrollV = math.max(0, math.min(targetScrollV, scrollFrame.maxY or 0))
+				scrollFrame:SetHorizontalScroll(targetScrollH)
+				scrollFrame:SetVerticalScroll(targetScrollV)
 			end
-
-			if rangeY > 0 and scrollFrame.maxY and scrollFrame.maxY > 0 then
-				local fractionY = (targetY - (viewH / 2)) / rangeY
-				targetScrollV = fractionY * scrollFrame.maxY
-			end
-
-			targetScrollH = math.max(0, math.min(targetScrollH, scrollFrame.maxX or 0))
-			targetScrollV = math.max(0, math.min(targetScrollV, scrollFrame.maxY or 0))
-
-			scrollFrame:SetHorizontalScroll(targetScrollH)
-			scrollFrame:SetVerticalScroll(targetScrollV)
 		end
 	end
 
