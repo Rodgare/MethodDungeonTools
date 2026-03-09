@@ -653,11 +653,6 @@ function MethodDungeonTools:HideInterface()
 	self.main_frame.HelpButton:Hide()
 end
 
-function MethodDungeonTools:ToggleDevMode()
-	db.devMode = not db.devMode
-	print("MDT: Reload Interface to enable dev mode features")
-end
-
 function MethodDungeonTools:CreateMenu()
 	-- Close button
 	self.main_frame.closeButton = CreateFrame("Button", "CloseButton", self.main_frame, "UIPanelCloseButton")
@@ -1509,22 +1504,19 @@ function MethodDungeonTools:CountForces(currentPull, currentOnly)
 	return pullCurrent
 end
 
----IsCurrentPresetTeeming
----Returns true if the current preset has teeming turned on, false otherwise
 function MethodDungeonTools:IsCurrentPresetTeeming()
 	return db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]].value.teeming
 end
 
-function MethodDungeonTools:MakeMapTexture(frame)
+function MethodDungeonTools:UpdateContextMenu(cursorX, cursorY)
 	MethodDungeonTools.contextMenuList = {}
-	local cursorX, cursorY
 	if db.devMode then
 		tinsert(MethodDungeonTools.contextMenuList, {
 			text = "Copy Position",
 			notCheckable = true,
 			func = function()
 				local scrollFrame = MethodDungeonTools.main_frame.scrollFrame
-				local relativeFrame = UIParent --UIParent
+				local relativeFrame = UIParent
 				local mapPanelFrame = MethodDungeonTools.main_frame.mapPanelFrame
 				local mapScale = mapPanelFrame:GetScale()
 				local scrollH = scrollFrame:GetHorizontalScroll()
@@ -1537,7 +1529,7 @@ function MethodDungeonTools:MakeMapTexture(frame)
 				local teeming = db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]].value.teeming
 						and ",teeming=true"
 					or ""
-				local group = db.currentDifficulty --hijack difficulty slider to determine linked group xd
+				local group = db.currentDifficulty
 
 				local cloneIdx = 1
 				local targetName = UnitName("target")
@@ -1592,7 +1584,7 @@ function MethodDungeonTools:MakeMapTexture(frame)
 			notCheckable = true,
 			func = function()
 				local scrollFrame = MethodDungeonTools.main_frame.scrollFrame
-				local relativeFrame = UIParent --UIParent
+				local relativeFrame = UIParent
 				local mapPanelFrame = MethodDungeonTools.main_frame.mapPanelFrame
 				local mapScale = mapPanelFrame:GetScale()
 				local scrollH = scrollFrame:GetHorizontalScroll()
@@ -1604,7 +1596,7 @@ function MethodDungeonTools:MakeMapTexture(frame)
 				local teeming = db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]].value.teeming
 						and ",teeming=true"
 					or ""
-				local group = db.currentDifficulty --hijack difficulty slider to determine linked group xd
+				local group = db.currentDifficulty
 
 				local cloneIdx = 1
 				local targetName = UnitName("target")
@@ -1648,7 +1640,7 @@ function MethodDungeonTools:MakeMapTexture(frame)
 			notCheckable = true,
 			func = function()
 				local scrollFrame = MethodDungeonTools.main_frame.scrollFrame
-				local relativeFrame = UIParent --UIParent
+				local relativeFrame = UIParent
 				local mapPanelFrame = MethodDungeonTools.main_frame.mapPanelFrame
 				local mapScale = mapPanelFrame:GetScale()
 				local scrollH = scrollFrame:GetHorizontalScroll()
@@ -1664,7 +1656,6 @@ function MethodDungeonTools:MakeMapTexture(frame)
 					if guid:find("-") then
 						id = select(6, strsplit("-", guid))
 					else
-						-- hex GUID fallback for 3.3.0
 						id = tonumber(guid:sub(-12, -9), 16)
 					end
 				end
@@ -1702,7 +1693,7 @@ function MethodDungeonTools:MakeMapTexture(frame)
 			notCheckable = true,
 			func = function()
 				local scrollFrame = MethodDungeonTools.main_frame.scrollFrame
-				local relativeFrame = UIParent --UIParent
+				local relativeFrame = UIParent
 				local mapPanelFrame = MethodDungeonTools.main_frame.mapPanelFrame
 				local mapScale = mapPanelFrame:GetScale()
 				local scrollH = scrollFrame:GetHorizontalScroll()
@@ -1718,7 +1709,6 @@ function MethodDungeonTools:MakeMapTexture(frame)
 					if guid:find("-") then
 						id = select(6, strsplit("-", guid))
 					else
-						-- hex GUID fallback for 3.3.0
 						id = tonumber(guid:sub(-12, -9), 16)
 					end
 				end
@@ -1726,24 +1716,10 @@ function MethodDungeonTools:MakeMapTexture(frame)
 					local encounterID
 					for i = 1, 10000 do
 						local id, name, description, displayInfo, iconImage = EJ_GetCreatureInfo(1, i)
-						--cordana fix, encouner name was "Cordana"
-
-						if name then
-							if string.find(name, "Galind") then
-								print(id, name)
-							end
-						end
-						if
-							name == UnitName("target") --[[or name == "Lord Kur'talos Ravencrest"]]
-						then
+						if name == UnitName("target") then
 							encounterID = i
 							break
 						end
-					end
-
-					--with ej open
-					if false then
-						local id, name, description, displayInfo, iconImage = EJ_GetCreatureInfo(1)
 					end
 
 					if encounterID then
@@ -1776,6 +1752,11 @@ function MethodDungeonTools:MakeMapTexture(frame)
 			func = nil,
 		})
 	end
+end
+
+function MethodDungeonTools:MakeMapTexture(frame)
+	local cursorX, cursorY
+	MethodDungeonTools:UpdateContextMenu(0, 0)
 
 	-- Scroll Frame
 	if frame.scrollFrame == nil then
@@ -1843,6 +1824,7 @@ function MethodDungeonTools:MakeMapTexture(frame)
 					MethodDungeonTools:ShowEnemyInfoFrame(clickedBlip)
 				else
 					cursorX, cursorY = GetCursorPosition()
+					MethodDungeonTools:UpdateContextMenu(cursorX, cursorY)
 					L_EasyMenu(MethodDungeonTools.contextMenuList, frame.contextDropdown, "cursor", 0, -15, "MENU", 5)
 					frame.contextDropdown:Show()
 				end
