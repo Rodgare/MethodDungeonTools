@@ -2134,12 +2134,18 @@ end
 function MethodDungeonTools:MakeDungeonBossButtons(frame)
 	if not dungeonBossButtons then
 		dungeonBossButtons = {}
-		for i = 1, 5 do
+		for i = 1, 10 do
 			dungeonBossButtons[i] = CreateFrame("Button", "MethodDungeonToolsBossButton" .. i, frame.mapPanelFrame)
-			dungeonBossButtons[i].bgImage = dungeonBossButtons[i]:CreateTexture(nil, "BACKGROUND")
-			dungeonBossButtons[i].bgImage:SetAllPoints()
+			dungeonBossButtons[i]:SetSize(18, 18) -- Base size for the icon
+			dungeonBossButtons[i]:SetFrameLevel(frame.mapPanelFrame:GetFrameLevel() + 20)
+			dungeonBossButtons[i]:RegisterForClicks("LeftButtonUp", "RightButtonUp")
+
+			-- The Skull Icon Layer
+			dungeonBossButtons[i].bgImage = dungeonBossButtons[i]:CreateTexture(nil, "ARTWORK")
+			dungeonBossButtons[i].bgImage:SetAllPoints(dungeonBossButtons[i])
+			dungeonBossButtons[i].bgImage:SetTexture("Interface\\TargetingFrame\\UI-TargetingFrame-Skull")
+
 			dungeonBossButtons[i]:SetScript("OnClick", nil)
-			dungeonBossButtons[i]:SetSize(25, 25)
 			dungeonBossButtons[i]:Hide()
 		end
 	end
@@ -2147,25 +2153,24 @@ end
 
 function MethodDungeonTools:UpdateDungeonBossButtons()
 	if dungeonBossButtons then
-		for i = 1, 5 do
+		for i = 1, #dungeonBossButtons do
 			dungeonBossButtons[i]:Hide()
-			if
-				MethodDungeonTools.dungeonBosses[db.currentDungeonIdx]
-				and MethodDungeonTools.dungeonBosses[db.currentDungeonIdx][db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]].value.currentSublevel]
-				and MethodDungeonTools.dungeonBosses[db.currentDungeonIdx][db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]].value.currentSublevel][i]
-			then
-				local data =
-					MethodDungeonTools.dungeonBosses[db.currentDungeonIdx][db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]].value.currentSublevel][i]
+			local bossData = MethodDungeonTools.dungeonBosses[db.currentDungeonIdx]
+			local subLevel =
+				db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]].value.currentSublevel
+			if bossData and bossData[subLevel] and bossData[subLevel][i] then
+				local data = bossData[subLevel][i]
 				dungeonBossButtons[i].tooltipTitle = data["name"]
 				local encounterID = data["encounterID"]
 
-				-- 3.3.5 workaround: Set a skull icon since EJ_GetCreatureInfo doesn't exist
-				dungeonBossButtons[i].bgImage:SetTexture("Interface\\TargetingFrame\\UI-TargetingFrame-Skull")
 				dungeonBossButtons[i]:Show()
-				dungeonBossButtons[i].bgImage:SetSize(16, 16)
-				dungeonBossButtons[i]:SetScript("OnClick", function()
+				dungeonBossButtons[i]:SetScript("OnClick", function(self, button)
 					if MouseIsOver(MethodDungeonToolsScrollFrame) then
-						MethodDungeonTools:DisplayEncounterInformation(encounterID)
+						if button == "RightButton" then
+							MethodDungeonTools:ShowEnemyInfoFrame(nil, i)
+						else
+							MethodDungeonTools:DisplayEncounterInformation(encounterID)
+						end
 					end
 				end)
 				dungeonBossButtons[i]:SetPoint(
@@ -4248,8 +4253,9 @@ SlashCmdList["MDTCLEAR"] = function()
 	print("|cFF00FF00[MDT Tracker]|r Все записи очищены.")
 end
 
-function MethodDungeonTools:ShowEnemyInfoFrame(blipIndex)
+function MethodDungeonTools:ShowEnemyInfoFrame(blipIndex, bossIndex)
 	if not self.EnemyInfoFrame then
+		-- ... existing frame creation code (I'll need to check the actual current content of the file at the end to see if it was reverted too)
 		local f = CreateFrame("Frame", "MDTEnemyInfoFrame", self.main_frame)
 		f:SetSize(600, 450)
 		f:SetPoint("CENTER", UIParent, "CENTER")
@@ -4347,24 +4353,30 @@ function MethodDungeonTools:ShowEnemyInfoFrame(blipIndex)
 	end
 
 	local f = self.EnemyInfoFrame
-	local enemyData = MethodDungeonTools.dungeonEnemies[db.currentDungeonIdx]
-	local blip = dungeonEnemyBlips[blipIndex]
-	local enemyIdx = blip and blip.enemyIdx
+	local data
+	if bossIndex then
+		local sublevel = db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]].value.currentSublevel
+		data = MethodDungeonTools.dungeonBosses[db.currentDungeonIdx][sublevel][bossIndex]
+	else
+		local enemyData = MethodDungeonTools.dungeonEnemies[db.currentDungeonIdx]
+		local blip = dungeonEnemyBlips[blipIndex]
+		local enemyIdx = blip and blip.enemyIdx
+		data = enemyIdx and enemyData and enemyData[enemyIdx]
+	end
 
-	if enemyIdx and enemyData and enemyData[enemyIdx] then
-		local data = enemyData[enemyIdx]
+	if data then
 		f.title:SetText(data.name or "Unknown")
 
 		-- Model
 		if data.displayId then
 			self:SetDisplayInfo(f.model, data.displayId, true)
 		else
-			self:SetDisplayInfo(f.model, data.id or enemyIdx, true)
+			self:SetDisplayInfo(f.model, data.id, true)
 		end
 
 		-- Stats
 		f.infoName:SetText(data.name or "Unknown")
-		f.infoId:SetText(tostring(data.id or enemyIdx))
+		f.infoId:SetText(tostring(data.id))
 		f.infoId:SetCursorPosition(0)
 
 		local hp = data.health or 0
