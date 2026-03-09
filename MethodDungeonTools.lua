@@ -934,7 +934,7 @@ function MethodDungeonTools:MakeSidePanel(frame)
 	end
 
 	if not db.presets[db.currentDungeonIdx][curPresetIdx + 1] then
-		db.presets[db.currentDungeonIdx][curPresetIdx + 1] = { text = "<New Preset>", value = 0 }
+		db.presets[db.currentDungeonIdx][curPresetIdx + 1] = { text = "<New Preset>", value = {} }
 	end
 
 	-- local breakLine = MethodDungeonTools:AceGUI_Create("Label")
@@ -3070,19 +3070,21 @@ function MethodDungeonTools:UpdateToDungeon(dungeonIdx, forceZone) --on open and
 	-- local zoneId = GetCurrentMapAreaID() -- 3.3.5 equivalent if needed
 	--local dungIdx = zoneIdToIdx[zoneId]
 	--if forceZone and dungIdx then db.currentDungeonIdx = dungIdx end TODO HERE
-	if not db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]].value.currentSublevel then
-		db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]].value.currentSublevel = 1
+	local currentPreset = db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]]
+	if not currentPreset.value or type(currentPreset.value) ~= "table" then
+		currentPreset.value = { currentSublevel = 1 }
+	end
+	if not currentPreset.value.currentSublevel then
+		currentPreset.value.currentSublevel = 1
 	end
 	frame.DungeonSelectDropdown:SetValue(dungeonList[db.currentDungeonIdx])
 	--populate 2nd dropdown with apropritate list of sublevels
 	frame.DungeonSublevelSelectDropdown:SetList(dungeonSubLevels[db.currentDungeonIdx])
 	frame.DungeonSublevelSelectDropdown:SetValue(
-		dungeonSubLevels[db.currentDungeonIdx][db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]].value.currentSublevel]
+		dungeonSubLevels[db.currentDungeonIdx][currentPreset.value.currentSublevel]
 	)
 	frame.sidePanel.DungeonPresetDropdown:SetList(db.presets[db.currentDungeonIdx])
-	frame.sidePanel.DungeonPresetDropdown:SetValue(
-		db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]].value
-	)
+	frame.sidePanel.DungeonPresetDropdown:SetValue(currentPreset.value)
 	MethodDungeonTools:UpdateMap()
 	MethodDungeonTools:ZoomMap(1, true)
 end
