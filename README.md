@@ -41,4 +41,4 @@
 
     В игре: ПМ Coda x3
 
-    [Discord](https://discordapp.com/users/123456789012345678)
+    * **Discord:** [Stratocaster](https://discordapp.com/users/123456789012345678)
