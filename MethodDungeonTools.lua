@@ -6,7 +6,30 @@ MethodDungeonTools.dungeonEnemies = {}
 MethodDungeonTools.dungeonBosses = {}
 MethodDungeonTools.dungeonTotalCount = {}
 MethodDungeonTools.dungeonMaps = {}
-MethodDungeonTools.dungeonSubLevels = {}
+MethodDungeonTools.dungeonList = {
+	{ text = "Ан'кахет: Старое Королевство", value = 1 },
+	{ text = "Драк'Тарон", value = 2 },
+	{ text = "Чертоги молний", value = 3 },
+	{ text = "Бастионы адского пламени", value = 4 },
+	{ text = "Гробницы маны", value = 5 },
+	{ text = "Кузня крови", value = 6 },
+	{ text = "Узилище", value = 7 },
+	{ text = "Крепость Утгард", value = 8 },
+}
+MethodDungeonTools.dungeonSubLevels = {
+	[1] = { { text = "1-й ярус", value = 1 } },
+	[2] = { { text = "1-й ярус", value = 1 }, { text = "2-й ярус", value = 2 } },
+	[3] = { { text = "1-й ярус", value = 1 }, { text = "2-й ярус", value = 2 } },
+	[4] = { { text = "1-й ярус", value = 1 } },
+	[5] = { { text = "1-й ярус", value = 1 } },
+	[6] = { { text = "1-й ярус", value = 1 } },
+	[7] = { { text = "1-й ярус", value = 1 } },
+	[8] = {
+		{ text = "1-й ярус", value = 1 },
+		{ text = "2-й ярус", value = 2 },
+		{ text = "3-й ярус", value = 3 },
+	},
+}
 
 local Dialog = LibStub("LibDialog-1.0")
 local dropDownLib, _ = LibStub("PhanxConfig-Dropdown")
@@ -554,48 +577,6 @@ local dungeonEnemyBlipMouseoverHighlight
 local dungeonEnemiesSelected = {}
 -- MethodDungeonTools.dungeonTotalCount = {} -- Initialized at the top now
 
-local dungeonList = {
-	[1] = "Ан'кахет: Старое Королевство",
-	[2] = "Крепость Драк'Тарон",
-	[3] = "Чертоги молний",
-	[4] = "Бастионы адского пламени",
-	[5] = "Гробницы маны",
-	[6] = "Кузня крови",
-	[7] = "Узилище",
-	[8] = "Крепость Утгард",
-}
-
-local dungeonSubLevels = {
-	[1] = {
-		[1] = "1-й ярус",
-	},
-	[2] = {
-		[1] = "1-й ярус",
-		[2] = "2-й ярус",
-	},
-	[3] = {
-		[1] = "1-й ярус",
-		[2] = "2-й ярус",
-	},
-	[4] = {
-		[1] = "1-й ярус",
-	},
-	[5] = {
-		[1] = "1-й ярус",
-	},
-	[6] = {
-		[1] = "1-й ярус",
-	},
-	[7] = {
-		[1] = "1-й ярус",
-	},
-	[8] = {
-		[1] = "1-й ярус",
-		[2] = "2-й ярус",
-		[3] = "3-й ярус",
-	},
-}
-
 -- MethodDungeonTools.dungeonMaps = { -- Initialized at the top now
 MethodDungeonTools.dungeonMaps = {
 	[1] = {
@@ -644,13 +625,17 @@ function MethodDungeonTools:ShowInterface()
 	else
 		self.main_frame:Show()
 		MethodDungeonTools:UpdateToDungeon(db.currentDungeonIdx)
-		self.main_frame.HelpButton:Show()
+		if self.main_frame.HelpButton then
+			self.main_frame.HelpButton:Show()
+		end
 	end
 end
 
 function MethodDungeonTools:HideInterface()
 	self.main_frame:Hide()
-	self.main_frame.HelpButton:Hide()
+	if self.main_frame.HelpButton then
+		self.main_frame.HelpButton:Hide()
+	end
 end
 
 function MethodDungeonTools:CreateMenu()
@@ -929,7 +914,7 @@ function MethodDungeonTools:MakeSidePanel(frame)
 	end
 
 	if not db.presets[db.currentDungeonIdx][curPresetIdx + 1] then
-		db.presets[db.currentDungeonIdx][curPresetIdx + 1] = { text = "<New Preset>", value = {} }
+		db.presets[db.currentDungeonIdx][curPresetIdx + 1] = { text = "<New Preset>", value = 0 }
 	end
 
 	-- local breakLine = MethodDungeonTools:AceGUI_Create("Label")
@@ -1825,7 +1810,19 @@ function MethodDungeonTools:MakeMapTexture(frame)
 				else
 					cursorX, cursorY = GetCursorPosition()
 					MethodDungeonTools:UpdateContextMenu(cursorX, cursorY)
-					L_EasyMenu(MethodDungeonTools.contextMenuList, frame.contextDropdown, "cursor", 0, -15, "MENU", 5)
+					if L_EasyMenu then
+						L_EasyMenu(
+							MethodDungeonTools.contextMenuList,
+							frame.contextDropdown,
+							"cursor",
+							0,
+							-15,
+							"MENU",
+							5
+						)
+					elseif EasyMenu then
+						EasyMenu(MethodDungeonTools.contextMenuList, frame.contextDropdown, "cursor", 0, -15, "MENU", 5)
+					end
 					frame.contextDropdown:Show()
 				end
 			end
@@ -2865,14 +2862,22 @@ function MethodDungeonTools:UpdateSidePanelCheckBoxes()
 end
 
 function MethodDungeonTools:CreateDungeonPresetDropdown(frame)
-	frame.DungeonPresetDropdown = dropDownLib:New(frame, nil, "Select Preset", db.presets[db.currentDungeonIdx], false)
-	frame.DungeonPresetDropdown:SetPoint("TOPLEFT", frame, "TOPLEFT", 5, 17)
-	frame.DungeonPresetDropdown:SetFrameStrata(mainFrameStrata)
-	frame.DungeonPresetDropdown:SetFrameLevel(5)
-	function frame.DungeonPresetDropdown:OnValueChanged(value, text)
-		for presetIdx, preset in pairs(db.presets[db.currentDungeonIdx]) do
-			if preset.value == value then
-				if value == 0 then
+	-- Dungeon Preset Dropdown using LibUIDropDownMenu
+	local presetDD = CreateFrame("Frame", "MDTDungeonPresetDropdown", frame, "L_UIDropDownMenuTemplate")
+	presetDD:SetPoint("TOPLEFT", frame, "TOPLEFT", -12, -5)
+	presetDD:SetFrameStrata("HIGH")
+	presetDD:SetFrameLevel(20)
+	frame.DungeonPresetDropdown = presetDD
+
+	L_UIDropDownMenu_Initialize(presetDD, function(self, level)
+		local presets = db.presets[db.currentDungeonIdx] or {}
+		for presetIdx, preset in ipairs(presets) do
+			local info = L_UIDropDownMenu_CreateInfo()
+			info.text = preset.text
+			info.value = presetIdx
+			info.checked = (presetIdx == db.currentPreset[db.currentDungeonIdx])
+			info.func = function()
+				if preset.value == 0 then
 					MethodDungeonTools:OpenNewPresetDialog()
 					MethodDungeonTools.main_frame.sidePanelDeleteButton:SetDisabled(true)
 				else
@@ -2884,83 +2889,132 @@ function MethodDungeonTools:CreateDungeonPresetDropdown(frame)
 					db.currentPreset[db.currentDungeonIdx] = presetIdx
 					MethodDungeonTools:UpdateMap()
 				end
+				L_UIDropDownMenu_SetSelectedValue(MethodDungeonTools.main_frame.DungeonPresetDropdown, presetIdx)
 			end
+			L_UIDropDownMenu_AddButton(info, level)
 		end
-	end
+	end)
+	L_UIDropDownMenu_SetWidth(presetDD, 130)
 end
 
 function MethodDungeonTools:CreateDungeonSelectDropdown(frame)
-	--sublevel select
-	frame.DungeonSublevelSelectDropdown = dropDownLib:New(frame, nil, "Select Sublevel", subLevelTable, false)
-	frame.DungeonSublevelSelectDropdown:SetPoint("TOPLEFT", frame.topPanel, "TOPLEFT", 0, -35)
-	frame.DungeonSublevelSelectDropdown:SetFrameStrata(mainFrameStrata)
-	frame.DungeonSublevelSelectDropdown:SetFrameLevel(5)
-	function frame.DungeonSublevelSelectDropdown:OnValueChanged(value, text)
-		for k, v in pairs(dungeonSubLevels[db.currentDungeonIdx]) do
-			if v == text then
-				db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]].value.currentSublevel = k
+	-- Sublevel Dropdown using LibUIDropDownMenu
+	local sublevelDD = CreateFrame("Frame", "MDTDungeonSublevelDropdown", frame, "L_UIDropDownMenuTemplate")
+	sublevelDD:SetPoint("TOPLEFT", frame.topPanel, "TOPLEFT", -15, -54)
+	sublevelDD:SetFrameStrata("HIGH")
+	sublevelDD:SetFrameLevel(20)
+	frame.DungeonSublevelSelectDropdown = sublevelDD
+
+	L_UIDropDownMenu_Initialize(sublevelDD, function(self, level)
+		local sublevels = MethodDungeonTools.dungeonSubLevels[db.currentDungeonIdx] or {}
+		for _, entry in ipairs(sublevels) do
+			local info = L_UIDropDownMenu_CreateInfo()
+			info.text = entry.text
+			info.value = entry.value
+			local currentSublevel = db.presets[db.currentDungeonIdx]
+				and db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]]
+				and db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]].value.currentSublevel
+			info.checked = (entry.value == (currentSublevel or 1))
+			info.func = function()
+				db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]].value.currentSublevel =
+					entry.value
+				L_UIDropDownMenu_SetText(MethodDungeonTools.main_frame.DungeonSublevelSelectDropdown, entry.text)
 				MethodDungeonTools:UpdateMap()
 				MethodDungeonTools:ZoomMap(1, true)
-				return
 			end
+			L_UIDropDownMenu_AddButton(info, level)
 		end
-	end
+	end)
+	L_UIDropDownMenu_SetWidth(sublevelDD, 130)
+	-- Default text: first sublevel name
+	local firstSublevel = MethodDungeonTools.dungeonSubLevels[db.currentDungeonIdx or 1]
+	L_UIDropDownMenu_SetText(
+		sublevelDD,
+		firstSublevel and firstSublevel[1] and firstSublevel[1].text or "1-й ярус"
+	)
 
-	--dungeon select
-	frame.DungeonSelectDropdown = dropDownLib:New(frame, nil, "Select Dungeon", dungeonList, false)
-	frame.DungeonSelectDropdown:SetPoint("TOPLEFT", frame.topPanel, "TOPLEFT", 0, -10)
-	frame.DungeonSelectDropdown:SetFrameStrata(mainFrameStrata)
-	frame.DungeonSelectDropdown:SetFrameLevel(5)
-	function frame.DungeonSelectDropdown:OnValueChanged(value, text)
-		for k, v in pairs(dungeonList) do
-			if v == text then
-				MethodDungeonTools:UpdateToDungeon(k)
-				return
+	-- Dungeon Select Dropdown using LibUIDropDownMenu
+	local dungeonDD = CreateFrame("Frame", "MDTDungeonSelectDropdown", frame, "L_UIDropDownMenuTemplate")
+	dungeonDD:SetPoint("TOPLEFT", frame.topPanel, "TOPLEFT", -15, -28)
+	dungeonDD:SetFrameStrata("HIGH")
+	dungeonDD:SetFrameLevel(20)
+	frame.DungeonSelectDropdown = dungeonDD
+
+	L_UIDropDownMenu_Initialize(dungeonDD, function(self, level)
+		for _, entry in ipairs(MethodDungeonTools.dungeonList) do
+			local info = L_UIDropDownMenu_CreateInfo()
+			info.text = entry.text
+			info.value = entry.value
+			info.checked = (entry.value == db.currentDungeonIdx)
+			info.func = function()
+				MethodDungeonTools:UpdateToDungeon(entry.value)
+				L_UIDropDownMenu_SetText(MethodDungeonTools.main_frame.DungeonSelectDropdown, entry.text)
 			end
+			L_UIDropDownMenu_AddButton(info, level)
 		end
-	end
+	end)
+	L_UIDropDownMenu_SetWidth(dungeonDD, 130)
+	-- Default text: dungeon name matching current index
+	local currentDungeonEntry = MethodDungeonTools.dungeonList[db.currentDungeonIdx or 1]
+	L_UIDropDownMenu_SetText(
+		dungeonDD,
+		currentDungeonEntry and currentDungeonEntry.text or MethodDungeonTools.dungeonList[1].text
+	)
 end
 
----EnsureDBTables
----Makes sure profiles are valid and have their fields set
 function MethodDungeonTools:EnsureDBTables()
+	db.currentDungeonIdx = db.currentDungeonIdx or 1
+	if not MethodDungeonTools.dungeonList[db.currentDungeonIdx] then
+		db.currentDungeonIdx = 1
+	end
+
 	db.currentPreset[db.currentDungeonIdx] = db.currentPreset[db.currentDungeonIdx] or 1
-	db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]].value.currentAffix = db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]].value.currentAffix
-		or "fortified"
+	if not db.presets[db.currentDungeonIdx] then
+		db.presets[db.currentDungeonIdx] = { { text = "Default", value = { currentSublevel = 1, pulls = {} } } }
+	end
+	if not db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]] then
+		db.currentPreset[db.currentDungeonIdx] = 1
+	end
 
-	db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]].value.currentDungeonIdx =
-		db.currentDungeonIdx
+	local currentPreset = db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]]
+	if not currentPreset.value or type(currentPreset.value) ~= "table" then
+		currentPreset.value = { currentSublevel = 1, pulls = {} }
+	end
 
-	db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]].value.teeming = db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]].value.teeming
-		or false
-	db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]].value.currentSublevel = db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]].value.currentSublevel
-		or 1
-
-	db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]].value.currentPull = db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]].value.currentPull
-		or 1
-	db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]].value.pulls = db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]].value.pulls
+	currentPreset.value.currentAffix = currentPreset.value.currentAffix or "fortified"
+	currentPreset.value.currentDungeonIdx = db.currentDungeonIdx
+	currentPreset.value.teeming = currentPreset.value.teeming or false
+	currentPreset.value.currentSublevel = currentPreset.value.currentSublevel or 1
+	currentPreset.value.currentPull = currentPreset.value.currentPull or 1
+	currentPreset.value.pulls = currentPreset.value.pulls or {}
+	currentPreset.value.pulls[currentPreset.value.currentPull] = currentPreset.value.pulls[currentPreset.value.currentPull]
 		or {}
-	db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]].value.pulls[db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]].value.currentPull] = db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]].value.pulls[db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]].value.currentPull]
-		or {}
 
-	for k, v in pairs(db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]].value.pulls) do
+	for k, v in pairs(currentPreset.value.pulls) do
 		if k == 0 then
-			db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]].value.pulls[0] = nil
+			currentPreset.value.pulls[0] = nil
 			break
 		end
 	end
 end
 
 function MethodDungeonTools:UpdateMap(ignoreSetSelection, ignoreReloadPullButtons)
+	MethodDungeonTools:EnsureDBTables()
 	local mapPanelFrame = self.main_frame.mapPanelFrame
 	local mapName
 	local frame = MethodDungeonTools.main_frame
 	mapName = MethodDungeonTools.dungeonMaps[db.currentDungeonIdx]
 		and MethodDungeonTools.dungeonMaps[db.currentDungeonIdx][0]
-	MethodDungeonTools:EnsureDBTables()
+	if not mapName then
+		return
+	end
+
 	local sublevel = db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]].value.currentSublevel
 	local fileName = MethodDungeonTools.dungeonMaps[db.currentDungeonIdx]
 		and MethodDungeonTools.dungeonMaps[db.currentDungeonIdx][sublevel]
+	if not fileName then
+		return
+	end
 	if not fileName or not mapName then
 		print(
 			"MDT Debug: Missing map data for dungeon "
@@ -3033,50 +3087,89 @@ function MethodDungeonTools:UpdateMap(ignoreSetSelection, ignoreReloadPullButton
 			db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]].value.currentPull
 		)
 	end
-	--update Sublevel select dropdown
-	frame.DungeonSublevelSelectDropdown:SetValue(
-		dungeonSubLevels[db.currentDungeonIdx][db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]].value.currentSublevel]
-	)
+	--update Sublevel select dropdown text and Dungeon dropdown text
+	if
+		MethodDungeonTools.dungeonSubLevels[db.currentDungeonIdx]
+		and db.presets[db.currentDungeonIdx]
+		and db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]]
+	then
+		L_UIDropDownMenu_Refresh(frame.DungeonSublevelSelectDropdown)
+		-- Sync visible text to current sublevel name
+		local currentSublevel = db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]].value.currentSublevel
+			or 1
+		local sublevels = MethodDungeonTools.dungeonSubLevels[db.currentDungeonIdx]
+		for _, entry in ipairs(sublevels) do
+			if entry.value == currentSublevel then
+				L_UIDropDownMenu_SetText(frame.DungeonSublevelSelectDropdown, entry.text)
+				break
+			end
+		end
+	end
+	-- Sync visible text to current dungeon name
+	if frame.DungeonSelectDropdown then
+		local dungeonEntry = MethodDungeonTools.dungeonList[db.currentDungeonIdx]
+		if dungeonEntry then
+			L_UIDropDownMenu_SetText(frame.DungeonSelectDropdown, dungeonEntry.text)
+		end
+	end
+	-- Sync visible text to current preset name
+	if frame.sidePanel and frame.sidePanel.DungeonPresetDropdown then
+		local currentPresetIdx = db.currentPreset[db.currentDungeonIdx]
+		local presetEntry = db.presets[db.currentDungeonIdx] and db.presets[db.currentDungeonIdx][currentPresetIdx]
+		if presetEntry then
+			L_UIDropDownMenu_SetText(frame.sidePanel.DungeonPresetDropdown, presetEntry.text)
+		end
+	end
 end
 
 ---UpdateToDungeon
 ---Updates the map to the specified dungeon
-function MethodDungeonTools:UpdateToDungeon(dungeonIdx, forceZone) --on open and dungeon change from dropdown TODO: decide if needed
+function MethodDungeonTools:UpdateToDungeon(dungeonIdx, forceZone)
 	local frame = MethodDungeonTools.main_frame
 	db.currentDungeonIdx = dungeonIdx
-	--populate 2nd dropdown with apropritate list of sublevels
-	frame.DungeonSublevelSelectDropdown:SetList(dungeonSubLevels[db.currentDungeonIdx])
-	frame.DungeonSublevelSelectDropdown:SetValue(dungeonSubLevels[db.currentDungeonIdx][1])
 
-	-- local zoneId = HBD:GetPlayerZone()
-	-- local zoneId = GetCurrentMapAreaID() -- 3.3.5 equivalent if needed
-	--local dungIdx = zoneIdToIdx[zoneId]
-	--if forceZone and dungIdx then db.currentDungeonIdx = dungIdx end TODO HERE
+	if not db.presets[db.currentDungeonIdx] then
+		db.presets[db.currentDungeonIdx] = { { text = "Default", value = { currentSublevel = 1, pulls = {} } } }
+	end
+	if not db.currentPreset[db.currentDungeonIdx] then
+		db.currentPreset[db.currentDungeonIdx] = 1
+	end
+
 	local currentPreset = db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]]
-	if not currentPreset.value or type(currentPreset.value) ~= "table" then
-		currentPreset.value = { currentSublevel = 1 }
+	if not currentPreset or not currentPreset.value or type(currentPreset.value) ~= "table" then
+		db.presets[db.currentDungeonIdx][1] = { text = "Default", value = { currentSublevel = 1, pulls = {} } }
+		db.currentPreset[db.currentDungeonIdx] = 1
+		currentPreset = db.presets[db.currentDungeonIdx][1]
 	end
 	if not currentPreset.value.currentSublevel then
 		currentPreset.value.currentSublevel = 1
 	end
-	frame.DungeonSelectDropdown:SetValue(dungeonList[db.currentDungeonIdx])
-	--populate 2nd dropdown with apropritate list of sublevels
-	frame.DungeonSublevelSelectDropdown:SetList(dungeonSubLevels[db.currentDungeonIdx])
-	frame.DungeonSublevelSelectDropdown:SetValue(
-		dungeonSubLevels[db.currentDungeonIdx][currentPreset.value.currentSublevel]
-	)
-	frame.sidePanel.DungeonPresetDropdown:SetList(db.presets[db.currentDungeonIdx])
-	frame.sidePanel.DungeonPresetDropdown:SetValue(currentPreset.value)
+
+	-- Refresh all dropdowns via LibUIDropDownMenu
+	if frame.DungeonSelectDropdown then
+		L_UIDropDownMenu_Refresh(frame.DungeonSelectDropdown)
+	end
+	if frame.DungeonSublevelSelectDropdown then
+		L_UIDropDownMenu_Refresh(frame.DungeonSublevelSelectDropdown)
+	end
+	if frame.sidePanel and frame.sidePanel.DungeonPresetDropdown then
+		L_UIDropDownMenu_Refresh(frame.sidePanel.DungeonPresetDropdown)
+	end
+
 	MethodDungeonTools:UpdateMap()
 	MethodDungeonTools:ZoomMap(1, true)
 end
 
 function MethodDungeonTools:DeletePreset(index)
 	tremove(db.presets[db.currentDungeonIdx], index)
-	db.currentPreset[db.currentDungeonIdx] = index - 1
-	MethodDungeonTools.main_frame.sidePanel.DungeonPresetDropdown:SetValue(
-		db.presets[db.currentDungeonIdx][index - 1].value
-	)
+	db.currentPreset[db.currentDungeonIdx] = math.max(1, index - 1)
+	if
+		MethodDungeonTools.main_frame
+		and MethodDungeonTools.main_frame.sidePanel
+		and MethodDungeonTools.main_frame.sidePanel.DungeonPresetDropdown
+	then
+		L_UIDropDownMenu_Refresh(MethodDungeonTools.main_frame.sidePanel.DungeonPresetDropdown)
+	end
 	MethodDungeonTools:UpdateMap()
 end
 
@@ -3426,8 +3519,8 @@ function MethodDungeonTools:SetMapSublevel(pull)
 
 	--update dropdown
 	local frame = MethodDungeonTools.main_frame
-	frame.DungeonSublevelSelectDropdown:SetValue(
-		dungeonSubLevels[db.currentDungeonIdx][db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]].value.currentSublevel]
+	self.main_frame.DungeonSublevelSelectDropdown:SetValue(
+		db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]].value.currentSublevel
 	)
 	if shouldResetZoom then
 		MethodDungeonTools:ZoomMap(1, true)
@@ -3849,73 +3942,73 @@ end
 
 ---CreateTutorialButton
 ---Creates the tutorial button and sets up the help plate frames
-function MethodDungeonTools:CreateTutorialButton(parent)
-	local button = CreateFrame("Button", parent, parent, "MainHelpPlateButton")
-	button:SetPoint("TOPLEFT", parent, "TOPLEFT", 0, 48)
-	button:SetScale(0.8)
-	button:SetFrameStrata(mainFrameStrata)
-	button:SetFrameLevel(6)
-	button:Hide()
+-- function MethodDungeonTools:CreateTutorialButton(parent)
+-- 	local button = CreateFrame("Button", parent, parent, "MainHelpPlateButton")
+-- 	button:SetPoint("TOPLEFT", parent, "TOPLEFT", 0, 48)
+-- 	button:SetScale(0.8)
+-- 	button:SetFrameStrata(mainFrameStrata)
+-- 	button:SetFrameLevel(6)
+-- 	button:Hide()
 
-	--dirty hook to make button hide
-	local originalHide = parent.Hide
-	function parent:Hide(...)
-		button:Hide()
-		return originalHide(self, ...)
-	end
+-- 	--dirty hook to make button hide
+-- 	local originalHide = parent.Hide
+-- 	function parent:Hide(...)
+-- 		button:Hide()
+-- 		return originalHide(self, ...)
+-- 	end
 
-	local helpPlate = {
-		FramePos = { x = 0, y = 0 },
-		FrameSize = { width = sizex, height = sizey },
-		[1] = {
-			ButtonPos = { x = 190, y = 0 },
-			HighLightBox = { x = 0, y = 0, width = 197, height = 56 },
-			ToolTipDir = "RIGHT",
-			ToolTipText = "Select a dungeon",
-		},
-		[2] = {
-			ButtonPos = { x = 190, y = -210 },
-			HighLightBox = { x = 0, y = -58, width = sizex - 6, height = sizey - 58 },
-			ToolTipDir = "RIGHT",
-			ToolTipText = "Select enemies for your pulls\nCTRL+Click to single select enemies",
-		},
-		[3] = {
-			ButtonPos = { x = 828, y = 0 },
-			HighLightBox = { x = 838, y = 30, width = 251, height = 87 },
-			ToolTipDir = "LEFT",
-			ToolTipText = "Manage presets",
-		},
-		[4] = {
-			ButtonPos = { x = 828, y = -87 },
-			HighLightBox = { x = 838, y = 30 - 87, width = 251, height = 83 },
-			ToolTipDir = "LEFT",
-			ToolTipText = "Customize dungeon Options",
-		},
-		[5] = {
-			ButtonPos = { x = 828, y = -(87 + 83) },
-			HighLightBox = { x = 838, y = 30 - (87 + 83), width = 251, height = 415 },
-			ToolTipDir = "LEFT",
-			ToolTipText = "Create and manage your pulls\nRight click for more options",
-		},
-	}
+-- 	local helpPlate = {
+-- 		FramePos = { x = 0, y = 0 },
+-- 		FrameSize = { width = sizex, height = sizey },
+-- 		[1] = {
+-- 			ButtonPos = { x = 190, y = 0 },
+-- 			HighLightBox = { x = 0, y = 0, width = 197, height = 56 },
+-- 			ToolTipDir = "RIGHT",
+-- 			ToolTipText = "Select a dungeon",
+-- 		},
+-- 		[2] = {
+-- 			ButtonPos = { x = 190, y = -210 },
+-- 			HighLightBox = { x = 0, y = -58, width = sizex - 6, height = sizey - 58 },
+-- 			ToolTipDir = "RIGHT",
+-- 			ToolTipText = "Select enemies for your pulls\nCTRL+Click to single select enemies",
+-- 		},
+-- 		[3] = {
+-- 			ButtonPos = { x = 828, y = 0 },
+-- 			HighLightBox = { x = 838, y = 30, width = 251, height = 87 },
+-- 			ToolTipDir = "LEFT",
+-- 			ToolTipText = "Manage presets",
+-- 		},
+-- 		[4] = {
+-- 			ButtonPos = { x = 828, y = -87 },
+-- 			HighLightBox = { x = 838, y = 30 - 87, width = 251, height = 83 },
+-- 			ToolTipDir = "LEFT",
+-- 			ToolTipText = "Customize dungeon Options",
+-- 		},
+-- 		[5] = {
+-- 			ButtonPos = { x = 828, y = -(87 + 83) },
+-- 			HighLightBox = { x = 838, y = 30 - (87 + 83), width = 251, height = 415 },
+-- 			ToolTipDir = "LEFT",
+-- 			ToolTipText = "Create and manage your pulls\nRight click for more options",
+-- 		},
+-- 	}
 
-	local function TutorialButtonOnClick(self)
-		if not HelpPlate_IsShowing(helpPlate) then
-			HelpPlate_Show(helpPlate, MethodDungeonTools.main_frame, self)
-		else
-			HelpPlate_Hide(true)
-		end
-	end
+-- 	local function TutorialButtonOnClick(self)
+-- 		if not HelpPlate_IsShowing(helpPlate) then
+-- 			HelpPlate_Show(helpPlate, MethodDungeonTools.main_frame, self)
+-- 		else
+-- 			HelpPlate_Hide(true)
+-- 		end
+-- 	end
 
-	local function TutorialButtonOnHide(self)
-		HelpPlate_Hide(true)
-	end
+-- 	local function TutorialButtonOnHide(self)
+-- 		HelpPlate_Hide(true)
+-- 	end
 
-	parent.HelpButton = button
+-- 	parent.HelpButton = button
 
-	button:SetScript("OnClick", TutorialButtonOnClick)
-	button:SetScript("OnHide", TutorialButtonOnHide)
-end
+-- 	button:SetScript("OnClick", TutorialButtonOnClick)
+-- 	button:SetScript("OnHide", TutorialButtonOnHide)
+-- end
 
 ---RegisterOptions
 ---Register the options of the addon to the blizzard options
@@ -3986,7 +4079,7 @@ function initFrames()
 	MethodDungeonTools:MakeDeleteConfirmationFrame(main_frame)
 	MethodDungeonTools:MakeClearConfirmationFrame(main_frame)
 
-	MethodDungeonTools:CreateTutorialButton(main_frame)
+	-- MethodDungeonTools:CreateTutorialButton(main_frame)
 
 	--tooltip
 	do
