@@ -125,6 +125,8 @@ local buttonTextFontSize = 12
 local methodColor = "|cFFF49D38"
 
 local db
+local MDT_SHARE_PREFIX = "MDTSHARE"
+local MDT_SHARE_MAX_CHUNK = 220
 local icon = LibStub("LibDBIcon-1.0")
 local LDB = LibStub("LibDataBroker-1.1"):NewDataObject("MethodDungeonTools", {
 	type = "data source",
@@ -179,6 +181,214 @@ function SlashCmdList.METHODDUNGEONTOOLS(cmd, editbox)
 		MethodDungeonTools:ShowInterface()
 	end
 end
+
+MethodDungeonTools.pendingSharedPresets = MethodDungeonTools.pendingSharedPresets or {}
+MethodDungeonTools.incomingSharedPresets = MethodDungeonTools.incomingSharedPresets or {}
+MethodDungeonTools.currentShareRequest = nil
+
+function MethodDungeonTools:GetCurrentPresetExportString()
+	return MethodDungeonTools:TableToString(
+		db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]],
+		true
+	)
+end
+
+function MethodDungeonTools:GetShareChannel()
+	if IsInRaid and IsInRaid() then
+		return "RAID"
+	end
+	if IsInGroup and IsInGroup() then
+		return "PARTY"
+	end
+	if GetNumPartyMembers and GetNumPartyMembers() > 0 then
+		return "PARTY"
+	end
+	if GetRealNumRaidMembers and GetRealNumRaidMembers() > 0 then
+		return "RAID"
+	end
+	if IsInGuild and IsInGuild() then
+		return "GUILD"
+	end
+	return nil
+end
+
+function MethodDungeonTools:SendAddonComm(prefix, payload, channel, target)
+	if C_ChatInfo and C_ChatInfo.SendAddonMessage then
+		return C_ChatInfo.SendAddonMessage(prefix, payload, channel, target)
+	elseif SendAddonMessage then
+		return SendAddonMessage(prefix, payload, channel, target)
+	end
+	return false
+end
+
+function MethodDungeonTools:RegisterShareComm()
+	if self.shareCommFrame then
+		return
+	end
+
+	if RegisterAddonMessagePrefix then
+		pcall(RegisterAddonMessagePrefix, MDT_SHARE_PREFIX)
+	end
+
+	self.shareCommFrame = CreateFrame("Frame")
+	self.shareCommFrame:RegisterEvent("CHAT_MSG_ADDON")
+	self.shareCommFrame:SetScript("OnEvent", function(_, event, prefix, message, channel, sender)
+		if event == "CHAT_MSG_ADDON" then
+			MethodDungeonTools:HandleShareComm(prefix, message, channel, sender)
+		end
+	end)
+end
+
+function MethodDungeonTools:GenerateShareId()
+	return tostring(time()) .. tostring(math.random(1000, 9999))
+end
+
+function MethodDungeonTools:OpenReceivedPresetDialog(sender, importString)
+	self.currentShareRequest = {
+		sender = sender,
+		importString = importString,
+	}
+
+	local popupText =
+		string.format("Игрок %s поделился маршрутом", sender or "неизвестно")
+	if StaticPopup_Show then
+		StaticPopup_Show("METHOD_DUNGEON_TOOLS_IMPORT_SHARE", popupText)
+		return
+	end
+
+	print("|cFF00FF00[MDT]|r " .. popupText)
+	print("|cFF00FF00[MDT]|r Открой MDT и импортируй строку вручную.")
+end
+
+function MethodDungeonTools:AcceptSharedPreset()
+	local request = self.currentShareRequest
+	if not request or not request.importString then
+		print("|cFFFF0000[MDT]|r Нет маршрута для импорта.")
+		return
+	end
+
+	local newPreset = MethodDungeonTools:StringToTable(request.importString, true)
+	if MethodDungeonTools:ValidateImportPreset(newPreset) then
+		MethodDungeonTools:ImportPreset(newPreset)
+		print(
+			"|cFF00FF00[MDT]|r Маршрут от "
+				.. (request.sender or "неизвестно")
+				.. " импортирован."
+		)
+	else
+		print(
+			"|cFFFF0000[MDT]|r Получен некорректный маршрут от "
+				.. (request.sender or "неизвестно")
+				.. "."
+		)
+	end
+	self.currentShareRequest = nil
+end
+
+function MethodDungeonTools:DeclineSharedPreset()
+	if self.currentShareRequest and self.currentShareRequest.sender then
+		print("|cFFFFFF00[MDT]|r Маршрут от " .. self.currentShareRequest.sender .. " отклонён.")
+	end
+	self.currentShareRequest = nil
+end
+
+function MethodDungeonTools:HandleShareComm(prefix, message, channel, sender)
+	if prefix ~= MDT_SHARE_PREFIX or not message or sender == UnitName("player") then
+		return
+	end
+
+	local cmd, shareId, arg1, arg2 = strsplit("|", message)
+	if not cmd or not shareId then
+		return
+	end
+
+	if cmd == "START" then
+		local totalChunks = tonumber(arg2) or 0
+		self.incomingSharedPresets[shareId] = {
+			sender = arg1 or sender,
+			totalChunks = totalChunks,
+			chunks = {},
+		}
+	elseif cmd == "DATA" then
+		local data = self.incomingSharedPresets[shareId]
+		if not data then
+			return
+		end
+		local chunkIndex = tonumber(arg1)
+		local chunkData = arg2 or ""
+		if chunkIndex then
+			data.chunks[chunkIndex] = chunkData
+		end
+	elseif cmd == "END" then
+		local data = self.incomingSharedPresets[shareId]
+		if not data then
+			return
+		end
+		local parts = {}
+		for i = 1, data.totalChunks do
+			if not data.chunks[i] then
+				print(
+					"|cFFFF0000[MDT]|r Не удалось получить все части маршрута от "
+						.. (data.sender or sender)
+						.. "."
+				)
+				self.incomingSharedPresets[shareId] = nil
+				return
+			end
+			parts[#parts + 1] = data.chunks[i]
+		end
+		local importString = table.concat(parts, "")
+		self.incomingSharedPresets[shareId] = nil
+		self:OpenReceivedPresetDialog(data.sender or sender, importString)
+	end
+end
+
+function MethodDungeonTools:ShareCurrentPreset()
+	local channel = self:GetShareChannel()
+	if not channel then
+		print(
+			"|cFFFFFF00[MDT]|r Для отправки маршрута нужно быть в группе, рейде или гильдии."
+		)
+		return
+	end
+
+	local export = self:GetCurrentPresetExportString()
+	if not export or export == "" then
+		print("|cFFFF0000[MDT]|r Не удалось подготовить маршрут к отправке.")
+		return
+	end
+
+	local shareId = self:GenerateShareId()
+	local senderName = UnitName("player") or "Unknown"
+	local totalChunks = math.ceil(string.len(export) / MDT_SHARE_MAX_CHUNK)
+
+	self:SendAddonComm(MDT_SHARE_PREFIX, "START|" .. shareId .. "|" .. senderName .. "|" .. totalChunks, channel)
+	for i = 1, totalChunks do
+		local startPos = ((i - 1) * MDT_SHARE_MAX_CHUNK) + 1
+		local chunk = string.sub(export, startPos, startPos + MDT_SHARE_MAX_CHUNK - 1)
+		self:SendAddonComm(MDT_SHARE_PREFIX, "DATA|" .. shareId .. "|" .. i .. "|" .. chunk, channel)
+	end
+	self:SendAddonComm(MDT_SHARE_PREFIX, "END|" .. shareId, channel)
+
+	print("|cFF00FF00[MDT]|r Маршрут отправлен в канал: " .. channel)
+end
+
+StaticPopupDialogs = StaticPopupDialogs or {}
+StaticPopupDialogs["METHOD_DUNGEON_TOOLS_IMPORT_SHARE"] = {
+	text = "%s",
+	button1 = "Принять",
+	button2 = "Отклонить",
+	OnAccept = function()
+		MethodDungeonTools:AcceptSharedPreset()
+	end,
+	OnCancel = function()
+		MethodDungeonTools:DeclineSharedPreset()
+	end,
+	timeout = 0,
+	whileDead = 1,
+	hideOnEscape = 1,
+	preferredIndex = 3,
+}
 
 local initFrames
 -------------------------
@@ -307,6 +517,7 @@ do
 			if not db.minimap.hide then
 				icon:Show("MethodDungeonTools")
 			end
+			MethodDungeonTools:RegisterShareComm()
 			Dialog:Register("MethodDungeonToolsPosCopyDialog", {
 				text = "Pos Copy",
 				width = 500,
@@ -616,7 +827,7 @@ function MethodDungeonTools:MakeSidePanel(frame)
 	end)
 
 	frame.sidePanelRenameButton = MethodDungeonTools:AceGUI_Create("Button")
-	frame.sidePanelRenameButton:SetWidth(buttonWidth)
+	frame.sidePanelRenameButton:SetWidth(130)
 	frame.sidePanelRenameButton:SetText("Переименовать")
 	frame.sidePanelRenameButton.frame:SetNormalFontObject(fontInstance)
 	frame.sidePanelRenameButton.frame:SetHighlightFontObject(fontInstance)
@@ -649,16 +860,23 @@ function MethodDungeonTools:MakeSidePanel(frame)
 	frame.sidePanelExportButton.frame:SetHighlightFontObject(fontInstance)
 	frame.sidePanelExportButton.frame:SetDisabledFontObject(fontInstance)
 	frame.sidePanelExportButton:SetCallback("OnClick", function(widget, callbackName, value)
-		local export = MethodDungeonTools:TableToString(
-			db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]],
-			true
-		)
+		local export = MethodDungeonTools:GetCurrentPresetExportString()
 		MethodDungeonTools:HideAllDialogs()
 		MethodDungeonTools.main_frame.ExportFrame:Show()
 		MethodDungeonTools.main_frame.ExportFrame:SetPoint("CENTER", MethodDungeonTools.main_frame, "CENTER", 0, 50)
 		MethodDungeonTools.main_frame.ExportFrameEditbox:SetText(export)
 		MethodDungeonTools.main_frame.ExportFrameEditbox:HighlightText(0, string.len(export))
 		MethodDungeonTools.main_frame.ExportFrameEditbox:SetFocus()
+	end)
+
+	frame.sidePanelShareButton = MethodDungeonTools:AceGUI_Create("Button")
+	frame.sidePanelShareButton:SetText("Поделиться")
+	frame.sidePanelShareButton:SetWidth(110)
+	frame.sidePanelShareButton.frame:SetNormalFontObject(fontInstance)
+	frame.sidePanelShareButton.frame:SetHighlightFontObject(fontInstance)
+	frame.sidePanelShareButton.frame:SetDisabledFontObject(fontInstance)
+	frame.sidePanelShareButton:SetCallback("OnClick", function(widget, callbackName, value)
+		MethodDungeonTools:ShareCurrentPreset()
 	end)
 
 	frame.sidePanelDeleteButton = MethodDungeonTools:AceGUI_Create("Button")
@@ -692,6 +910,7 @@ function MethodDungeonTools:MakeSidePanel(frame)
 	frame.sidePanel.WidgetGroup:AddChild(frame.sidePanelNewButton)
 	frame.sidePanel.WidgetGroup:AddChild(frame.sidePanelImportButton)
 	frame.sidePanel.WidgetGroup:AddChild(frame.sidePanelExportButton)
+	frame.sidePanel.WidgetGroup:AddChild(frame.sidePanelShareButton)
 	frame.sidePanel.WidgetGroup:AddChild(frame.sidePanelRenameButton)
 	frame.sidePanel.WidgetGroup:AddChild(frame.sidePanelClearButton)
 	frame.sidePanel.WidgetGroup:AddChild(frame.sidePanelDeleteButton)
@@ -717,6 +936,11 @@ function MethodDungeonTools:MakeSidePanel(frame)
 	if not db.presets[db.currentDungeonIdx][curPresetIdx + 1] then
 		db.presets[db.currentDungeonIdx][curPresetIdx + 1] = { text = "<New Preset>", value = 0 }
 	end
+
+	-- local breakLine = MethodDungeonTools:AceGUI_Create("Label")
+	-- breakLine:SetFullWidth(true)
+	-- breakLine:SetText(" ")
+	-- frame.sidePanel:AddChild(breakLine)
 
 	--Tyranical/Fortified toggle
 	frame.sidePanelFortifiedCheckBox = MethodDungeonTools:AceGUI_Create("CheckBox")
@@ -745,7 +969,7 @@ function MethodDungeonTools:MakeSidePanel(frame)
 	frame.sidePanelTyrannicalCheckBox = MethodDungeonTools:AceGUI_Create("CheckBox")
 	frame.sidePanelTyrannicalCheckBox:SetLabel("Тираник")
 	frame.sidePanelTyrannicalCheckBox.text:SetTextHeight(10)
-	frame.sidePanelTyrannicalCheckBox:SetWidth(100)
+	frame.sidePanelTyrannicalCheckBox:SetWidth(110)
 	frame.sidePanelTyrannicalCheckBox:SetHeight(15)
 	if db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]].value.currentAffix then
 		if
@@ -2600,10 +2824,15 @@ function MethodDungeonTools:HideAllDialogs()
 	MethodDungeonTools.main_frame.DeleteConfirmationFrame:Hide()
 end
 
-function MethodDungeonTools:OpenImportPresetDialog()
+function MethodDungeonTools:OpenImportPresetDialog(importText)
 	MethodDungeonTools:HideAllDialogs()
 	MethodDungeonTools.main_frame.presetImportFrame:SetPoint("CENTER", MethodDungeonTools.main_frame, "CENTER", 0, 50)
 	MethodDungeonTools.main_frame.presetImportFrame:Show()
+	if importText then
+		MethodDungeonTools.main_frame.presetImportBox:SetText(importText)
+	else
+		MethodDungeonTools.main_frame.presetImportBox:SetText("")
+	end
 	MethodDungeonTools.main_frame.presetImportBox:SetFocus()
 end
 
@@ -2963,12 +3192,16 @@ function MethodDungeonTools:MakePresetImportFrame(frame)
 	frame.presetImportBox:SetCallback("OnEnterPressed", function(widget, event, text)
 		importString = text
 	end)
+	frame.presetImportBox:SetCallback("OnTextChanged", function(widget, event, text)
+		importString = text or (widget.GetText and widget:GetText()) or ""
+	end)
 	frame.presetImportFrame:AddChild(frame.presetImportBox)
 
 	local importButton = MethodDungeonTools:AceGUI_Create("Button")
 	importButton:SetText("Import")
 	importButton:SetWidth(100)
 	importButton:SetCallback("OnClick", function()
+		importString = (frame.presetImportBox.GetText and frame.presetImportBox:GetText()) or importString or ""
 		local newPreset = MethodDungeonTools:StringToTable(importString, true)
 		if MethodDungeonTools:ValidateImportPreset(newPreset) then
 			MethodDungeonTools.main_frame.presetImportFrame:Hide()
