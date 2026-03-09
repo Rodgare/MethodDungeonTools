@@ -2399,6 +2399,9 @@ function MethodDungeonTools:UpdateDungeonEnemies()
 		if v.colorOverlay then
 			v.colorOverlay:Hide()
 		end
+		if v.pullCircle then
+			v.pullCircle:Hide()
+		end
 		if v.patrolIndicator then
 			v.patrolIndicator:Hide()
 		end
@@ -2475,7 +2478,6 @@ function MethodDungeonTools:UpdateDungeonEnemies()
 								"OVERLAY"
 							)
 							colorOverlay:SetDrawLayer("OVERLAY", 7)
-							-- Custom generated ring mask to perfectly crop the corners of the square
 							colorOverlay:SetTexture(
 								"Interface\\AddOns\\" .. addonName .. "\\Textures\\Circle_Border.tga"
 							)
@@ -2484,6 +2486,19 @@ function MethodDungeonTools:UpdateDungeonEnemies()
 						else
 							-- Ensure it stays on top even if reused
 							dungeonEnemyBlips[idx].colorOverlay:SetDrawLayer("OVERLAY", 7)
+						end
+
+						-- Semi-transparent filled circle tinted with pull color
+						if not dungeonEnemyBlips[idx].pullCircle then
+							local pullCircle = dungeonEnemyBlips[idx]:CreateTexture(
+								"MethodDungeonToolsDungeonEnemyBlip" .. idx .. "PullCircle",
+								"OVERLAY"
+							)
+							pullCircle:SetDrawLayer("OVERLAY", 3)
+							pullCircle:SetTexture("Interface\\AddOns\\" .. addonName .. "\\Textures\\Circle_White.tga")
+							pullCircle:SetPoint("CENTER", dungeonEnemyBlips[idx], "CENTER", 0, 0)
+							pullCircle:Hide()
+							dungeonEnemyBlips[idx].pullCircle = pullCircle
 						end
 
 						-- Fetch spell icon if available
@@ -2535,6 +2550,10 @@ function MethodDungeonTools:UpdateDungeonEnemies()
 						-- The thicker generated ring size requires a 1.6x multiplier for perfect crop
 						dungeonEnemyBlips[idx].colorOverlay:SetWidth(16 * data["scale"])
 						dungeonEnemyBlips[idx].colorOverlay:SetHeight(16 * data["scale"])
+						if dungeonEnemyBlips[idx].pullCircle then
+							dungeonEnemyBlips[idx].pullCircle:SetWidth(10 * data["scale"])
+							dungeonEnemyBlips[idx].pullCircle:SetHeight(10 * data["scale"])
+						end
 						dungeonEnemyBlips[idx]:SetPoint(
 							"CENTER",
 							MethodDungeonTools.main_frame.mapPanelTile1,
@@ -2618,6 +2637,16 @@ function MethodDungeonTools:UpdateDungeonEnemies()
 
 						-- Force the circular border to be 100% fully opaque regardless of the database value
 						dungeonEnemyBlips[idx].colorOverlay:SetVertexColor(r, g, b, 1.0)
+
+						-- Semi-transparent pull color circle on top of icon
+						if dungeonEnemyBlips[idx].pullCircle then
+							if dungeonEnemyBlips[idx].pullIdx then
+								dungeonEnemyBlips[idx].pullCircle:SetVertexColor(r, g, b, 0.4)
+								dungeonEnemyBlips[idx].pullCircle:Show()
+							else
+								dungeonEnemyBlips[idx].pullCircle:Hide()
+							end
+						end
 
 						dungeonEnemyBlips[idx]:Show()
 						dungeonEnemyBlips[idx].colorOverlay:Show()
