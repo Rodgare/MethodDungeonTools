@@ -151,7 +151,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 		["color"] = { r = 2, g = 3, b = 4, a = 0.8 },
 		["clones"] = {
 			[1] = { x = 629.55989048437, y = -309.70711278626, sublevel = 1, g = 2 },
-			[2] = { x = 629.55989048437, y = -309.70711278626, sublevel = 1, g = 2 },
+			[2] = { x = 639.55989048437, y = -318.70711278626, sublevel = 1, g = 2 },
 			[3] = { x = 641.6196241774, y = -303.88515084743, sublevel = 1, g = 2 },
 			[4] = { x = 687.77948939644, y = -290.99366442847, sublevel = 1, g = 3 },
 			[5] = { x = 701.91853835671, y = -291.82537620204, sublevel = 1, g = 3 },
@@ -461,7 +461,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 		["health"] = 130330,
 		["level"] = 80,
 		["creatureType"] = "Разное",
-		["count"] = 0.93,
+		["count"] = 1.5,
 		["scale"] = 1,
 		["color"] = { r = 2, g = 3, b = 4, a = 0.8 },
 		["clones"] = {
