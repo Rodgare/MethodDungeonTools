@@ -8,14 +8,27 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+
+      - name: Delete old tag
+        run: |
+          git push --delete origin latest || true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create Archive
         run: |
-          mkdir MethodDungeonTools
-          rsync -rr . MethodDungeonTools --exclude .git --exclude .github
+          # Удаляем старое, если осталось, и создаем чистое
+          rm -rf MethodDungeonTools
+          mkdir -p MethodDungeonTools
+          # Копируем файлы (исключая гит и сам экшен)
+          rsync -av . MethodDungeonTools --exclude .git --exclude .github --exclude MethodDungeonTools --exclude MDT.zip
+          # Зипуем
           zip -r MDT.zip MethodDungeonTools
 
       - name: Update Latest Release
@@ -23,8 +36,12 @@ jobs:
         with:
           files: MDT.zip
           tag_name: latest
-          name: Latest Version
-          body: "Последнее обновление: ${{ github.event.head_commit.message }}"
+          name: "Latest Version"
+          body: |
+            ## 🚀 Последние изменения
+            ${{ github.event.head_commit.message }}
+
+            _Обновлено автоматически: ${{ github.event.head_commit.timestamp }}_
           prerelease: false
           make_latest: "true"
         env:
