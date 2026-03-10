@@ -7,7 +7,8 @@
 **💾 [СКАЧАТЬ АДДОН](https://github.com/Rodgare/MethodDungeonTools/releases/download/latest/MDT.zip)**
 =======
 
-**⚙️ Установка**
+**⚙️ Установка**  
+
 Если скачали по прямой ссылке выше:
   Просто переместите папку MethodDungeonTools в вашу папку с аддонами. Ничего переименовывать не нужно.
 
