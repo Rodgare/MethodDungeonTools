@@ -1758,6 +1758,7 @@ function MethodDungeonTools:MakeMapTexture(frame)
 		frame.scrollFrame:EnableMouse(true)
 		frame.scrollFrame:SetScript("OnMouseDown", function(self, button)
 			local scrollFrame = MethodDungeonTools.main_frame.scrollFrame
+			scrollFrame.moved = false
 			if button == "LeftButton" and scrollFrame.zoomedIn and not IsControlKeyDown() then
 				scrollFrame.panning = true
 				local x, y = GetCursorPosition()
@@ -1765,7 +1766,6 @@ function MethodDungeonTools:MakeMapTexture(frame)
 				scrollFrame.cursorY = y
 				scrollFrame.x = scrollFrame:GetHorizontalScroll()
 				scrollFrame.y = scrollFrame:GetVerticalScroll()
-				scrollFrame.moved = false
 			end
 		end)
 
@@ -1777,7 +1777,7 @@ function MethodDungeonTools:MakeMapTexture(frame)
 					scrollFrame.panning = false
 				end
 				--handle clicks on enemy blips
-				if MouseIsOver(MethodDungeonToolsScrollFrame) then
+				if not scrollFrame.moved and MouseIsOver(MethodDungeonToolsScrollFrame) then
 					for i = 1, numDungeonEnemyBlips do
 						if dungeonEnemyBlips[i] and MouseIsOver(dungeonEnemyBlips[i]) then
 							local isCTRLKeyDown = IsControlKeyDown()
