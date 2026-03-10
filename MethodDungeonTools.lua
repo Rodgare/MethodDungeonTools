@@ -2660,6 +2660,11 @@ function MethodDungeonTools:UpdateDungeonEnemies()
 							end
 						end
 
+						-- Set alpha based on pull membership
+						-- NPCs in ANY pull (pullIdx is set) are 1.0 (opaque)
+						-- NPCs not in any pull are 0.5 (semi-transparent)
+						dungeonEnemyBlips[idx]:SetAlpha(dungeonEnemyBlips[idx].pullIdx and 1 or 0.8)
+
 						-- Force the circular border to be 100% fully opaque regardless of the database value
 						dungeonEnemyBlips[idx].colorOverlay:SetVertexColor(r, g, b, 1.0)
 
@@ -2945,7 +2950,10 @@ function MethodDungeonTools:CreateDungeonPresetDropdown(frame)
 					db.currentPreset[db.currentDungeonIdx] = presetIdx
 					MethodDungeonTools:UpdateMap()
 				end
-				L_UIDropDownMenu_SetSelectedValue(MethodDungeonTools.main_frame.DungeonPresetDropdown, presetIdx)
+				L_UIDropDownMenu_SetSelectedValue(
+					MethodDungeonTools.main_frame.sidePanel.DungeonPresetDropdown,
+					presetIdx
+				)
 			end
 			L_UIDropDownMenu_AddButton(info, level)
 		end
