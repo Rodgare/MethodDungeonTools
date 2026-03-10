@@ -53,7 +53,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 			[2] = { x = 530.28919224501, y = -258.07405020331, sublevel = 1, g = 33 },
 			[3] = { x = 603.3552918538, y = -268.28945291634, sublevel = 1, g = 35 },
 			[4] = { x = 631.70009740361, y = -306.00968823205, sublevel = 1, g = 37 },
-			[5] = { x = 783.89171310219, y = -371.61872815114, sublevel = 1, g = 42 },
+			[5] = { x = 783.89171310219, y = -371.61872815114, sublevel = 1, g = 43 },
 		},
 	},
 	[17962] = { -- Map ID 17962 to array index in lua
@@ -266,7 +266,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 			[6] = { x = 621.62421198671, y = -315.5286939821, sublevel = 1, g = 37 },
 			[7] = { x = 681.66952798149, y = -279.813006364, sublevel = 1, g = 38 },
 			[8] = { x = 788.83003815351, y = -350.87798299054, sublevel = 1, g = 42 },
-			[9] = { x = 772.03991777655, y = -381.00144605525, sublevel = 1, g = 42 },
+			[9] = { x = 772.03991777655, y = -381.00144605525, sublevel = 1, g = 43 },
 		},
 	},
 	[21126] = { -- Map ID 21126 to array index in lua
