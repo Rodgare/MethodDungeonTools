@@ -291,7 +291,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	[17958] = { -- Map ID 17958 to array index in lua
 		["id"] = 17958,
 		spells = { 15655, 31554 },
-		["iconId"] = 15655,
+		["iconId"] = 31554,
 		["name"] = "Защитник резервуара Кривого Клыка",
 		["health"] = 130330,
 		["level"] = 80,
@@ -306,8 +306,10 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 			[4] = { x = 382.87971988423, y = -180.56267847565, sublevel = 1, g = 24 },
 			[5] = { x = 440.65749564572, y = -180.56267847565, sublevel = 1, g = 25 },
 			[6] = { x = 445.76974491084, y = -171.03463718717, sublevel = 1, g = 25 },
-			[7] = { x = 555.60504562826, y = -241.03928991552, sublevel = 1, g = 34 },
-			[8] = { x = 556.59273981709, y = -253.38496880878, sublevel = 1, g = 34 },
+			[7] = { x = 403, y = -259, sublevel = 1, g = 26 },
+			[8] = { x = 417, y = -259, sublevel = 1, g = 26 },
+			[9] = { x = 555.60504562826, y = -241.03928991552, sublevel = 1, g = 34 },
+			[10] = { x = 556.59273981709, y = -253.38496880878, sublevel = 1, g = 34 },
 		},
 	},
 	[21128] = { -- Map ID 21128 to array index in lua
