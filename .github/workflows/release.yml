@@ -1,0 +1,29 @@
+name: Create Release ZIP
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Create Archive
+        run: |
+          mkdir MethodDungeonTools
+          rsync -rr . MethodDungeonTools --exclude .git --exclude .github
+          zip -r MDT.zip MethodDungeonTools
+
+      - name: Update Latest Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: MDT.zip
+          tag_name: latest
+          name: Latest Version
+          body: "Автоматическое обновление аддона. Просто скачайте MDT.zip ниже."
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
