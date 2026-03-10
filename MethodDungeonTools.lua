@@ -3937,7 +3937,6 @@ function MethodDungeonTools:MakeExportFrame(frame)
 	frame.ExportFrameEditbox:SetNumLines(20)
 	frame.ExportFrameEditbox:SetCallback("OnEnterPressed", function(widget, event, text) end)
 	frame.ExportFrame:AddChild(frame.ExportFrameEditbox)
-	--frame.presetCreationFrame:SetStatusText("AceGUI-3.0 Example Container Frame")
 	frame.ExportFrame:Hide()
 end
 
