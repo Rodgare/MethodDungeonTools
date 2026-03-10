@@ -19,11 +19,13 @@ jobs:
           zip -r MDT.zip MethodDungeonTools
 
       - name: Update Latest Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           files: MDT.zip
           tag_name: latest
           name: Latest Version
-          body: "Автоматическое обновление аддона. Просто скачайте MDT.zip ниже."
+          body: "Последнее обновление: ${{ github.event.head_commit.message }}"
+          prerelease: false
+          make_latest: "true"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
