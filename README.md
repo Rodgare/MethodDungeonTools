@@ -1,10 +1,10 @@
-![Downloads](https://img.shields.io/github/downloads/Rodgare/MethodDungeonTools/total?style=for-the-badge&color=brightgreen)[![Create Release ZIP](https://github.com/Rodgare/MethodDungeonTools/actions/workflows/release.yml/badge.svg?branch=main)](https://github.com/Rodgare/MethodDungeonTools/actions/workflows/release.yml)
+![Downloads](https://img.shields.io/github/downloads/Rodgare/MethodDungeonTools/total?style=for-the-badge&color=brightgreen) [![Create Release ZIP](https://github.com/Rodgare/MethodDungeonTools/actions/workflows/release.yml/badge.svg?branch=main)](https://github.com/Rodgare/MethodDungeonTools/actions/workflows/release.yml)
 # ⚔️ Mythic/Method Dungeon Tools (MDT)
 ## Специальная адаптация для Sirus.su
 
 Легендарный аддон с актуальных версий WoW для планирования маршрутов теперь доступен на Sirus! Это незаменимый инструмент для танков и групп, которые хотят проходить подземелья максимально эффективно, планировать каждый запул и оптимизировать время прохождения.
 
-**💾 [СКАЧАТЬ АДДОН с гитхаба](https://github.com/Rodgare/MethodDungeonTools/archive/refs/heads/main.zip)**
+**💾 [СКАЧАТЬ АДДОН](https://github.com/Rodgare/MethodDungeonTools/releases/download/latest/MDT.zip)**
 =======
 
 **⚙️ Установка**
