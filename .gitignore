@@ -11,4 +11,5 @@ inject_spells.py
 world_smart_scripts.csv
 generate_border.py
 add_icons.py
+clean_icons.py
 .gitignore
