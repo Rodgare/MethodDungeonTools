@@ -1,3 +1,5 @@
+![Downloads](https://img.shields.io/github/downloads/Rodgare/MethodDungeonTools/total?style=for-the-badge&color=brightgreen)
+
 # ⚔️ Mythic/Method Dungeon Tools (MDT)
 ## Специальная адаптация для Sirus.su
 
