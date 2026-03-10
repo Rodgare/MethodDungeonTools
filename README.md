@@ -1,4 +1,4 @@
-![Downloads](https://img.shields.io/github/downloads/Rodgare/MethodDungeonTools/total?style=flat&color=brightgreen) [![Create Release ZIP](https://github.com/Rodgare/MethodDungeonTools/actions/workflows/release.yml/badge.svg?branch=main)](https://github.com/Rodgare/MethodDungeonTools/actions/workflows/release.yml)
+[![Create Release ZIP](https://github.com/Rodgare/MethodDungeonTools/actions/workflows/release.yml/badge.svg?branch=main)](https://github.com/Rodgare/MethodDungeonTools/actions/workflows/release.yml)
 # ⚔️ Mythic/Method Dungeon Tools (MDT)
 ## Специальная адаптация для Sirus.su
 
