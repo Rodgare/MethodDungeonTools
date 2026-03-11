@@ -5,7 +5,8 @@
 Легендарный аддон с актуальных версий WoW для планирования маршрутов теперь доступен на Sirus! Это незаменимый инструмент для танков и групп, которые хотят проходить подземелья максимально эффективно, планировать каждый запул и оптимизировать время прохождения.
 
 **[💾 СКАЧАТЬ АДДОН (Github)](https://github.com/Rodgare/MethodDungeonTools/releases/download/latest/MDT.zip)**  
-*[💾 Альтернативная ссылка (Gitlab)](https://gitlab.com/hagakure202/MethodDungeonTools/-/jobs/artifacts/main/raw/MDT.zip?job=build_addon)*
+
+[💾 Альтернативная ссылка (Gitlab)](https://gitlab.com/hagakure202/MethodDungeonTools/-/jobs/artifacts/main/raw/MDT.zip?job=build_addon)
 =======
 
 **⚙️ Установка**  
