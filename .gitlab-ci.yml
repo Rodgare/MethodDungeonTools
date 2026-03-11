@@ -1,0 +1,41 @@
+image: alpine:latest
+
+stages:
+  - build
+  - release
+
+build_addon:
+  stage: build
+  before_script:
+    - apk add --no-cache zip rsync
+  script:
+    - mkdir -p MethodDungeonTools
+    - rsync -av . MethodDungeonTools --exclude .git --exclude .github --exclude .gitlab-ci.yml --exclude MethodDungeonTools --exclude MDT.zip
+    - zip -r MDT.zip MethodDungeonTools
+  artifacts:
+    name: "MDT-Sirus-Latest"
+    paths:
+      - MDT.zip
+    expire_in: never
+  only:
+    - main
+
+create_release:
+  stage: release
+  image: registry.gitlab.com/gitlab-org/release-cli:latest
+  needs:
+    - job: build_addon
+      artifacts: true
+  script:
+    - echo "Creating release for $CI_COMMIT_SHORT_SHA"
+  release:
+    name: "Latest Version"
+    description: "Автоматическая сборка для Sirus.su. Коммит: $CI_COMMIT_MESSAGE"
+    tag_name: "latest"
+    ref: "$CI_COMMIT_SHA"
+    assets:
+      links:
+        - name: "MDT.zip"
+          url: "${CI_PROJECT_URL}/-/jobs/artifacts/main/raw/MDT.zip?job=build_addon"
+  only:
+    - main
