@@ -7,10 +7,7 @@
 **[💾 СКАЧАТЬ АДДОН (GitHub)](https://github.com/Rodgare/MethodDungeonTools/releases/download/latest/MDT.zip)**
 
 ---
-> [!IMPORTANT]
-> *[💾 Альтернативная ссылка (GitLab)](https://gitlab.com/hagakure202/MethodDungeonTools/-/jobs/artifacts/main/raw/MDT.zip?job=build_addon) — используйте, если GitHub недоступен.*
-
-=======
+> *[💾 Альтернативная ссылка (GitLab)](https://gitlab.com/hagakure202/MethodDungeonTools/-/jobs/artifacts/main/raw/MDT.zip?job=build_addon) — используйте, если GitHub недоступен.*  
 
 **⚙️ Установка**  
   

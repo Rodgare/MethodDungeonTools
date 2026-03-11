@@ -26,8 +26,12 @@ create_release:
   needs:
     - job: build_addon
       artifacts: true
+  before_script:
+    - apk add --no-cache curl
   script:
     - |
+      curl --request DELETE --header "JOB-TOKEN: $CI_JOB_TOKEN" "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/releases/latest" || true
+
       release-cli create --name "Latest Version" \
         --description "Автоматическая сборка для Sirus.su. Коммит: $CI_COMMIT_MESSAGE" \
         --tag-name "latest" \
