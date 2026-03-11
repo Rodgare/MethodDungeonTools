@@ -27,15 +27,11 @@ create_release:
     - job: build_addon
       artifacts: true
   script:
-    - echo "Creating release for $CI_COMMIT_SHORT_SHA"
-  release:
-    name: "Latest Version"
-    description: "Автоматическая сборка для Sirus.su. Коммит: $CI_COMMIT_MESSAGE"
-    tag_name: "latest"
-    ref: "$CI_COMMIT_SHA"
-    assets:
-      links:
-        - name: "MDT.zip"
-          url: "${CI_PROJECT_URL}/-/jobs/artifacts/main/raw/MDT.zip?job=build_addon"
+    - |
+      release-cli create --name "Latest Version" \
+        --description "Автоматическая сборка для Sirus.su. Коммит: $CI_COMMIT_MESSAGE" \
+        --tag-name "latest" \
+        --ref "$CI_COMMIT_SHA" \
+        --assets-link "{\"name\":\"MDT.zip\",\"url\":\"${CI_PROJECT_URL}/-/jobs/artifacts/main/raw/MDT.zip?job=build_addon\"}"
   only:
     - main
