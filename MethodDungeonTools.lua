@@ -2642,6 +2642,8 @@ function MethodDungeonTools:UpdateDungeonEnemies()
 
 						-- Check if this enemy is in a pull, color the border accordingly
 						local preset = db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]]
+						local currentPullNum = tonumber(preset.value.currentPull)
+						local isInCurrentPull = false
 						dungeonEnemyBlips[idx].pullIdx = nil
 						for pullIdx, pullData in pairs(preset.value.pulls) do
 							if pullData[enemyIdx] then
@@ -2654,10 +2656,27 @@ function MethodDungeonTools:UpdateDungeonEnemies()
 										local pColor = MethodDungeonTools.pullColors[colorIdx]
 										r, g, b = pColor[1], pColor[2], pColor[3]
 										dungeonEnemyBlips[idx].pullIdx = pullIdx
+										if tonumber(pullIdx) == currentPullNum then
+											isInCurrentPull = true
+										end
 										break
 									end
 								end
 							end
+						end
+
+						-- Set scale (15% increase for current pull)
+						local activeScale = data["scale"] or 1
+						if isInCurrentPull then
+							activeScale = activeScale * 1.15
+						end
+						dungeonEnemyBlips[idx]:SetWidth(10 * activeScale)
+						dungeonEnemyBlips[idx]:SetHeight(10 * activeScale)
+						dungeonEnemyBlips[idx].colorOverlay:SetWidth(16 * activeScale)
+						dungeonEnemyBlips[idx].colorOverlay:SetHeight(16 * activeScale)
+						if dungeonEnemyBlips[idx].pullCircle then
+							dungeonEnemyBlips[idx].pullCircle:SetWidth(10 * activeScale)
+							dungeonEnemyBlips[idx].pullCircle:SetHeight(10 * activeScale)
 						end
 
 						-- Set alpha based on pull membership
@@ -3707,6 +3726,7 @@ function MethodDungeonTools:SetSelectionToPull(pull, noAutoCenter)
 	end
 
 	MethodDungeonTools:UpdateEnemiesSelected()
+	MethodDungeonTools:UpdateDungeonEnemies()
 end
 
 ---UpdatePullButtonNPCData
