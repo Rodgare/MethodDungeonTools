@@ -2477,7 +2477,14 @@ function MethodDungeonTools:UpdateDungeonEnemies()
 							local font, size = dungeonEnemyBlips[idx].fontString:GetFont()
 							dungeonEnemyBlips[idx].fontName = font
 							dungeonEnemyBlips[idx].fontString:SetFont(font, 9, "OUTLINE")
-							dungeonEnemyBlips[idx].fontString:SetPoint("CENTER", dungeonEnemyBlips[idx], "CENTER", 0, 0)
+							dungeonEnemyBlips[idx].fontString:SetPoint(
+								"CENTER",
+								dungeonEnemyBlips[idx],
+								"CENTER",
+								-0.5,
+								0
+							)
+							dungeonEnemyBlips[idx].fontString:SetShadowOffset(0, 0)
 							dungeonEnemyBlips[idx].fontString:SetJustifyH("CENTER")
 						end
 						dungeonEnemyBlips[idx].count = data["count"]
@@ -2701,7 +2708,12 @@ function MethodDungeonTools:UpdateDungeonEnemies()
 						dungeonEnemyBlips[idx].colorOverlay:Show()
 
 						if dungeonEnemyBlips[idx].fontString then
-							dungeonEnemyBlips[idx].fontString:Hide()
+							if dungeonEnemyBlips[idx].pullIdx then
+								dungeonEnemyBlips[idx].fontString:SetText(dungeonEnemyBlips[idx].pullIdx)
+								dungeonEnemyBlips[idx].fontString:Show()
+							else
+								dungeonEnemyBlips[idx].fontString:Hide()
+							end
 						end
 
 						--clear patrol flag
@@ -4349,7 +4361,6 @@ function initFrames()
 		},
 	}
 end
-
 
 -- MDT Automated Tracker for Sirus
 local mdtTrackerFrame = CreateFrame("Frame")
