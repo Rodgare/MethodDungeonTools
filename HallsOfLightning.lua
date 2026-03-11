@@ -449,7 +449,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 		["health"] = 130330,
 		["level"] = 81,
 		["creatureType"] = "Великан",
-		["count"] = 3,
+		["count"] = 2.95,
 		["scale"] = 1,
 		["color"] = { r = 2, g = 3, b = 4, a = 0.8 },
 		["clones"] = {

@@ -13,3 +13,4 @@ generate_border.py
 add_icons.py
 clean_icons.py
 .gitignore
+/tmp/
