@@ -4460,7 +4460,9 @@ mdtTrackerFrame:SetScript("OnEvent", function(self, event, ...)
 		-- )
 		-- Record all non-player deaths (creatures, pets, etc.)
 		if destGUID and not destGUID:find("Player") then
-			table.insert(mdtRecentlyDead, { id = id, name = destName or "Unknown", time = GetTime() })
+			local name = destName or "Unknown"
+			print("|cFFFFFF00[MDT]|r СМЕРТЬ: " .. name .. " (" .. id .. ")")
+			table.insert(mdtRecentlyDead, { id = id, name = name, time = GetTime() })
 		end
 	elseif event == "PLAYER_TARGET_CHANGED" then
 		CacheUnit("target")
@@ -4490,6 +4492,7 @@ mdtTrackerFrame:SetScript("OnUpdate", function(self, elapsed)
 		p = math.min(cData.total, 100)
 	end
 
+	local now = GetTime()
 	if p > mdtLastForces then
 		local diff = p - mdtLastForces
 		mdtLastForces = p
@@ -4498,37 +4501,28 @@ mdtTrackerFrame:SetScript("OnUpdate", function(self, elapsed)
 			db.MobDataTally = {}
 		end
 
-		local now = GetTime()
 		local matched = {}
 		for i = #mdtRecentlyDead, 1, -1 do
-			if (now - mdtRecentlyDead[i].time) <= 5 then
+			if (now - mdtRecentlyDead[i].time) <= 5 then -- 5s window for precision
 				table.insert(matched, mdtRecentlyDead[i])
+				table.remove(mdtRecentlyDead, i)
 			end
 		end
 
 		local count = #matched
 		if count > 0 then
 			local perMob = math.floor((diff / count) * 100) / 100
-			local msg = ""
 			for _, mob in ipairs(matched) do
-				msg = msg .. mob.name .. " (" .. mob.id .. ") "
 				table.insert(db.MobDataTally, {
 					name = mob.name,
 					id = mob.id,
 					percent = perMob,
 					totalPercent = p,
 					date = date("%Y-%m-%d %H:%M:%S"),
+					status = "OK"
 				})
+				print(string.format("|cFF00FF00[MDT]|r %s (%d) => |cFFFFFFFF%.2f%%|r", mob.name, mob.id, perMob))
 			end
-			print(
-				"|cFF00FF00[MDT Tracker]|r "
-					.. msg
-					.. "=> "
-					.. string.format("%.2f", diff)
-					.. "% (по "
-					.. string.format("%.2f", perMob)
-					.. "% каждый)"
-			)
 		else
 			-- Forces changed but nobody died in our list - record as unknown
 			table.insert(db.MobDataTally, {
@@ -4538,12 +4532,35 @@ mdtTrackerFrame:SetScript("OnUpdate", function(self, elapsed)
 				totalPercent = p,
 				date = date("%Y-%m-%d %H:%M:%S"),
 			})
-			print(
-				"|cFFFF8800[MDT Tracker]|r Неизвестная цель дала "
-					.. string.format("%.2f", diff)
-					.. "%"
-			)
+			print(string.format("|cFFFF8800[MDT]|r Неизв. цель => %.2f%%", diff))
 		end
+	end
+
+	-- Bug Hunter Timeout: If NPC died > 5s ago and no % was awarded, log it as bug
+	for i = #mdtRecentlyDead, 1, -1 do
+		if (now - mdtRecentlyDead[i].time) > 5 then
+			local mob = mdtRecentlyDead[i]
+			table.insert(db.MobDataTally, {
+				name = mob.name,
+				id = mob.id,
+				percent = 0,
+				totalPercent = mdtLastForces,
+				date = date("%Y-%m-%d %H:%M:%S"),
+				status = "BUG: No % awarded",
+			})
+			print(
+				"|cFFFF0000[MDT Tracker] БАГ: "
+					.. mob.name
+					.. " ("
+					.. mob.id
+					.. ") - ПРОЦЕНТ НЕ НАЧИСЛЕН!|r"
+			)
+			table.remove(mdtRecentlyDead, i)
+		end
+	end
+
+	-- Limit recently dead cache to avoid memory leaks
+	if #mdtRecentlyDead > 50 then
 		mdtRecentlyDead = {}
 	end
 end)
