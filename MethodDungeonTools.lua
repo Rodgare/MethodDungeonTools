@@ -2482,7 +2482,7 @@ function MethodDungeonTools:UpdateDungeonEnemies()
 								dungeonEnemyBlips[idx],
 								"CENTER",
 								-0.5,
-								0
+								-0.5
 							)
 							dungeonEnemyBlips[idx].fontString:SetShadowOffset(0, 0)
 							dungeonEnemyBlips[idx].fontString:SetJustifyH("CENTER")
