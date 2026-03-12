@@ -112,26 +112,31 @@ function MethodDungeonTools:AceGUI_Create(...)
 	return widget
 end
 
+local tooltip, dungeonEnemyBlips, numDungeonEnemyBlips, dungeonBossButtons
+local cloneOffset, lastDialog, lastMouseoverBlip, mouseoverBlip, firstWaypointBlip, oldWaypointBlip
+
 -- Polyfill for MouseIsOver
-if not MouseIsOver then
-	function MouseIsOver(frame)
-		if not frame then
-			return false
-		end
-		return frame:IsMouseOver()
+function MethodDungeonTools:MouseIsOver(frame)
+	if not frame then
+		return false
 	end
+	if _G.MouseIsOver then
+		return _G.MouseIsOver(frame)
+	end
+	return frame:IsMouseOver()
 end
 
 -- Polyfill for Encounter Journal (missing in 3.3.0)
-if not EJ_GetCreatureInfo then
-	function EJ_GetCreatureInfo()
-		return nil
+function MethodDungeonTools:EJ_GetCreatureInfo(...)
+	if _G.EJ_GetCreatureInfo then
+		return _G.EJ_GetCreatureInfo(...)
 	end
+	return nil
 end
 
 -- Polyfill for C_Timer
-if not C_Timer then
-	C_Timer = {
+if not _G.C_Timer then
+	_G.C_Timer = {
 		After = function(duration, callback)
 			local AceTimer = LibStub and LibStub("AceTimer-3.0", true)
 			if AceTimer then
@@ -140,6 +145,8 @@ if not C_Timer then
 		end,
 	}
 end
+
+local tooltip, dungeonEnemyBlips, numDungeonEnemyBlips, dungeonBossButtons
 
 local mainFrameStrata = "HIGH"
 local sizex = 840
@@ -396,7 +403,7 @@ function MethodDungeonTools:ShareCurrentPreset()
 	print("|cFF00FF00[MDT]|r Маршрут отправлен в канал: " .. channel)
 end
 
-StaticPopupDialogs = StaticPopupDialogs or {}
+-- StaticPopupDialogs = StaticPopupDialogs or {} -- TAINT!!!!11
 StaticPopupDialogs["METHOD_DUNGEON_TOOLS_IMPORT_SHARE"] = {
 	text = "%s",
 	button1 = "Принять",
@@ -1356,9 +1363,9 @@ function MethodDungeonTools:UpdatePullTooltip(tooltip)
 		tooltip:Hide()
 		return
 	end
-	if not MouseIsOver(frame.sidePanel.pullButtonsScrollFrame.frame) then
+	if not MethodDungeonTools:MouseIsOver(frame.sidePanel.pullButtonsScrollFrame.frame) then
 		tooltip:Hide()
-	elseif frame.sidePanel.newPullButton and MouseIsOver(frame.sidePanel.newPullButton.frame) then
+	elseif frame.sidePanel.newPullButton and MethodDungeonTools:MouseIsOver(frame.sidePanel.newPullButton.frame) then
 		tooltip:Hide()
 	else
 		if
@@ -1367,7 +1374,7 @@ function MethodDungeonTools:UpdatePullTooltip(tooltip)
 			and frame.sidePanel.newPullButtons[tooltip.currentPull]
 		then
 			for k, v in pairs(frame.sidePanel.newPullButtons[tooltip.currentPull].enemyPortraits) do
-				if MouseIsOver(v) then
+				if MethodDungeonTools:MouseIsOver(v) then
 					if v:IsShown() then
 						tooltip.Model:Show()
 						local modelPath = v.enemyData.modelPath
@@ -1698,8 +1705,9 @@ function MethodDungeonTools:UpdateContextMenu(cursorX, cursorY)
 				if id then
 					local encounterID
 					for i = 1, 10000 do
-						local id, name, description, displayInfo, iconImage = EJ_GetCreatureInfo(1, i)
-						if name == UnitName("target") then
+						local EJ_id, EJ_name, description, displayInfo, iconImage =
+							MethodDungeonTools:EJ_GetCreatureInfo(1, i)
+						if EJ_name == UnitName("target") then
 							encounterID = i
 							break
 						end
@@ -1777,9 +1785,9 @@ function MethodDungeonTools:MakeMapTexture(frame)
 					scrollFrame.panning = false
 				end
 				--handle clicks on enemy blips
-				if not scrollFrame.moved and MouseIsOver(MethodDungeonToolsScrollFrame) then
+				if not scrollFrame.moved and MethodDungeonTools:MouseIsOver(MethodDungeonToolsScrollFrame) then
 					for i = 1, numDungeonEnemyBlips do
-						if dungeonEnemyBlips[i] and MouseIsOver(dungeonEnemyBlips[i]) then
+						if dungeonEnemyBlips[i] and MethodDungeonTools:MouseIsOver(dungeonEnemyBlips[i]) then
 							local isCTRLKeyDown = IsControlKeyDown()
 							local isShiftKeyDown = IsShiftKeyDown()
 							if isShiftKeyDown then
@@ -1819,11 +1827,11 @@ function MethodDungeonTools:MakeMapTexture(frame)
 						end
 					end
 				end
-			elseif (button == "RightButton") and MouseIsOver(MethodDungeonToolsScrollFrame) then
+			elseif (button == "RightButton") and MethodDungeonTools:MouseIsOver(MethodDungeonToolsScrollFrame) then
 				local clickedBlip = nil
 				if numDungeonEnemyBlips then
 					for i = 1, numDungeonEnemyBlips do
-						if dungeonEnemyBlips[i] and MouseIsOver(dungeonEnemyBlips[i]) then
+						if dungeonEnemyBlips[i] and MethodDungeonTools:MouseIsOver(dungeonEnemyBlips[i]) then
 							clickedBlip = i
 							break
 						end
@@ -1833,7 +1841,7 @@ function MethodDungeonTools:MakeMapTexture(frame)
 				if clickedBlip and not db.devMode then
 					MethodDungeonTools:ShowEnemyInfoFrame(clickedBlip)
 				else
-					cursorX, cursorY = GetCursorPosition()
+					local cursorX, cursorY = GetCursorPosition()
 					MethodDungeonTools:UpdateContextMenu(cursorX, cursorY)
 					if L_EasyMenu then
 						L_EasyMenu(
@@ -1872,7 +1880,7 @@ function MethodDungeonTools:MakeMapTexture(frame)
 			frameX = (frameX / mapScale) + scrollH
 			frameY = (frameY / mapScale) + scrollV
 			if db.devMode then
-				if MouseIsOver(scrollFrame) then
+				if MethodDungeonTools:MouseIsOver(scrollFrame) then
 					MethodDungeonTools.main_frame.CoordinateDisplay:SetText(
 						string.format("X: %.2f, Y: %.2f", frameX, -frameY)
 					)
@@ -1946,14 +1954,14 @@ function MethodDungeonTools:MakeMapTexture(frame)
 			end
 
 			local mouseoverBlip
-			if MouseIsOver(MethodDungeonToolsScrollFrame) and dungeonEnemyBlips then
+			if MethodDungeonTools:MouseIsOver(MethodDungeonToolsScrollFrame) and dungeonEnemyBlips then
 				-- Prevent tooltips if hovering the Enemy Info window
 				local isOverInfo = MethodDungeonTools.EnemyInfoFrame
 					and MethodDungeonTools.EnemyInfoFrame:IsShown()
-					and MouseIsOver(MethodDungeonTools.EnemyInfoFrame)
+					and MethodDungeonTools:MouseIsOver(MethodDungeonTools.EnemyInfoFrame)
 				if not isOverInfo then
 					for i = 1, numDungeonEnemyBlips do
-						if MouseIsOver(dungeonEnemyBlips[i]) then
+						if MethodDungeonTools:MouseIsOver(dungeonEnemyBlips[i]) then
 							mouseoverBlip = i
 							break
 						end
@@ -1962,13 +1970,13 @@ function MethodDungeonTools:MakeMapTexture(frame)
 			end
 			local mouseOverBoss
 			--handle mouseover on bosses
-			if MouseIsOver(MethodDungeonToolsScrollFrame) and dungeonBossButtons then
+			if MethodDungeonTools:MouseIsOver(MethodDungeonToolsScrollFrame) and dungeonBossButtons then
 				local isOverInfo = MethodDungeonTools.EnemyInfoFrame
 					and MethodDungeonTools.EnemyInfoFrame:IsShown()
-					and MouseIsOver(MethodDungeonTools.EnemyInfoFrame)
+					and MethodDungeonTools:MouseIsOver(MethodDungeonTools.EnemyInfoFrame)
 				if not isOverInfo then
 					for k, v in pairs(dungeonBossButtons) do
-						if MouseIsOver(v) then
+						if MethodDungeonTools:MouseIsOver(v) then
 							mouseoverBlip = nil
 							mouseOverBoss = k
 							break
@@ -2244,11 +2252,12 @@ function MethodDungeonTools:MakeMapTexture(frame)
 				--tooltipLastShown = GetTime()
 
 
-			local mouseOverPullButton
-			if MouseIsOver(MethodDungeonTools.main_frame.sidePanel.pullButtonsScrollFrame.frame) then
-				for idx,_ in pairs(MethodDungeonTools.main_frame.sidePanel.newPullButtons) do
-					mouseOverPullButton = idx
-					break
+			if MethodDungeonTools.main_frame.sidePanel and MethodDungeonTools.main_frame.sidePanel.pullButtonsScrollFrame then
+				if MethodDungeonTools:MouseIsOver(MethodDungeonTools.main_frame.sidePanel.pullButtonsScrollFrame.frame) then
+					for idx, _ in pairs(MethodDungeonTools.main_frame.sidePanel.newPullButtons) do
+						mouseOverPullButton = idx
+						break
+					end
 				end
 			end
 
@@ -2393,7 +2402,7 @@ function MethodDungeonTools:UpdateDungeonBossButtons()
 
 				dungeonBossButtons[i]:Show()
 				dungeonBossButtons[i]:SetScript("OnClick", function(self, button)
-					if MouseIsOver(MethodDungeonToolsScrollFrame) then
+					if MethodDungeonTools:MouseIsOver(MethodDungeonToolsScrollFrame) then
 						if button == "RightButton" then
 							MethodDungeonTools:ShowEnemyInfoFrame(nil, i)
 						else
@@ -2674,13 +2683,16 @@ function MethodDungeonTools:UpdateDungeonEnemies()
 						if isInCurrentPull then
 							activeScale = activeScale * 1.15
 						end
-						dungeonEnemyBlips[idx]:SetWidth(10 * activeScale)
-						dungeonEnemyBlips[idx]:SetHeight(10 * activeScale)
-						dungeonEnemyBlips[idx].colorOverlay:SetWidth(16 * activeScale)
-						dungeonEnemyBlips[idx].colorOverlay:SetHeight(16 * activeScale)
+						local finalSize = math.floor(10 * activeScale)
+						local overlaySize = math.floor(16 * activeScale)
+
+						dungeonEnemyBlips[idx]:SetWidth(finalSize)
+						dungeonEnemyBlips[idx]:SetHeight(finalSize)
+						dungeonEnemyBlips[idx].colorOverlay:SetWidth(overlaySize)
+						dungeonEnemyBlips[idx].colorOverlay:SetHeight(overlaySize)
 						if dungeonEnemyBlips[idx].pullCircle then
-							dungeonEnemyBlips[idx].pullCircle:SetWidth(10 * activeScale)
-							dungeonEnemyBlips[idx].pullCircle:SetHeight(10 * activeScale)
+							dungeonEnemyBlips[idx].pullCircle:SetWidth(finalSize)
+							dungeonEnemyBlips[idx].pullCircle:SetHeight(finalSize)
 						end
 
 						-- Set alpha based on pull membership
@@ -4144,7 +4156,7 @@ function initFrames()
 	main_frame:SetScript("OnEvent", function(self, ...)
 		local event, loaded = ...
 		if event == "ADDON_LOADED" then
-			if addon == loaded then
+			if addonName == loaded then
 				--AltManager:OnLoad();
 			end
 		end
@@ -4519,7 +4531,7 @@ mdtTrackerFrame:SetScript("OnUpdate", function(self, elapsed)
 					percent = perMob,
 					totalPercent = p,
 					date = date("%Y-%m-%d %H:%M:%S"),
-					status = "OK"
+					status = "OK",
 				})
 				print(string.format("|cFF00FF00[MDT]|r %s (%d) => |cFFFFFFFF%.2f%%|r", mob.name, mob.id, perMob))
 			end

@@ -13,6 +13,7 @@
 local MINOR_VERSION = 20170904
 
 local lib, oldminor = LibStub:NewLibrary("PhanxConfig-Dropdown", MINOR_VERSION)
+--[[
 print(
 	"[PhanxConfig-Dropdown] NewLibrary result: lib=",
 	lib ~= nil,
@@ -21,11 +22,14 @@ print(
 	"MINOR_VERSION=",
 	MINOR_VERSION
 )
+]]
+
 if not lib then
-	print("[PhanxConfig-Dropdown] SKIPPED - another addon registered a newer version!")
+	-- print("[PhanxConfig-Dropdown] SKIPPED - another addon registered a newer version!")
 	return
 end
-print("[PhanxConfig-Dropdown] Library registered successfully, our code will run.")
+-- print("[PhanxConfig-Dropdown] Library registered successfully, our code will run.")
+
 
 lib.listFrames = lib.listFrames or {}
 
@@ -42,7 +46,7 @@ local function CloseOwnDropdowns()
 end
 
 local function OpenDropdown(dropdown)
-	print("[PhanxConfig] OpenDropdown called")
+	-- print("[PhanxConfig] OpenDropdown called")
 	local list = dropdown.list
 	if not list then
 		list = CreateList(dropdown)
@@ -55,7 +59,7 @@ local function OpenDropdown(dropdown)
 	CloseOwnDropdowns()
 
 	if show then
-		print("[PhanxConfig] Showing list, items count:", dropdown.items and #dropdown.items or 0)
+		-- print("[PhanxConfig] Showing list, items count:", dropdown.items and #dropdown.items or 0)
 		list:Show()
 		list:Raise()
 		local selectedIndex
@@ -113,18 +117,18 @@ end
 
 local function ListButton_OnClick(self)
 	local dropdown = self:GetParent():GetParent()
-	print("[PhanxConfig] ListButton_OnClick: value=", self.value, "text=", self:GetText())
+	-- print("[PhanxConfig] ListButton_OnClick: value=", self.value, "text=", self:GetText())
 	dropdown.selected = self.value
 	dropdown.list:Hide()
 
 	dropdown.valueText:SetText(self:GetText() or self.value)
 
 	local callback = dropdown.OnValueChanged or dropdown.callback
-	print("[PhanxConfig] callback exists:", callback ~= nil, "type:", type(callback))
+	-- print("[PhanxConfig] callback exists:", callback ~= nil, "type:", type(callback))
 	if callback then
 		local ok, err = pcall(callback, dropdown, self.value, self:GetText())
 		if not ok then
-			print("[PhanxConfig] CALLBACK ERROR:", err)
+			-- print("[PhanxConfig] CALLBACK ERROR:", err)
 		end
 	end
 
@@ -138,7 +142,7 @@ local function ListButton_OnClick(self)
 end
 
 local function CreateListButton(parent)
-	print("[PhanxConfig] CreateListButton called")
+	-- print("[PhanxConfig] CreateListButton called")
 	local button = CreateFrame("Button", nil, parent)
 	button:SetHeight(UIDROPDOWNMENU_BUTTON_HEIGHT)
 	button:SetFrameLevel(parent:GetFrameLevel() + 10)
@@ -172,14 +176,15 @@ local function CreateListButton(parent)
 	button:EnableMouse(true)
 	button:SetScript("OnClick", ListButton_OnClick)
 	button:SetScript("OnMouseDown", function(self, btn)
-		print("[PhanxConfig] Button OnMouseDown:", btn)
+		-- print("[PhanxConfig] Button OnMouseDown:", btn)
 	end)
 	button:SetScript("OnMouseUp", function(self, btn)
-		print("[PhanxConfig] Button OnMouseUp:", btn)
+		-- print("[PhanxConfig] Button OnMouseUp:", btn)
 	end)
 	button:SetScript("OnEnter", function(self)
-		print("[PhanxConfig] Button OnEnter")
+		-- print("[PhanxConfig] Button OnEnter")
 	end)
+
 
 	return button
 end
@@ -300,27 +305,18 @@ function CreateList(dropdown) -- local
 
 	-- Diagnostic: print what frame is under the mouse every 1 second while list is shown
 	local diagTimer = 0
-	list:SetScript("OnUpdate", function(self, elapsed)
-		diagTimer = diagTimer + elapsed
-		if diagTimer > 1 then
-			diagTimer = 0
-			local focus = GetMouseFocus()
-			if focus then
-				print(
-					"[PhanxConfig-DIAG] MouseFocus:",
-					focus:GetName() or "unnamed",
-					"type:",
-					focus:GetObjectType(),
-					"strata:",
-					focus:GetFrameStrata(),
-					"level:",
-					focus:GetFrameLevel()
-				)
-			else
-				print("[PhanxConfig-DIAG] MouseFocus: nil")
+-- [[
+			if diagTimer > 1 then
+				diagTimer = 0
+				local focus = GetMouseFocus()
+				if focus then
+					-- print(...)
+				else
+					-- print("[PhanxConfig-DIAG] MouseFocus: nil")
+				end
 			end
-		end
-	end)
+-- ]]
+
 
 	list.text = list:CreateFontString()
 	list.text:SetFont((GameFontNormal:GetFont()), UIDROPDOWNMENU_DEFAULT_TEXT_HEIGHT + 2)
@@ -368,7 +364,7 @@ end
 ------------------------------------------------------------------------
 
 local function Button_OnClick(self)
-	print("[PhanxConfig] Button_OnClick - dropdown button clicked")
+	-- print("[PhanxConfig] Button_OnClick - dropdown button clicked")
 	if PlaySound then
 		pcall(PlaySound, SOUNDKIT and SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON or 856)
 	end
