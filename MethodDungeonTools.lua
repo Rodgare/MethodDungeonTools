@@ -1204,18 +1204,18 @@ function MethodDungeonTools:AddOrRemoveEnemyBlipToCurrentPull(i, add, ignoreGrou
 end
 
 MethodDungeonTools.pullColors = {
-	{ 1, 0.4, 0.4 }, -- Red
-	{ 0.4, 1, 0.4 }, -- Green
-	{ 0.4, 0.4, 1 }, -- Blue
-	{ 1, 1, 0.4 }, -- Yellow
-	{ 1, 0.4, 1 }, -- Magenta
-	{ 0.4, 1, 1 }, -- Cyan
-	{ 1, 0.64, 0 }, -- Orange
+	{ 1, 0, 0 }, -- Bright Red
+	{ 0, 1, 0 }, -- Bright Green
+	{ 0, 0.4, 1 }, -- Electric Blue
+	{ 1, 1, 0 }, -- Bright Yellow
+	{ 1, 0.4, 1 }, -- Bright Magenta
+	{ 0, 1, 1 }, -- Bright Cyan
+	{ 1, 0.5, 0 }, -- Bright Orange
 	{ 0.64, 0.16, 0.16 }, -- Brown
-	{ 0.5, 0.5, 0.5 }, -- Gray
-	{ 1, 0.75, 0.79 }, -- Pink
-	{ 0.5, 0, 0.5 }, -- Purple
-	{ 0, 0.5, 0.5 }, -- Teal
+	{ 0.7, 1, 0 }, -- Lime Green
+	{ 1, 0.3, 0.6 }, -- Hot Pink
+	{ 0.7, 0, 1 }, -- Bright Purple
+	{ 0, 1, 0.5 }, -- Bright Mint/Teal
 }
 
 ---UpdateEnemyBlipSelection
@@ -2642,10 +2642,7 @@ function MethodDungeonTools:UpdateDungeonEnemies()
 							end
 						end
 
-						local r, g, b =
-							dungeonEnemyBlips[idx].color.r,
-							dungeonEnemyBlips[idx].color.g,
-							dungeonEnemyBlips[idx].color.b
+						local r, g, b = 0.5, 0.5, 0.5
 
 						-- Check if this enemy is in a pull, color the border accordingly
 						local preset = db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]]
