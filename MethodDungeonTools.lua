@@ -1893,10 +1893,14 @@ function MethodDungeonTools:MakeMapTexture(frame)
 			end
 
 			-- Always show the Clear Lines button
-			MethodDungeonTools.main_frame.GridToggle:Show()
+			if db.devMode then
+				MethodDungeonTools.main_frame.GridToggle:Show()
+			else
+				MethodDungeonTools.main_frame.GridToggle:Hide()
+			end
 
 			-- Drawing Tool logic everywhere!
-			if IsControlKeyDown() and IsMouseButtonDown("LeftButton") then
+			if db.devMode and IsControlKeyDown() and IsMouseButtonDown("LeftButton") then
 				if not scrollFrame.isDrawing then
 					scrollFrame.isDrawing = true
 					scrollFrame.lastDrawX = frameX
