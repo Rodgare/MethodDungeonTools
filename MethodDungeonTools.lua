@@ -2337,7 +2337,7 @@ function MethodDungeonTools:CalculateEnemyHealth(boss, fortified, tyrannical, ba
 	if boss == true and tyrannical == true then
 		mult = 1.4
 	end
-	mult = round((1.1 ^ (level - 1)) * mult, 2)
+	mult = round((1.15 ^ (level - 1)) * mult, 2)
 	return round(mult * baseHealth, 0)
 end
 
