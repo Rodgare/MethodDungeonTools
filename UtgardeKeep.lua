@@ -80,7 +80,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 		["health"] = 999,
 		["level"] = 80,
 		["creatureType"] = "Humanoid",
-		["count"] = 0.74,
+		["count"] = 0,
 		["color"] = { r = 1, g = 1, b = 1, a = 0.8 },
 		["scale"] = 1,
 		["clones"] = {
@@ -254,7 +254,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 		["health"] = 999,
 		["level"] = 80,
 		["creatureType"] = "Humanoid",
-		["count"] = 0.36,
+		["count"] = 0,
 		["color"] = { r = 1, g = 1, b = 1, a = 0.8 },
 		["scale"] = 1,
 		["clones"] = {
