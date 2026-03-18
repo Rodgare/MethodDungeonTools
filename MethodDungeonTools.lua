@@ -2708,15 +2708,16 @@ function MethodDungeonTools:UpdateDungeonEnemies()
 							dungeonEnemyBlips[idx].pullCircle:SetHeight(finalSize)
 						end
 
-						-- Set alpha based on pull membership
-						-- NPCs in ANY pull (pullIdx is set) are 1.0 (opaque)
-						-- NPCs not in any pull are 0.5 (semi-transparent)
-						dungeonEnemyBlips[idx]:SetAlpha(dungeonEnemyBlips[idx].pullIdx and 1 or 0.8)
+						dungeonEnemyBlips[idx]:SetAlpha(1.0)
+						dungeonEnemyBlips[idx].texture:SetVertexColor(
+							1,
+							1,
+							1,
+							dungeonEnemyBlips[idx].pullIdx and 1.0 or 0.7
+						)
 
-						-- Force the circular border to be 100% fully opaque regardless of the database value
 						dungeonEnemyBlips[idx].colorOverlay:SetVertexColor(r, g, b, 1.0)
 
-						-- Semi-transparent pull color circle on top of icon
 						if dungeonEnemyBlips[idx].pullCircle then
 							if dungeonEnemyBlips[idx].pullIdx then
 								dungeonEnemyBlips[idx].pullCircle:SetVertexColor(r, g, b, 0.4)
