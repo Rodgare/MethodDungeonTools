@@ -2336,7 +2336,7 @@ function MethodDungeonTools:MakeMapTexture(frame)
 end
 
 local function round(number, decimals)
-	return (("%%.%df"):format(decimals)):format(number)
+	return tonumber((("%%.%df"):format(decimals)):format(number))
 end
 function MethodDungeonTools:CalculateEnemyHealth(boss, fortified, tyrannical, baseHealth, level)
 	local mult = 1
@@ -4776,13 +4776,25 @@ function MethodDungeonTools:ShowEnemyInfoFrame(blipIndex, bossIndex)
 		f.infoId:SetText(tostring(data.id))
 		f.infoId:SetCursorPosition(0)
 
-		local hp = data.health or 0
-		if hp > 1000000 then
+		local fortified = false
+		if db.presets and db.presets[db.currentDungeonIdx] then
+			local p = db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]]
+			if p and p.value and p.value.currentAffix == "fortified" then
+				fortified = true
+			end
+		end
+		local tyrannical = not fortified
+		local isBoss = bossIndex ~= nil
+		local level = db.currentDifficulty or 1
+		local baseHp = data.health or 0
+		local hp = tonumber(self:CalculateEnemyHealth(isBoss, fortified, tyrannical, baseHp, level))
+
+		if hp and hp > 10000000 then
 			f.infoHealth:SetText(string.format("%.2fm", hp / 1000000))
-		elseif hp > 1000 then
+		elseif hp > 10000 then
 			f.infoHealth:SetText(string.format("%.1fk", hp / 1000))
 		else
-			f.infoHealth:SetText(tostring(hp))
+			f.infoHealth:SetText(self:FormatEnemyHealth(hp) .. " (" .. hp .. ")")
 		end
 
 		f.infoType:SetText(data.creatureType or "Unknown")
