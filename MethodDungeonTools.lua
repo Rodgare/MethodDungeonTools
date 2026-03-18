@@ -2491,23 +2491,9 @@ function MethodDungeonTools:UpdateDungeonEnemies()
 							dungeonEnemyBlips[idx].texture:SetAllPoints()
 
 							dungeonEnemyBlips[idx].selected = false
-							dungeonEnemyBlips[idx].fontString = dungeonEnemyBlips[idx]:CreateFontString(
-								"MethodDungeonToolsDungeonEnemyBlip" .. idx .. "Text",
-								"OVERLAY",
-								"GameFontHighlightSmall"
-							)
-							local font, size = dungeonEnemyBlips[idx].fontString:GetFont()
-							dungeonEnemyBlips[idx].fontName = font
-							dungeonEnemyBlips[idx].fontString:SetFont(font, 9, "OUTLINE")
-							dungeonEnemyBlips[idx].fontString:SetPoint(
-								"CENTER",
-								dungeonEnemyBlips[idx],
-								"CENTER",
-								-0.5,
-								-0.5
-							)
-							dungeonEnemyBlips[idx].fontString:SetShadowOffset(0, 0)
-							dungeonEnemyBlips[idx].fontString:SetJustifyH("CENTER")
+							dungeonEnemyBlips[idx].fontString = dungeonEnemyBlips[idx]:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+							dungeonEnemyBlips[idx].fontString:SetPoint("CENTER", dungeonEnemyBlips[idx], "CENTER", 0, 0)
+							dungeonEnemyBlips[idx].fontString:Hide()
 						end
 						dungeonEnemyBlips[idx].count = data["count"]
 						dungeonEnemyBlips[idx].name = data["name"]
@@ -2608,12 +2594,13 @@ function MethodDungeonTools:UpdateDungeonEnemies()
 							dungeonEnemyBlips[idx].pullCircle:SetWidth(10 * data["scale"])
 							dungeonEnemyBlips[idx].pullCircle:SetHeight(10 * data["scale"])
 						end
+						dungeonEnemyBlips[idx]:ClearAllPoints()
 						dungeonEnemyBlips[idx]:SetPoint(
 							"CENTER",
 							MethodDungeonTools.main_frame.mapPanelTile1,
 							"TOPLEFT",
-							clone.x,
-							clone.y
+							math.floor(clone.x + 0.5),
+							math.floor(clone.y + 0.5)
 						)
 						dungeonEnemyBlips[idx].outline:SetPoint("CENTER", dungeonEnemyBlips[idx], "CENTER", 0, 0)
 						dungeonEnemyBlips[idx].outline:SetWidth((10 * data["scale"]) * 1.3)
@@ -2731,12 +2718,7 @@ function MethodDungeonTools:UpdateDungeonEnemies()
 						dungeonEnemyBlips[idx].colorOverlay:Show()
 
 						if dungeonEnemyBlips[idx].fontString then
-							if dungeonEnemyBlips[idx].pullIdx then
-								dungeonEnemyBlips[idx].fontString:SetText(dungeonEnemyBlips[idx].pullIdx)
-								dungeonEnemyBlips[idx].fontString:Show()
-							else
-								dungeonEnemyBlips[idx].fontString:Hide()
-							end
+							dungeonEnemyBlips[idx].fontString:Hide()
 						end
 
 						--clear patrol flag
