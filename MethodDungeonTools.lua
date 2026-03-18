@@ -711,6 +711,15 @@ function MethodDungeonTools:MakeTopBottomTextures(frame)
 		frame.bottomPanelTex:SetAllPoints()
 		frame.bottomPanelTex:SetDrawLayer("ARTWORK", -5)
 		MethodDungeonTools:SetColorTexture(frame.bottomPanelTex, 0, 0, 0, 0.7)
+
+		frame.bottomPanelVersion = frame.bottomPanel:CreateFontString("MethodDungeonTools version")
+		frame.bottomPanelVersion:SetFont("Fonts\\FRIZQT__.TTF", 10)
+		frame.bottomPanelVersion:SetTextColor(1, 1, 1, 0.7)
+		frame.bottomPanelVersion:SetJustifyH("LEFT")
+		frame.bottomPanelVersion:SetText(
+			"v: " .. (GetAddOnMetadata(addonName, "Version") or "1.0.1") .. " Адаптация под Sirus: Coda"
+		)
+		frame.bottomPanelVersion:SetPoint("LEFT", frame.bottomPanel, "LEFT", 10, 0)
 	end
 
 	frame.bottomPanel:ClearAllPoints()
