@@ -5,7 +5,7 @@
 ## Notes: Инструмент для планирования и оптимизации прохождения подземелий Mythic+.
 ## OptionalDeps: LibStub, LibUIDropDownMenu
 ## SavedVariables: MethodDungeonToolsDB
-
+## X-Sirus-Update: https://Rodgare/MethodDungeonTools/tree/main
 ## OptionalDeps: Ace3
 
 #@no-lib-strip@
