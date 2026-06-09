@@ -279,15 +279,7 @@ function MethodDungeonTools:OpenReceivedPresetDialog(sender, importString)
 		importString = importString,
 	}
 
-	local popupText =
-		string.format("Игрок %s поделился маршрутом", sender or "неизвестно")
-	if StaticPopup_Show then
-		StaticPopup_Show("METHOD_DUNGEON_TOOLS_IMPORT_SHARE", popupText)
-		return
-	end
-
-	print("|cFF00FF00[MDT]|r " .. popupText)
-	print("|cFF00FF00[MDT]|r Открой MDT и импортируй строку вручную.")
+	Dialog:Spawn("MethodDungeonToolsImportShareDialog", { sender = sender })
 end
 
 function MethodDungeonTools:AcceptSharedPreset()
@@ -402,23 +394,6 @@ function MethodDungeonTools:ShareCurrentPreset()
 
 	print("|cFF00FF00[MDT]|r Маршрут отправлен в канал: " .. channel)
 end
-
--- StaticPopupDialogs = StaticPopupDialogs or {} -- TAINT!!!!11
-StaticPopupDialogs["METHOD_DUNGEON_TOOLS_IMPORT_SHARE"] = {
-	text = "%s",
-	button1 = "Принять",
-	button2 = "Отклонить",
-	OnAccept = function()
-		MethodDungeonTools:AcceptSharedPreset()
-	end,
-	OnCancel = function()
-		MethodDungeonTools:DeclineSharedPreset()
-	end,
-	timeout = 0,
-	whileDead = 1,
-	hideOnEscape = 1,
-	preferredIndex = 3,
-}
 
 local initFrames
 -------------------------
@@ -567,6 +542,31 @@ do
 				buttons = {
 					{ text = CLOSE },
 				},
+				show_while_dead = true,
+				hide_on_escape = true,
+			})
+			Dialog:Register("MethodDungeonToolsImportShareDialog", {
+				text = "",
+				width = 420,
+				buttons = {
+					{
+						text = "Принять",
+						on_click = function()
+							MethodDungeonTools:AcceptSharedPreset()
+						end,
+					},
+					{
+						text = "Отклонить",
+						on_click = function()
+							MethodDungeonTools:DeclineSharedPreset()
+						end,
+					},
+				},
+				on_show = function(self, data)
+					self.text:SetText(
+						string.format("Игрок %s поделился маршрутом", data.sender or "неизвестно")
+					)
+				end,
 				show_while_dead = true,
 				hide_on_escape = true,
 			})
