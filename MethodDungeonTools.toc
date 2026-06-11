@@ -1,7 +1,7 @@
 ## Interface: 30300
 ## Title: Method Dungeon Tools (Sirus)
 ## Author: Nnogga, Sirus Edition by Coda
-## Version: 1.0.3
+## Version: 1.0.4
 ## Notes: Инструмент для планирования и оптимизации прохождения подземелий Mythic+.
 ## OptionalDeps: LibStub, LibUIDropDownMenu
 ## SavedVariables: MethodDungeonToolsDB
@@ -31,7 +31,7 @@ AceGUIWidget-MethodDungeonToolsPullButton.lua
 AceGUIWidget-MethodDungeonToolsNewPullButton.lua
 MethodDungeonTools.lua
 Transmission.lua
-Ahnkahet.lua
+AuchenaiCrypts.lua
 DrakTharonKeep.lua
 HallsOfLightning.lua
 HellfireRamparts.lua

@@ -7,7 +7,7 @@ MethodDungeonTools.dungeonBosses = {}
 MethodDungeonTools.dungeonTotalCount = {}
 MethodDungeonTools.dungeonMaps = {}
 MethodDungeonTools.dungeonList = {
-	{ text = "Ан'кахет: Старое Королевство", value = 1 },
+	{ text = "Аукенайские гробницы", value = 1 },
 	{ text = "Драк'Тарон", value = 2 },
 	{ text = "Чертоги молний", value = 3 },
 	{ text = "Бастионы адского пламени", value = 4 },
@@ -17,7 +17,7 @@ MethodDungeonTools.dungeonList = {
 	{ text = "Крепость Утгард", value = 8 },
 }
 MethodDungeonTools.dungeonSubLevels = {
-	[1] = { { text = "1-й ярус", value = 1 } },
+	[1] = { { text = "1-й ярус", value = 1 }, { text = "2-й ярус", value = 2 } },
 	[2] = { { text = "1-й ярус", value = 1 }, { text = "2-й ярус", value = 2 } },
 	[3] = { { text = "1-й ярус", value = 1 }, { text = "2-й ярус", value = 2 } },
 	[4] = { { text = "1-й ярус", value = 1 } },
@@ -587,8 +587,9 @@ local dungeonEnemiesSelected = {}
 -- MethodDungeonTools.dungeonMaps = { -- Initialized at the top now
 MethodDungeonTools.dungeonMaps = {
 	[1] = {
-		[0] = "Ahnkahet",
-		[1] = "Ahnkahet1_",
+		[0] = "AuchenaiCrypts",
+		[1] = "AuchenaiCrypts1_",
+		[2] = "AuchenaiCrypts2_",
 	},
 	[2] = {
 		[0] = "DrakTharonKeep",
