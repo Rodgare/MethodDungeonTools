@@ -47,7 +47,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[18493] = { -- Map ID 18493 to array index in lua
 		["id"] = 18493,
-		spells = { 32858, 32859, 32860 },
+		spells = { 32858, 32859, 32860, 32853, 32854, 32855, 32856, 32857 },
 		["iconId"] = 32858,
 		["name"] = "Аукенайский жрец душ",
 		["health"] = 18333,
@@ -81,7 +81,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[18495] = { -- Map ID 18495 to array index in lua
 		["id"] = 18495,
-		spells = { 17289, 32861 },
+		spells = { 17289, 32861, 32853, 32854, 32855, 32856, 32857 },
 		["iconId"] = 17289,
 		["name"] = "Аукенайский воздаятель",
 		["health"] = 13720,
@@ -103,7 +103,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[18497] = { -- Map ID 18497 to array index in lua
 		["id"] = 18497,
-		spells = { 32846, 32849, 37321, 38168 },
+		spells = { 32846, 32849, 37321, 38168, 32853, 32854, 32855, 32856, 32857 },
 		["iconId"] = 32849,
 		["name"] = "Аукенайский монах",
 		["health"] = 18333,
@@ -149,7 +149,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[18521] = { -- Map ID 18521 to array index in lua
 		["id"] = 18521,
-		spells = { },
+		spells = { 199046, 30641 },
 		["iconId"] = 32885,
 		["name"] = "Свирепый скелет",
 		["health"] = 17396,
@@ -171,7 +171,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 	},
 	[18524] = { -- Map ID 18524 to array index in lua
 		["id"] = 18524,
-		spells = { 32885 },
+		spells = { 59611, 34920, 32885 },
 		["iconId"] = 32885,
 		["name"] = "Разгневанный скелет",
 		["health"] = 16819,
