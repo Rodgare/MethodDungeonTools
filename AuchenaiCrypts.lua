@@ -272,7 +272,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 		["health"] = 3303,
 		["level"] = 80,
 		["creatureType"] = "Нежить",
-		["count"] = 0.5,
+		["count"] = 0,
 		["scale"] = 0.8,
 		["color"] = { r = 1, g = 1, b = 1, a = 0.8 },
 		["clones"] = {
