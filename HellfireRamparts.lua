@@ -10,6 +10,7 @@ MethodDungeonTools.dungeonBosses[dungeonIndex] = {
 			["name"] = "Начальник стражи Гарголмар",
 			["encounterID"] = 17306,
 			["id"] = 17306,
+			spells = { 34645, 32154, 30641, 22857 },
 			["displayId"] = 17306,
 			["health"] = 431392,
 			["x"] = 612, -- 193.121
@@ -19,6 +20,7 @@ MethodDungeonTools.dungeonBosses[dungeonIndex] = {
 			["name"] = "Омор Неодолимый",
 			["encounterID"] = 17308,
 			["id"] = 17308,
+			spells = { 30637, 30686, 30695, 30707 },
 			["displayId"] = 17308,
 			["health"] = 431392,
 			["x"] = 327, -- 193.121
@@ -28,6 +30,7 @@ MethodDungeonTools.dungeonBosses[dungeonIndex] = {
 			["name"] = "Вазруден Глашатай",
 			["encounterID"] = 17307,
 			["id"] = 17307,
+			spells = { 30637, 30686, 30695, 30707 },
 			["displayId"] = 17307,
 			["health"] = 431392,
 			["x"] = 297, -- 193.121
@@ -37,6 +40,21 @@ MethodDungeonTools.dungeonBosses[dungeonIndex] = {
 }
 
 MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
+	[17536] = { -- Map ID 17259 to array index in lua
+		["id"] = 17536,
+		spells = { 36920 },
+		["iconId"] = 36920,
+		["name"] = "Назан",
+		["health"] = 1752530,
+		["level"] = 82,
+		["creatureType"] = "Драконид",
+		["count"] = 0,
+		["scale"] = 1,
+		["color"] = { r = 2, g = 3, b = 4, a = 0.8 },
+		["clones"] = {
+			[1] = {x = 307.34337181616,y = -470.31517809412,sublevel=1,g=34},
+		},
+	},
 	[17259] = { -- Map ID 17259 to array index in lua
 		["id"] = 17259,
 		spells = { 16244, 14516, 6713 },
@@ -45,7 +63,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 		["health"] = 693000,
 		["level"] = 80,
 		["creatureType"] = "Гуманоид",
-		["count"] = 1.2,
+		["count"] = 1.33,
 		["scale"] = 0.8,
 		["color"] = { r = 2, g = 3, b = 4, a = 0.8 },
 		["clones"] = {
@@ -77,7 +95,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 		["health"] = 693000,
 		["level"] = 80,
 		["creatureType"] = "Гуманоид",
-		["count"] = 1.2,
+		["count"] = 1.33,
 		["scale"] = 0.8,
 		["color"] = { r = 2, g = 3, b = 4, a = 0.8 },
 		["clones"] = {
@@ -93,7 +111,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 		["health"] = 693000,
 		["level"] = 80,
 		["creatureType"] = "Гуманоид",
-		["count"] = 1.2,
+		["count"] = 1.33,
 		["scale"] = 0.8,
 		["color"] = { r = 2, g = 3, b = 4, a = 0.8 },
 		["clones"] = {
@@ -114,7 +132,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 		["health"] = 554400,
 		["level"] = 80,
 		["creatureType"] = "Гуманоид",
-		["count"] = 1.2,
+		["count"] = 1.33,
 		["scale"] = 0.8,
 		["color"] = { r = 2, g = 3, b = 4, a = 0.8 },
 		["clones"] = {
@@ -144,7 +162,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 		["health"] = 693000,
 		["level"] = 80,
 		["creatureType"] = "Гуманоид",
-		["count"] = 1.2,
+		["count"] = 1.33,
 		["scale"] = 0.8,
 		["color"] = { r = 2, g = 3, b = 4, a = 0.8 },
 		["clones"] = {
@@ -164,7 +182,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 		["health"] = 693000,
 		["level"] = 80,
 		["creatureType"] = "Гуманоид",
-		["count"] = 1.2,
+		["count"] = 1.33,
 		["scale"] = 0.8,
 		["color"] = { r = 2, g = 3, b = 4, a = 0.8 },
 		["clones"] = {
@@ -194,7 +212,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 		["health"] = 252000,
 		["level"] = 80,
 		["creatureType"] = "Животное",
-		["count"] = 1.2,
+		["count"] = 1.33,
 		["scale"] = 0.7,
 		["color"] = { r = 2, g = 3, b = 4, a = 0.8 },
 		["clones"] = {
@@ -228,7 +246,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 		["health"] = 693000,
 		["level"] = 80,
 		["creatureType"] = "Гуманоид",
-		["count"] = 1.2,
+		["count"] = 1.33,
 		["scale"] = 0.8,
 		["color"] = { r = 2, g = 3, b = 4, a = 0.8 },
 		["clones"] = {
@@ -244,7 +262,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 		["health"] = 1008000,
 		["level"] = 80,
 		["creatureType"] = "Гуманоид",
-		["count"] = 1.2,
+		["count"] = 1.33,
 		["scale"] = 1,
 		["color"] = { r = 2, g = 3, b = 4, a = 0.8 },
 		["clones"] = {
@@ -259,7 +277,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 		["health"] = 201600,
 		["level"] = 80,
 		["creatureType"] = "Гуманоид",
-		["count"] = 1.2,
+		["count"] = 1.33,
 		["scale"] = 0.8,
 		["color"] = { r = 2, g = 3, b = 4, a = 0.8 },
 		["clones"] = {
@@ -270,6 +288,21 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 			[5] = { x = 534.25226546388, y = -245.99269362432, sublevel = 1, g = 22 },
 			[6] = { x = 524.25226546388, y = -245.99269362432, sublevel = 1, g = 22 },
 			[7] = { x = 524.25226546388, y = -255.99269362432, sublevel = 1, g = 22 },
+		},
+	},
+	[17540] = { -- Map ID 17478 to array index in lua
+		["id"] = 17540,
+		spells = { 35748, 15785 },
+		["iconId"] = 15785,
+		["name"] = "Злобная гончая",
+		["health"] = 214200,
+		["level"] = 80,
+		["creatureType"] = "Демон",
+		["count"] = 0,
+		["scale"] = 0.6,
+		["color"] = { r = 2, g = 3, b = 4, a = 0.8 },
+		["clones"] = {
+			[1] = {x = 339.97336710129,y = -104.97921278263,sublevel=1,g=33},
 		},
 	},
 }

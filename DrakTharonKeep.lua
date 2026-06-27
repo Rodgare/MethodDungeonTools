@@ -10,8 +10,9 @@ MethodDungeonTools.dungeonBosses[dungeonIndex] = {
 			["name"] = "Кровотролль",
 			["encounterID"] = 26630,
 			["id"] = 26630,
+			spells = { 49639, 49637, 49380, 49555 },
 			["displayId"] = 26630,
-			["health"] = 100000,
+			["health"] = 280404,
 			["x"] = 474.51697032218,
 			["y"] = -102.8432592536,
 		},
@@ -19,8 +20,9 @@ MethodDungeonTools.dungeonBosses[dungeonIndex] = {
 			["name"] = "Новос Призыватель",
 			["encounterID"] = 26631,
 			["id"] = 26631,
+			spells = { 49034, 49037, 50089, 59910 },
 			["displayId"] = 26631,
-			["health"] = 100000,
+			["health"] = 404430,
 			["x"] = 583.55428850967,
 			["y"] = -261.65782094358,
 		},
@@ -28,8 +30,9 @@ MethodDungeonTools.dungeonBosses[dungeonIndex] = {
 			["name"] = "Король Дред",
 			["encounterID"] = 27483,
 			["id"] = 27483,
+			spells = { 48920, 48873, 414266, 48878, 22686, 48849 },
 			["displayId"] = 27483,
-			["health"] = 100000,
+			["health"] = 560809,
 			["x"] = 511,
 			["y"] = -482,
 		},
@@ -37,10 +40,11 @@ MethodDungeonTools.dungeonBosses[dungeonIndex] = {
 	[2] = {
 		[1] = {
 			["id"] = 26632,
+			spells = { 59963, 59965, 59969, 53463, 59973, 59971, 59972, 49356 },
 			["name"] = "Пророк Тарон'джа",
 			["encounterID"] = 26632,
 			["displayId"] = 26632,
-			["health"] = 100000,
+			["health"] = 665961,
 			["x"] = 401,
 			["y"] = -74,
 		},
@@ -56,7 +60,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 		["health"] = 130330,
 		["level"] = 81,
 		["creatureType"] = "Нежить",
-		["count"] = 2.2,
+		["count"] = 2.44,
 		["scale"] = 1.2,
 		["color"] = { r = 2, g = 3, b = 4, a = 0.8 },
 		["clones"] = {
@@ -72,7 +76,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 		["health"] = 63000,
 		["level"] = 80,
 		["creatureType"] = "Животное",
-		["count"] = 0.5,
+		["count"] = 0.55,
 		["scale"] = 1.2,
 		["color"] = { r = 2, g = 3, b = 4, a = 0.8 },
 		["clones"] = {
@@ -91,7 +95,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 		["health"] = 63000,
 		["level"] = 80,
 		["creatureType"] = "Гуманоид",
-		["count"] = 2.2,
+		["count"] = 2.44,
 		["scale"] = 1.2,
 		["color"] = { r = 2, g = 3, b = 4, a = 0.8 },
 		["clones"] = {
@@ -107,7 +111,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 		["health"] = 63000,
 		["level"] = 80,
 		["creatureType"] = "Животное",
-		["count"] = 2.19,
+		["count"] = 2.44,
 		["scale"] = 1.2,
 		["color"] = { r = 2, g = 3, b = 4, a = 0.8 },
 		["clones"] = {
@@ -124,7 +128,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 		["health"] = 63000,
 		["level"] = 80,
 		["creatureType"] = "Нежить",
-		["count"] = 2.19,
+		["count"] = 2.44,
 		["scale"] = 1.2,
 		["color"] = { r = 2, g = 3, b = 4, a = 0.8 },
 		["clones"] = {
@@ -163,7 +167,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 		["health"] = 63000,
 		["level"] = 80,
 		["creatureType"] = "Гуманоид",
-		["count"] = 2.19,
+		["count"] = 2.44,
 		["scale"] = 1.2,
 		["color"] = { r = 2, g = 3, b = 4, a = 0.8 },
 		["clones"] = {
@@ -184,7 +188,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 		["health"] = 63000,
 		["level"] = 80,
 		["creatureType"] = "Нежить",
-		["count"] = 2.2,
+		["count"] = 2.44,
 		["scale"] = 1.4,
 		["color"] = { r = 2, g = 3, b = 4, a = 0.8 },
 		["clones"] = {
@@ -199,7 +203,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 		["health"] = 63000,
 		["level"] = 80,
 		["creatureType"] = "Нежить",
-		["count"] = 2.19,
+		["count"] = 2.44,
 		["scale"] = 1.2,
 		["color"] = { r = 2, g = 3, b = 4, a = 0.8 },
 		["clones"] = {
@@ -217,7 +221,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 		["health"] = 63000,
 		["level"] = 80,
 		["creatureType"] = "Нежить",
-		["count"] = 2.2,
+		["count"] = 2.44,
 		["scale"] = 1.2,
 		["color"] = { r = 2, g = 3, b = 4, a = 0.8 },
 		["clones"] = {
@@ -234,7 +238,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 		["health"] = 63000,
 		["level"] = 80,
 		["creatureType"] = "Нежить",
-		["count"] = 2.2,
+		["count"] = 5.77,
 		["scale"] = 1.2,
 		["color"] = { r = 2, g = 3, b = 4, a = 0.8 },
 		["clones"] = {
@@ -249,7 +253,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 		["health"] = 63000,
 		["level"] = 80,
 		["creatureType"] = "Гуманоид",
-		["count"] = 2.2,
+		["count"] = 2.44,
 		["scale"] = 1.2,
 		["color"] = { r = 2, g = 3, b = 4, a = 0.8 },
 		["clones"] = {
@@ -265,7 +269,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 		["health"] = 63000,
 		["level"] = 80,
 		["creatureType"] = "Животное",
-		["count"] = 2.2,
+		["count"] = 2.44,
 		["scale"] = 1.2,
 		["color"] = { r = 2, g = 3, b = 4, a = 0.8 },
 		["clones"] = {
@@ -285,7 +289,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 		["health"] = 63000,
 		["level"] = 80,
 		["creatureType"] = "Гуманоид",
-		["count"] = 2.2,
+		["count"] = 2.44,
 		["scale"] = 1.2,
 		["color"] = { r = 2, g = 3, b = 4, a = 0.8 },
 		["clones"] = {
@@ -300,7 +304,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 		["health"] = 100800,
 		["level"] = 80,
 		["creatureType"] = "Нежить",
-		["count"] = 2.19,
+		["count"] = 2.44,
 		["scale"] = 1.4,
 		["color"] = { r = 2, g = 3, b = 4, a = 0.8 },
 		["clones"] = {
@@ -320,7 +324,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 		["health"] = 63000,
 		["level"] = 80,
 		["creatureType"] = "Нежить",
-		["count"] = 2.2,
+		["count"] = 2.44,
 		["scale"] = 1,
 		["color"] = { r = 2, g = 3, b = 4, a = 0.8 },
 		["clones"] = {
@@ -337,7 +341,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 		["health"] = 63000,
 		["level"] = 80,
 		["creatureType"] = "Нежить",
-		["count"] = 2.2,
+		["count"] = 2.44,
 		["scale"] = 1,
 		["color"] = { r = 2, g = 3, b = 4, a = 0.8 },
 		["clones"] = {
@@ -356,7 +360,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 		["health"] = 12600,
 		["level"] = 80,
 		["creatureType"] = "Животное",
-		["count"] = 0.5,
+		["count"] = 0,
 		["scale"] = 1,
 		["color"] = { r = 2, g = 3, b = 4, a = 0.8 },
 		["clones"] = {
