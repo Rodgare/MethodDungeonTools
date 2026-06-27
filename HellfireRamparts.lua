@@ -63,7 +63,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 		["health"] = 693000,
 		["level"] = 80,
 		["creatureType"] = "Гуманоид",
-		["count"] = 1.33,
+		["count"] = 1.33333,
 		["scale"] = 0.8,
 		["color"] = { r = 2, g = 3, b = 4, a = 0.8 },
 		["clones"] = {
@@ -95,7 +95,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 		["health"] = 693000,
 		["level"] = 80,
 		["creatureType"] = "Гуманоид",
-		["count"] = 1.33,
+		["count"] = 1.33333,
 		["scale"] = 0.8,
 		["color"] = { r = 2, g = 3, b = 4, a = 0.8 },
 		["clones"] = {
@@ -111,7 +111,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 		["health"] = 693000,
 		["level"] = 80,
 		["creatureType"] = "Гуманоид",
-		["count"] = 1.33,
+		["count"] = 1.33333,
 		["scale"] = 0.8,
 		["color"] = { r = 2, g = 3, b = 4, a = 0.8 },
 		["clones"] = {
@@ -132,7 +132,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 		["health"] = 554400,
 		["level"] = 80,
 		["creatureType"] = "Гуманоид",
-		["count"] = 1.33,
+		["count"] = 1.33333,
 		["scale"] = 0.8,
 		["color"] = { r = 2, g = 3, b = 4, a = 0.8 },
 		["clones"] = {
@@ -162,7 +162,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 		["health"] = 693000,
 		["level"] = 80,
 		["creatureType"] = "Гуманоид",
-		["count"] = 1.33,
+		["count"] = 1.33333,
 		["scale"] = 0.8,
 		["color"] = { r = 2, g = 3, b = 4, a = 0.8 },
 		["clones"] = {
@@ -182,7 +182,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 		["health"] = 693000,
 		["level"] = 80,
 		["creatureType"] = "Гуманоид",
-		["count"] = 1.33,
+		["count"] = 1.33333,
 		["scale"] = 0.8,
 		["color"] = { r = 2, g = 3, b = 4, a = 0.8 },
 		["clones"] = {
@@ -212,7 +212,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 		["health"] = 252000,
 		["level"] = 80,
 		["creatureType"] = "Животное",
-		["count"] = 1.33,
+		["count"] = 1.33333,
 		["scale"] = 0.7,
 		["color"] = { r = 2, g = 3, b = 4, a = 0.8 },
 		["clones"] = {
@@ -246,7 +246,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 		["health"] = 693000,
 		["level"] = 80,
 		["creatureType"] = "Гуманоид",
-		["count"] = 1.33,
+		["count"] = 1.33333,
 		["scale"] = 0.8,
 		["color"] = { r = 2, g = 3, b = 4, a = 0.8 },
 		["clones"] = {
@@ -262,7 +262,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 		["health"] = 1008000,
 		["level"] = 80,
 		["creatureType"] = "Гуманоид",
-		["count"] = 1.33,
+		["count"] = 1.33333,
 		["scale"] = 1,
 		["color"] = { r = 2, g = 3, b = 4, a = 0.8 },
 		["clones"] = {
@@ -277,7 +277,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 		["health"] = 201600,
 		["level"] = 80,
 		["creatureType"] = "Гуманоид",
-		["count"] = 1.33,
+		["count"] = 1.33333,
 		["scale"] = 0.8,
 		["color"] = { r = 2, g = 3, b = 4, a = 0.8 },
 		["clones"] = {

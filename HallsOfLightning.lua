@@ -116,7 +116,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 		["health"] = 63000,
 		["level"] = 80,
 		["creatureType"] = "Элементаль",
-		["count"] = 1.43,
+		["count"] = 1.43333,
 		["scale"] = 1,
 		["color"] = { r = 2, g = 3, b = 4, a = 0.8 },
 		["clones"] = {
@@ -131,7 +131,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 		["health"] = 7875,
 		["level"] = 80,
 		["creatureType"] = "Элементаль",
-		["count"] = 1.18,
+		["count"] = 1.18888,
 		["scale"] = 1,
 		["color"] = { r = 2, g = 3, b = 4, a = 0.8 },
 		["clones"] = {
@@ -162,7 +162,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 		["health"] = 63000,
 		["level"] = 80,
 		["creatureType"] = "Элементаль",
-		["count"] = 1.43,
+		["count"] = 1.43333,
 		["scale"] = 1,
 		["color"] = { r = 2, g = 3, b = 4, a = 0.8 },
 		["clones"] = {
@@ -181,7 +181,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 		["health"] = 63000,
 		["level"] = 80,
 		["creatureType"] = "Гуманоид",
-		["count"] = 1.43,
+		["count"] = 1.43333,
 		["scale"] = 1,
 		["color"] = { r = 2, g = 3, b = 4, a = 0.8 },
 		["clones"] = {
@@ -203,7 +203,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 		["health"] = 63000,
 		["level"] = 80,
 		["creatureType"] = "Гуманоид",
-		["count"] = 1.43,
+		["count"] = 1.43333,
 		["scale"] = 1,
 		["color"] = { r = 2, g = 3, b = 4, a = 0.8 },
 		["clones"] = {
@@ -223,7 +223,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 		["health"] = 126000,
 		["level"] = 80,
 		["creatureType"] = "Механизм",
-		["count"] = 2.31,
+		["count"] = 2.31111,
 		["scale"] = 1,
 		["color"] = { r = 2, g = 3, b = 4, a = 0.8 },
 		["clones"] = {
@@ -244,7 +244,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 		["health"] = 63000,
 		["level"] = 80,
 		["creatureType"] = "Гуманоид",
-		["count"] = 1.43,
+		["count"] = 1.43333,
 		["scale"] = 1,
 		["color"] = { r = 2, g = 3, b = 4, a = 0.8 },
 		["clones"] = {
@@ -264,7 +264,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 		["health"] = 63000,
 		["level"] = 80,
 		["creatureType"] = "Гуманоид",
-		["count"] = 1.31,
+		["count"] = 1.31111,
 		["scale"] = 1,
 		["color"] = { r = 2, g = 3, b = 4, a = 0.8 },
 		["clones"] = {
@@ -288,7 +288,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 		["health"] = 63000,
 		["level"] = 80,
 		["creatureType"] = "Гуманоид",
-		["count"] = 1.31,
+		["count"] = 1.31111,
 		["scale"] = 1,
 		["color"] = { r = 2, g = 3, b = 4, a = 0.8 },
 		["clones"] = {
@@ -314,7 +314,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 		["health"] = 63000,
 		["level"] = 80,
 		["creatureType"] = "Гуманоид",
-		["count"] = 1.31,
+		["count"] = 1.31111,
 		["scale"] = 1,
 		["color"] = { r = 2, g = 3, b = 4, a = 0.8 },
 		["clones"] = {
@@ -334,7 +334,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 		["health"] = 63000,
 		["level"] = 80,
 		["creatureType"] = "Гуманоид",
-		["count"] = 1.18,
+		["count"] = 1.18888,
 		["scale"] = 1,
 		["color"] = { r = 2, g = 3, b = 4, a = 0.8 },
 		["clones"] = {
@@ -353,7 +353,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 		["health"] = 126000,
 		["level"] = 80,
 		["creatureType"] = "Гуманоид",
-		["count"] = 2.31,
+		["count"] = 2.31111,
 		["scale"] = 1,
 		["color"] = { r = 2, g = 3, b = 4, a = 0.8 },
 		["clones"] = {
@@ -374,7 +374,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 		["health"] = 63000,
 		["level"] = 80,
 		["creatureType"] = "Элементаль",
-		["count"] = 1.56,
+		["count"] = 1.56666,
 		["scale"] = 1,
 		["color"] = { r = 2, g = 3, b = 4, a = 0.8 },
 		["clones"] = {
@@ -401,7 +401,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 		["health"] = 63000,
 		["level"] = 80,
 		["creatureType"] = "Элементаль",
-		["count"] = 1.56,
+		["count"] = 1.566666,
 		["scale"] = 1,
 		["color"] = { r = 2, g = 3, b = 4, a = 0.8 },
 		["clones"] = {
@@ -452,7 +452,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 		["health"] = 126000,
 		["level"] = 80,
 		["creatureType"] = "Великан",
-		["count"] = 3.6,
+		["count"] = 3.66666,
 		["scale"] = 1,
 		["color"] = { r = 2, g = 3, b = 4, a = 0.8 },
 		["clones"] = {

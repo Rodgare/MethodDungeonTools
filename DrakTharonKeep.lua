@@ -60,7 +60,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 		["health"] = 130330,
 		["level"] = 81,
 		["creatureType"] = "Нежить",
-		["count"] = 2.44,
+		["count"] = 2.44444,
 		["scale"] = 1.2,
 		["color"] = { r = 2, g = 3, b = 4, a = 0.8 },
 		["clones"] = {
@@ -76,7 +76,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 		["health"] = 63000,
 		["level"] = 80,
 		["creatureType"] = "Животное",
-		["count"] = 0.55,
+		["count"] = 0.55555,
 		["scale"] = 1.2,
 		["color"] = { r = 2, g = 3, b = 4, a = 0.8 },
 		["clones"] = {
@@ -95,7 +95,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 		["health"] = 63000,
 		["level"] = 80,
 		["creatureType"] = "Гуманоид",
-		["count"] = 2.44,
+		["count"] = 2.44444,
 		["scale"] = 1.2,
 		["color"] = { r = 2, g = 3, b = 4, a = 0.8 },
 		["clones"] = {
@@ -111,7 +111,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 		["health"] = 63000,
 		["level"] = 80,
 		["creatureType"] = "Животное",
-		["count"] = 2.44,
+		["count"] = 2.44444,
 		["scale"] = 1.2,
 		["color"] = { r = 2, g = 3, b = 4, a = 0.8 },
 		["clones"] = {
@@ -128,7 +128,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 		["health"] = 63000,
 		["level"] = 80,
 		["creatureType"] = "Нежить",
-		["count"] = 2.44,
+		["count"] = 2.44444,
 		["scale"] = 1.2,
 		["color"] = { r = 2, g = 3, b = 4, a = 0.8 },
 		["clones"] = {
@@ -167,7 +167,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 		["health"] = 63000,
 		["level"] = 80,
 		["creatureType"] = "Гуманоид",
-		["count"] = 2.44,
+		["count"] = 2.44444,
 		["scale"] = 1.2,
 		["color"] = { r = 2, g = 3, b = 4, a = 0.8 },
 		["clones"] = {
@@ -188,7 +188,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 		["health"] = 63000,
 		["level"] = 80,
 		["creatureType"] = "Нежить",
-		["count"] = 2.44,
+		["count"] = 2.44444,
 		["scale"] = 1.4,
 		["color"] = { r = 2, g = 3, b = 4, a = 0.8 },
 		["clones"] = {
@@ -203,7 +203,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 		["health"] = 63000,
 		["level"] = 80,
 		["creatureType"] = "Нежить",
-		["count"] = 2.44,
+		["count"] = 2.44444,
 		["scale"] = 1.2,
 		["color"] = { r = 2, g = 3, b = 4, a = 0.8 },
 		["clones"] = {
@@ -221,7 +221,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 		["health"] = 63000,
 		["level"] = 80,
 		["creatureType"] = "Нежить",
-		["count"] = 2.44,
+		["count"] = 2.44444,
 		["scale"] = 1.2,
 		["color"] = { r = 2, g = 3, b = 4, a = 0.8 },
 		["clones"] = {
@@ -238,7 +238,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 		["health"] = 63000,
 		["level"] = 80,
 		["creatureType"] = "Нежить",
-		["count"] = 5.77,
+		["count"] = 5.77777,
 		["scale"] = 1.2,
 		["color"] = { r = 2, g = 3, b = 4, a = 0.8 },
 		["clones"] = {
@@ -253,7 +253,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 		["health"] = 63000,
 		["level"] = 80,
 		["creatureType"] = "Гуманоид",
-		["count"] = 2.44,
+		["count"] = 2.44444,
 		["scale"] = 1.2,
 		["color"] = { r = 2, g = 3, b = 4, a = 0.8 },
 		["clones"] = {
@@ -269,7 +269,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 		["health"] = 63000,
 		["level"] = 80,
 		["creatureType"] = "Животное",
-		["count"] = 2.44,
+		["count"] = 2.44444,
 		["scale"] = 1.2,
 		["color"] = { r = 2, g = 3, b = 4, a = 0.8 },
 		["clones"] = {
@@ -289,7 +289,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 		["health"] = 63000,
 		["level"] = 80,
 		["creatureType"] = "Гуманоид",
-		["count"] = 2.44,
+		["count"] = 2.44444,
 		["scale"] = 1.2,
 		["color"] = { r = 2, g = 3, b = 4, a = 0.8 },
 		["clones"] = {
@@ -304,7 +304,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 		["health"] = 100800,
 		["level"] = 80,
 		["creatureType"] = "Нежить",
-		["count"] = 2.44,
+		["count"] = 2.44444,
 		["scale"] = 1.4,
 		["color"] = { r = 2, g = 3, b = 4, a = 0.8 },
 		["clones"] = {
@@ -324,7 +324,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 		["health"] = 63000,
 		["level"] = 80,
 		["creatureType"] = "Нежить",
-		["count"] = 2.44,
+		["count"] = 2.44444,
 		["scale"] = 1,
 		["color"] = { r = 2, g = 3, b = 4, a = 0.8 },
 		["clones"] = {
@@ -341,7 +341,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 		["health"] = 63000,
 		["level"] = 80,
 		["creatureType"] = "Нежить",
-		["count"] = 2.44,
+		["count"] = 2.44444,
 		["scale"] = 1,
 		["color"] = { r = 2, g = 3, b = 4, a = 0.8 },
 		["clones"] = {

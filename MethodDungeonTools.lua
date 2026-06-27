@@ -1061,7 +1061,7 @@ function MethodDungeonTools:Progressbar_SetValue(self, pullCurrent, totalCurrent
 		self.Bar:SetStatusBarColor(0.26, 0.42, 1)
 	end
 	self.Bar:SetValue(percent)
-	self.Bar.Label:SetText(pullCurrent .. "% (" .. totalCurrent .. "/" .. totalMax .. "%) ")
+	self.Bar.Label:SetText(string.format("%.2f%% (%.2f%%/%.0f%%)", pullCurrent, totalCurrent, totalMax))
 	self.AnimValue = percent
 end
 
@@ -1111,13 +1111,13 @@ function MethodDungeonTools:UpdateEnemiesSelected()
 			.. v.quantity
 			.. "x "
 			.. enemyName
-			.. "("
-			.. v.count * v.quantity
-			.. ")"
+			.. " ("
+			.. string.format("%.2f", v.count * v.quantity)
+			.. "%)"
 		newLineString = "\n"
 		currentTotalCount = currentTotalCount + (v.count * v.quantity)
 	end
-	sidePanelStringText = sidePanelStringText .. newLineString .. newLineString .. "Count: " .. currentTotalCount
+	sidePanelStringText = sidePanelStringText .. newLineString .. newLineString .. "Прогресс: " .. string.format("%.2f%%", currentTotalCount)
 	self.main_frame.sidePanelString:SetText(sidePanelStringText)
 
 	local grandTotal = 0
@@ -1428,10 +1428,10 @@ function MethodDungeonTools:UpdatePullTooltip(tooltip)
 						)
 						text = text .. MethodDungeonTools:FormatEnemyHealth(health) .. " HP" .. newLine
 						text = text
-							.. "Enemy Forces: "
-							.. v.enemyData.count
+							.. "Получаемые %: "
+							.. string.format("%.2f%%", v.enemyData.count)
 							.. " ("
-							.. v.enemyData.count * v.enemyData.quantity
+							.. string.format("%.2f%%", v.enemyData.count * v.enemyData.quantity)
 							.. ")"
 						tooltip.topString:SetText(text)
 						tooltip.topString:Show()
@@ -2097,8 +2097,7 @@ function MethodDungeonTools:MakeMapTexture(frame)
 						.. MethodDungeonTools:FormatEnemyHealth(health)
 						.. " HP\n"
 						.. "Получаемые %: "
-						.. data.count
-						.. "%"
+						.. string.format("%.2f%%", data.count)
 				)
 				tooltip.String:Show()
 				tooltip:Show()
@@ -4315,7 +4314,7 @@ function initFrames()
 		botString:SetJustifyV("BOTTOM")
 		botString:SetHeight(20)
 		botString:SetWidth(250)
-		botString.defaultText = "Получаемые %%: %d  |  Всего: %d/%d"
+		botString.defaultText = "Получаемые %%: %.2f%%  |  Всего: %.2f%%/%.0f%%"
 		botString:SetPoint("BOTTOM", MethodDungeonTools.pullTooltip, "BOTTOM", 0, 14)
 		botString:Hide()
 	end
@@ -4574,6 +4573,36 @@ mdtTrackerFrame:SetScript("OnUpdate", function(self, elapsed)
 	end
 end)
 
+local function DumpTableRecursive(tbl, indent)
+	indent = indent or "   "
+	if type(tbl) ~= "table" then
+		print(indent .. tostring(tbl))
+		return
+	end
+	for k, v in pairs(tbl) do
+		if type(v) == "table" then
+			print(indent .. "-> [" .. tostring(k) .. "] (table):")
+			local subHasData = false
+			for subK, subV in pairs(v) do
+				subHasData = true
+				if type(subV) == "table" then
+					print(indent .. "   [" .. tostring(subK) .. "] (table):")
+					for subK2, subV2 in pairs(subV) do
+						print(indent .. "      [" .. tostring(subK2) .. "] = " .. tostring(subV2))
+					end
+				else
+					print(indent .. "   [" .. tostring(subK) .. "] = " .. tostring(subV))
+				end
+			end
+			if not subHasData then
+				print(indent .. "   (empty table)")
+			end
+		else
+			print(indent .. "-> [" .. tostring(k) .. "] = " .. tostring(v))
+		end
+	end
+end
+
 local function DumpSirusChallengeInfo()
 	if not C_GlobalStorage or not C_GlobalStorage.GetVar then
 		print("|cFFFF0000[MDT Tracker]|r C_GlobalStorage недоступен.")
@@ -4585,7 +4614,7 @@ local function DumpSirusChallengeInfo()
 		"ASMSG_CHALLENGE_MODE_AFFIX_INFO",
 		"ASMSG_CHALLENGE_MODE_MODIFIERS_OVERRIDE",
 	}
-	print("|cFF00FF00[MDT Tracker]|r === Дамп переменных Сируса ===")
+	print("|cFF00FF00[MDT Tracker]|r === Дамп переменных Сируса (с рекурсией) ===")
 	local foundAny = false
 	for _, varName in ipairs(vars) do
 		local ok, data = pcall(function()
@@ -4593,14 +4622,8 @@ local function DumpSirusChallengeInfo()
 		end)
 		if ok and data then
 			foundAny = true
-			if type(data) == "table" then
-				print("|cFFFFD100[GlobalStorage]|r " .. varName .. ":")
-				for k, v in pairs(data) do
-					print("   -> " .. tostring(k) .. " = " .. tostring(v))
-				end
-			else
-				print("|cFFFFD100[GlobalStorage]|r " .. varName .. " = " .. tostring(data))
-			end
+			print("|cFFFFD100[GlobalStorage]|r " .. varName .. ":")
+			DumpTableRecursive(data, "   ")
 		end
 	end
 	if not foundAny then
