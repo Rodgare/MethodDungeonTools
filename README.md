@@ -47,20 +47,27 @@
 
 ---
 
+**❤️ Благодарности**  
+  * **Спасибо [Aimonfae](https://sirus.su/base/character/x3/Aimonfae) [Сила соли](https://sirus.su/base/guilds/x3/1704)**
+  * **Спасибо [Димапотняк](https://sirus.su/base/character/x3/%D0%94%D0%B8%D0%BC%D0%B0%D0%BF%D0%BE%D1%82%D0%BD%D1%8F%D0%BA) [Ленивые коты](https://sirus.su/base/guilds/x3/913)**
+  * **Спасибо [Иллюхер](https://sirus.su/base/character/x3/%D0%98%D0%BB%D1%8E%D1%85%D0%B5%D1%80) [Лилу Даллас](https://sirus.su/base/guilds/x3/3209)**
+  * **Спасибо [Дворфу](https://discordapp.com/users/285113754021134337)**
+  * **Спасибо стримеру [SEGAZBS](https://www.twitch.tv/segazbs) за помощь в разработке некоторых фич**
+  * **Спасибо всем остальным кто отправляет баги и оставляет отзывы**
+
+---
+
 ### 🐛 Обратная связь
 
 Аддон активно развивается. Если вы нашли баг, неточность в координатах или % моба — пишите, буду стараться все исправить!
 
 * **В игре:** ПМ `Coda x3`
 * **Discord:** [Stratocaster](https://discordapp.com/users/123456789012345678)
+* **Discord ключников:** [БОГИ ДИПЛИТА](https://discord.gg/5dtFjRr4W)
 * [Гитхаб](https://github.com/Rodgare/MethodDungeonTools)
+* [Гитлаб](https://gitlab.com/axel19911/MethodDungeonTools)
 
 **🎨 Известные баги**  
 
 3д модельки могут не подгружаться до входа в данж, пока непонятно как это фиксить, так работает на уровне клиента игры
 
-**❤️ Благодарности**  
-  * **Спасибо стримеру [SEGAZBS](https://www.twitch.tv/segazbs) за помощь в разработке некоторых фич**
-  * **Спасибо [Дворфу](https://discordapp.com/users/285113754021134337) за фидбек**
-  * **Спасибо [Иллюхеру](https://discordapp.com/users/281131130487308288) за помощь в сборе инфы**
-  * **Спасибо всем остальным кто отправляет баги и оставляет отзывы**
