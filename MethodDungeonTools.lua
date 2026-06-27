@@ -4520,7 +4520,7 @@ mdtTrackerFrame:SetScript("OnUpdate", function(self, elapsed)
 
 		local count = #matched
 		if count > 0 then
-			local perMob = math.floor((diff / count) * 100) / 100
+			local perMob = math.floor((diff / count) * 100) / 10000
 			for _, mob in ipairs(matched) do
 				table.insert(db.MobDataTally, {
 					name = mob.name,
