@@ -4574,6 +4574,61 @@ mdtTrackerFrame:SetScript("OnUpdate", function(self, elapsed)
 	end
 end)
 
+local function DumpSirusChallengeInfo()
+	if not C_GlobalStorage or not C_GlobalStorage.GetVar then
+		print("|cFFFF0000[MDT Tracker]|r C_GlobalStorage недоступен.")
+		return
+	end
+	local vars = {
+		"ASMSG_CHALLENGE_MODE_INFO",
+		"ASMSG_CHALLENGE_MODE_CREATURE_KILLED",
+		"ASMSG_CHALLENGE_MODE_AFFIX_INFO",
+		"ASMSG_CHALLENGE_MODE_MODIFIERS_OVERRIDE",
+	}
+	print("|cFF00FF00[MDT Tracker]|r === Дамп переменных Сируса ===")
+	local foundAny = false
+	for _, varName in ipairs(vars) do
+		local ok, data = pcall(function()
+			return C_GlobalStorage.GetVar(varName)
+		end)
+		if ok and data then
+			foundAny = true
+			if type(data) == "table" then
+				print("|cFFFFD100[GlobalStorage]|r " .. varName .. ":")
+				for k, v in pairs(data) do
+					print("   -> " .. tostring(k) .. " = " .. tostring(v))
+				end
+			else
+				print("|cFFFFD100[GlobalStorage]|r " .. varName .. " = " .. tostring(data))
+			end
+		end
+	end
+	if not foundAny then
+		print("|cFFFF8800[MDT Tracker]|r Все переменные ключа пустые (nil). Вы вне ключа.")
+	end
+end
+
+mdtTrackerFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
+local oldOnEvent = mdtTrackerFrame:GetScript("OnEvent")
+mdtTrackerFrame:SetScript("OnEvent", function(self, event, ...)
+	if event == "PLAYER_ENTERING_WORLD" then
+		if mdtIsTracking then
+			print("|cFF00FF00[MDT Tracker]|r Вход в мир/зону. Проверка данных ключа...")
+			DumpSirusChallengeInfo()
+		end
+		return
+	end
+	if oldOnEvent then
+		oldOnEvent(self, event, ...)
+	end
+end)
+
+-- Command: /mdtinfo — дамп глобальных переменных ключа Сируса
+SLASH_MDTINFO1 = "/mdtinfo"
+SlashCmdList["MDTINFO"] = function()
+	DumpSirusChallengeInfo()
+end
+
 -- Command: /mdttrack
 SLASH_MDTTRACK1 = "/mdttrack"
 SlashCmdList["MDTTRACK"] = function(msg)
@@ -4590,6 +4645,7 @@ SlashCmdList["MDTTRACK"] = function(msg)
 		print(
 			"|cFF00FF00[MDT Tracker]|r Убивай мобов — результаты появятся в чате и сохранятся в SavedVariables."
 		)
+		DumpSirusChallengeInfo()
 	else
 		mdtRecentlyDead = {}
 		local savedCount = db.MobDataTally and #db.MobDataTally or 0
