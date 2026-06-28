@@ -4527,28 +4527,36 @@ mdtTrackerFrame:SetScript("OnUpdate", function(self, elapsed)
 
 		local count = #matched
 		if count > 0 then
+			local totalCountData = MethodDungeonTools.dungeonTotalCount[db.currentDungeonIdx] or { normal = 900, teeming = 900 }
+			local currentMaxForces = totalCountData.normal or 900
 			local perMob = math.floor((diff / count) * 100) / 10000
+			local perMobPoints = math.floor((perMob / 100) * currentMaxForces + 0.5)
 			for _, mob in ipairs(matched) do
 				table.insert(db.MobDataTally, {
 					name = mob.name,
 					id = mob.id,
 					percent = perMob,
+					points = perMobPoints,
 					totalPercent = p,
 					date = date("%Y-%m-%d %H:%M:%S"),
 					status = "OK",
 				})
-				print(string.format("|cFF00FF00[MDT]|r %s (%d) => |cFFFFFFFF%.2f%%|r", mob.name, mob.id, perMob))
+				print(string.format("|cFF00FF00[MDT]|r %s (%d) => |cFFFFFFFF%.4f%%|r |cFF00FFFF(Очки: %d/%d)|r", mob.name, mob.id, perMob, perMobPoints, currentMaxForces))
 			end
 		else
 			-- Forces changed but nobody died in our list - record as unknown
+			local totalCountData = MethodDungeonTools.dungeonTotalCount[db.currentDungeonIdx] or { normal = 900, teeming = 900 }
+			local currentMaxForces = totalCountData.normal or 900
+			local diffPoints = math.floor((diff / 100) * currentMaxForces + 0.5)
 			table.insert(db.MobDataTally, {
 				name = "Unknown Target",
 				id = 0,
 				percent = diff,
+				points = diffPoints,
 				totalPercent = p,
 				date = date("%Y-%m-%d %H:%M:%S"),
 			})
-			print(string.format("|cFFFF8800[MDT]|r Неизв. цель => %.2f%%", diff))
+			print(string.format("|cFFFF8800[MDT]|r Неизв. цель => %.4f%% |cFF00FFFF(Очки: %d/%d)|r", diff, diffPoints, currentMaxForces))
 		end
 	end
 
