@@ -1049,6 +1049,7 @@ end
 ---Sets the value/progress/color of the count progressbar to the apropriate data
 function MethodDungeonTools:Progressbar_SetValue(self, pullCurrent, totalCurrent, totalMax)
 	local percent = (totalCurrent / totalMax) * 100
+	local pullPercent = (pullCurrent / totalMax) * 100
 	if percent >= 102 then
 		if totalCurrent - totalMax > 8 then
 			self.Bar:SetStatusBarColor(1, 0, 0, 1)
@@ -1061,7 +1062,7 @@ function MethodDungeonTools:Progressbar_SetValue(self, pullCurrent, totalCurrent
 		self.Bar:SetStatusBarColor(0.26, 0.42, 1)
 	end
 	self.Bar:SetValue(percent)
-	self.Bar.Label:SetText(string.format("%.2f%% (%.2f%%/%.0f%%)", pullCurrent, totalCurrent, totalMax))
+	self.Bar.Label:SetText(string.format("%.2f%% (%.0f/%.0f)", pullPercent, totalCurrent, totalMax))
 	self.AnimValue = percent
 end
 
@@ -1102,22 +1103,27 @@ function MethodDungeonTools:UpdateEnemiesSelected()
 		end
 	end
 
+	local totalCountData = MethodDungeonTools.dungeonTotalCount[db.currentDungeonIdx] or { teeming = 100, normal = 100 }
+	local totalMax = teeming == true and totalCountData.teeming or totalCountData.normal
+
 	local sidePanelStringText = ""
 	local newLineString = ""
 	local currentTotalCount = 0
 	for enemyName, v in pairs(dungeonEnemiesSelected) do
+		local mobPercent = (v.count / totalMax) * 100
 		sidePanelStringText = sidePanelStringText
 			.. newLineString
 			.. v.quantity
 			.. "x "
 			.. enemyName
 			.. " ("
-			.. string.format("%.2f", v.count * v.quantity)
+			.. string.format("%.2f", mobPercent * v.quantity)
 			.. "%)"
 		newLineString = "\n"
 		currentTotalCount = currentTotalCount + (v.count * v.quantity)
 	end
-	sidePanelStringText = sidePanelStringText .. newLineString .. newLineString .. "Прогресс: " .. string.format("%.2f%%", currentTotalCount)
+	local currentTotalPercent = (currentTotalCount / totalMax) * 100
+	sidePanelStringText = sidePanelStringText .. newLineString .. newLineString .. "Прогресс: " .. string.format("%.2f%%", currentTotalPercent)
 	self.main_frame.sidePanelString:SetText(sidePanelStringText)
 
 	local grandTotal = 0
@@ -1459,11 +1465,13 @@ function MethodDungeonTools:UpdatePullTooltip(tooltip)
 			local totalForcesMax = MethodDungeonTools:IsCurrentPresetTeeming()
 					and MethodDungeonTools.dungeonTotalCount[db.currentDungeonIdx].teeming
 				or MethodDungeonTools.dungeonTotalCount[db.currentDungeonIdx].normal
+			local pullPct = (pullForces / totalForcesMax) * 100
+			local totalPct = (totalForces / totalForcesMax) * 100
 			text = string.format(
 				MethodDungeonTools.pullTooltip.botString.defaultText,
-				pullForces,
-				totalForces,
-				totalForcesMax
+				pullPct,
+				totalPct,
+				100
 			)
 			tooltip.botString:SetText(text)
 			tooltip.botString:Show()
@@ -2097,7 +2105,7 @@ function MethodDungeonTools:MakeMapTexture(frame)
 						.. MethodDungeonTools:FormatEnemyHealth(health)
 						.. " HP\n"
 						.. "Получаемые %: "
-						.. string.format("%.2f%%", data.count)
+						.. string.format("%.2f%%", ((data.count or 0) / (MethodDungeonTools:IsCurrentPresetTeeming() and MethodDungeonTools.dungeonTotalCount[db.currentDungeonIdx].teeming or MethodDungeonTools.dungeonTotalCount[db.currentDungeonIdx].normal)) * 100)
 				)
 				tooltip.String:Show()
 				tooltip:Show()
