@@ -6,7 +6,7 @@
 ## OptionalDeps: LibStub, LibUIDropDownMenu
 ## SavedVariables: MethodDungeonToolsDB
 ## X-Sirus-Update: https://github.com/rodgare/MethodDungeonTools/tree/main
-## X-Sirus-Category: 21
+## X-Sirus-Category: 11
 ## OptionalDeps: Ace3
 
 #@no-lib-strip@
