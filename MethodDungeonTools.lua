@@ -1062,7 +1062,7 @@ function MethodDungeonTools:Progressbar_SetValue(self, pullCurrent, totalCurrent
 		self.Bar:SetStatusBarColor(0.26, 0.42, 1)
 	end
 	self.Bar:SetValue(percent)
-	self.Bar.Label:SetText(string.format("%.2f%% (%.0f/%.0f)", pullPercent, totalCurrent, totalMax))
+	self.Bar.Label:SetText(string.format("%.2f%% (%.2f/%.2f)", pullPercent, totalCurrent, totalMax))
 	self.AnimValue = percent
 end
 

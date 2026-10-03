@@ -15,3 +15,5 @@ clean_icons.py
 .gitignore
 /tmp/
 .vscode/settings.json
+MythicDungeonToolsRetail
+.gitignore

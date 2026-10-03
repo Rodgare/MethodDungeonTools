@@ -2,7 +2,7 @@ local dungeonIndex = 1
 local nerfMultiplier = 1
 local pi = math.pi
 
-MethodDungeonTools.dungeonTotalCount[dungeonIndex] = { normal = 900, teeming = 900, teemingEnabled = false }
+MethodDungeonTools.dungeonTotalCount[dungeonIndex] = { normal = 90, teeming = 90, teemingEnabled = false }
 
 MethodDungeonTools.dungeonBosses[dungeonIndex] = {
 	[2] = { -- 1-й ярус
@@ -53,7 +53,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 		["health"] = 554400,
 		["level"] = 80,
 		["creatureType"] = "Гуманоид",
-		["count"] = 23,
+		["count"] = 2.299999952316284,
 		["scale"] = 1,
 		["color"] = { r = 1, g = 1, b = 1, a = 0.8 },
 		["clones"] = {
@@ -87,7 +87,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 		["health"] = 693000,
 		["level"] = 80,
 		["creatureType"] = "Гуманоид",
-		["count"] = 23,
+		["count"] = 2.299999952316284,
 		["scale"] = 1,
 		["color"] = { r = 1, g = 1, b = 1, a = 0.8 },
 		["clones"] = {
@@ -109,7 +109,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 		["health"] = 693000,
 		["level"] = 80,
 		["creatureType"] = "Гуманоид",
-		["count"] = 20,
+		["count"] = 2,
 		["scale"] = 1,
 		["color"] = { r = 1, g = 1, b = 1, a = 0.8 },
 		["clones"] = {
@@ -130,7 +130,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 		["id"] = 18506,
 		spells = { 32888 },
 		["iconId"] = 32888,
-		["name"] = "Украденная душа",
+		["name"] = "Гневная душа",
 		["health"] = 93555,
 		["level"] = 80,
 		["creatureType"] = "Разное",
@@ -155,7 +155,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 		["health"] = 252000,
 		["level"] = 80,
 		["creatureType"] = "Нежить",
-		["count"] = 12,
+		["count"] = 1.2000000476837158,
 		["scale"] = 1,
 		["color"] = { r = 1, g = 1, b = 1, a = 0.8 },
 		["clones"] = {
@@ -177,7 +177,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 		["health"] = 252000,
 		["level"] = 80,
 		["creatureType"] = "Нежить",
-		["count"] = 12,
+		["count"] = 1.2000000476837158,
 		["scale"] = 1,
 		["color"] = { r = 1, g = 1, b = 1, a = 0.8 },
 		["clones"] = {
@@ -338,7 +338,7 @@ MethodDungeonTools.dungeonEnemies[dungeonIndex] = {
 		["health"] = 554400,
 		["level"] = 80,
 		["creatureType"] = "Гуманоид",
-		["count"] = 23,
+		["count"] = 2.299999952316284,
 		["scale"] = 1,
 		["color"] = { r = 1, g = 1, b = 1, a = 0.8 },
 		["clones"] = {
