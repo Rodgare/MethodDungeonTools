@@ -2007,16 +2007,17 @@ function MethodDungeonTools:MakeMapTexture(frame)
 				end
 			end
 			if mouseOverBoss then
-				local data =
-					MethodDungeonTools.dungeonBosses[db.currentDungeonIdx][db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]].value.currentSublevel][mouseOverBoss]
+				local bossData = MethodDungeonTools.dungeonBosses[db.currentDungeonIdx]
+				local preset =
+					db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]]
+				local data = bossData and preset and preset.value
+						and bossData[preset.value.currentSublevel]
+						and bossData[preset.value.currentSublevel][mouseOverBoss]
 				if data then
 					local fortified = false
 					local boss = true
-					if db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]].value.currentAffix then
-						if
-							db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]].value.currentAffix
-							== "fortified"
-						then
+					if preset.value.currentAffix then
+						if preset.value.currentAffix == "fortified" then
 							fortified = true
 						end
 					end
@@ -2073,15 +2074,12 @@ function MethodDungeonTools:MakeMapTexture(frame)
 				end
 			elseif mouseoverBlip then
 				local data = dungeonEnemyBlips[mouseoverBlip]
+				local preset =
+					db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]]
 				local fortified = false
 				local boss = false
-				if db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]].value.currentAffix then
-					if
-						db.presets[db.currentDungeonIdx][db.currentPreset[db.currentDungeonIdx]].value.currentAffix
-						== "fortified"
-					then
-						fortified = true
-					end
+				if preset.value.currentAffix and preset.value.currentAffix == "fortified" then
+					fortified = true
 				end
 				local tyrannical = not fortified
 				local health = MethodDungeonTools:CalculateEnemyHealth(
